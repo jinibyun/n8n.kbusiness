@@ -1,0 +1,12 @@
+{
+	"servers": {
+		"n8n-mcp": {
+			"type": "http",
+			"url": "https://n8n.kbusiness.ca/mcp-server/http",
+			"headers": {
+				"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTU4MzNjMy0wNjcxLTQ0ZGYtYmUzMS0zZWNiMzUzNjg1YmUiLCJpc3MiOiJuOG4iLCJhdWQiOiJtY3Atc2VydmVyLWFwaSIsImp0aSI6ImQ0NmQyYTRjLWM2MDEtNGQ3Ni1hMzk4LTFjNGY5ZDVjYzY1MyIsImlhdCI6MTc4MTAxODk4M30.0okSd70s_bCTAZ--PwGGoDxevoVV8OXPdIR433zSLs0"
+			}
+		}
+	},
+	"inputs": []
+}
