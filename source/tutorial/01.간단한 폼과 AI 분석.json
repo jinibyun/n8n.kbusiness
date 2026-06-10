@@ -1,0 +1,157 @@
+{
+  "updatedAt": "2026-06-10T19:20:56.474Z",
+  "createdAt": "2026-06-10T19:06:04.811Z",
+  "id": "kgyZL1u2miQhm5BV",
+  "name": "간단한 폼과 AI 분석",
+  "description": "n8n Form Trigger로 고객 문의를 받고 OpenAI Chat Model로 답변을 생성한 뒤 Respond to Webhook으로 즉시 응답을 반환하는 튜토리얼 워크플로입니다.",
+  "active": false,
+  "isArchived": false,
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "고객 문의 접수",
+        "formDescription": "이름, 이메일, 문의 내용을 남겨주시면 AI가 즉시 답변합니다.",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "이름",
+              "fieldName": "name"
+            },
+            {
+              "fieldLabel": "이메일",
+              "fieldType": "email",
+              "fieldName": "email"
+            },
+            {
+              "fieldLabel": "문의 내용",
+              "fieldType": "textarea",
+              "fieldName": "inquiry"
+            },
+            {
+              "fieldLabel": "날짜",
+              "fieldType": "date",
+              "fieldName": "date"
+            },
+            {
+              "fieldLabel": "시간",
+              "fieldName": "time"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6b6bdc73-b5e0-429d-b27a-ed79d8e53bf6",
+      "name": "n8n Form Trigger",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.5,
+      "position": [
+        0,
+        112
+      ],
+      "webhookId": "f9230f1d-8953-4a42-9538-3ef7e10479c1"
+    },
+    {
+      "parameters": {
+        "modelId": {
+          "__rl": true,
+          "value": "gpt-4o-mini",
+          "mode": "list",
+          "cachedResultName": "GPT-4O-MINI"
+        },
+        "responses": {
+          "values": [
+            {
+              "content": "={{ $json.inquiry }}"
+            },
+            {
+              "role": "system",
+              "content": "너는 우리 가게의 친절한 예약 상담원이야"
+            }
+          ]
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.openAi",
+      "typeVersion": 2.3,
+      "position": [
+        224,
+        112
+      ],
+      "id": "8bf1392e-8b4f-47b0-b514-eb683cdb0c14",
+      "name": "Message a model",
+      "credentials": {
+        "openAiApi": {
+          "id": "LpurHLLxN4l8QZpP",
+          "name": "OpenAI account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "**폼** 데이타를 자동으로 AI 로 하여금 분석하게 하기",
+        "height": 256,
+        "width": 416
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        176,
+        64
+      ],
+      "id": "ce305e29-5a23-4357-bbf4-be2a75655632",
+      "name": "Sticky Note"
+    }
+  ],
+  "connections": {
+    "n8n Form Trigger": {
+      "main": [
+        [
+          {
+            "node": "Message a model",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "staticData": null,
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "templateCredsSetupCompleted": true
+  },
+  "nodeGroups": [],
+  "pinData": {},
+  "versionId": "1c389c5f-804a-4703-b6d5-6fed1a1c8dd2",
+  "activeVersionId": null,
+  "versionCounter": 24,
+  "triggerCount": 0,
+  "shared": [
+    {
+      "updatedAt": "2026-06-10T19:06:04.811Z",
+      "createdAt": "2026-06-10T19:06:04.811Z",
+      "role": "workflow:owner",
+      "workflowId": "kgyZL1u2miQhm5BV",
+      "projectId": "2uSiLPUGyNB6hQ5F",
+      "project": {
+        "updatedAt": "2026-06-08T01:33:56.100Z",
+        "createdAt": "2026-06-04T14:43:46.810Z",
+        "id": "2uSiLPUGyNB6hQ5F",
+        "name": "Jini Byun <jinibyunsungmin@gmail.com>",
+        "type": "personal",
+        "icon": null,
+        "description": null,
+        "creatorId": "6a5833c3-0671-44df-be31-3ecb353685be"
+      }
+    }
+  ],
+  "tags": [],
+  "activeVersion": null
+}
