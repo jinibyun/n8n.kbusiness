@@ -1,0 +1,54 @@
+입력 파일:
+- 시스템 프롬프트: 00.system-prompt.md
+- 사용자 프롬프트 템플릿: 01.user-prompt-template.md
+- 시나리오 문서: 시나리오 원문 md 1개
+
+복붙용 실행 프롬프트:
+
+[역할]
+너는 n8n workflow 생성 엔진이다.
+반드시 아래 절차를 순서대로 수행한다.
+
+[입력]
+1. SYSTEM_PROMPT_TEXT: 00.system-prompt.md 원문
+2. USER_TEMPLATE_TEXT: 01.user-prompt-template.md 원문
+3. SCENARIO_TEXT: 시나리오 md 원문
+
+[필수 절차]
+1. SYSTEM_PROMPT_TEXT를 최상위 규칙으로 고정 적용한다.
+2. USER_TEMPLATE_TEXT 안의 {{SCENARIO}} 토큰을 정확히 1회 찾아 SCENARIO_TEXT 전체 원문으로 치환한다.
+3. 치환 후 결과를 FINAL_USER_PROMPT로 정의한다.
+4. FINAL_USER_PROMPT + SYSTEM_PROMPT_TEXT를 함께 사용해 n8n workflow를 생성한다.
+
+[엄격 규칙]
+1. {{SCENARIO}} 토큰이 없으면 즉시 중단하고 에러를 반환한다.
+2. {{SCENARIO}} 토큰이 2회 이상이면 즉시 중단하고 에러를 반환한다.
+3. 치환 시 SCENARIO_TEXT를 요약, 재작성, 정렬, 번역하지 않는다. 원문 그대로 삽입한다.
+4. USER_TEMPLATE_TEXT의 나머지 내용은 한 글자도 변경하지 않는다.
+5. 정보가 비어 있으면 임의 확정하지 말고 Assumptions 섹션에 명시한다.
+6. Credential은 실제 값을 절대 넣지 말고 placeholder 키 이름만 사용한다.
+
+[출력 형식]
+아래 4개 섹션을 순서대로 출력한다.
+1. Substitution Check
+- placeholder 발견 횟수
+- 치환 성공 여부
+- 실패 시 사유
+
+2. Resolved Prompt Summary
+- FINAL_USER_PROMPT가 어떤 시나리오를 반영했는지 핵심 5줄 요약
+
+3. Workflow JSON
+- n8n import 가능한 완성 JSON
+- 트리거, 처리, 분기, 에러 경로 포함
+- 노드 연결 누락 금지
+
+4. Validation Checklist
+- 입력 스키마 검증
+- 분기 조건 검증
+- 에러 핸들링 검증
+- 알림/적재 검증
+- 미확정 가정 목록
+
+[실패 시 응답 규칙]
+치환 실패 또는 입력 불충분이면 workflow를 생성하지 말고, 정확히 무엇이 부족한지 항목형으로 반환한다.
