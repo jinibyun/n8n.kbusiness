@@ -1,0 +1,220 @@
+﻿{
+    "updatedAt":  "2026-06-20T23:35:16.816Z",
+    "createdAt":  "2026-06-10T19:44:14.364Z",
+    "id":  "LpP8F3ivDuRtofJM",
+    "name":  "02.간단한 폼과 AI 분석 2",
+    "description":  "n8n Form Trigger로 고객 문의를 받고 OpenAI Chat Model로 답변을 생성한 뒤 Respond to Webhook으로 즉시 응답을 반환하는 튜토리얼 워크플로입니다.",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "formTitle":  "고객 문의 접수",
+                                         "formDescription":  "이름, 이메일, 문의 내용을 남겨주시면 AI가 즉시 답변합니다.",
+                                         "formFields":  {
+                                                            "values":  [
+                                                                           {
+                                                                               "fieldLabel":  "이름",
+                                                                               "fieldName":  "name"
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "이메일",
+                                                                               "fieldType":  "email",
+                                                                               "fieldName":  "email"
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "문의 내용",
+                                                                               "fieldType":  "textarea",
+                                                                               "fieldName":  "inquiry"
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "날짜",
+                                                                               "fieldType":  "date",
+                                                                               "fieldName":  "date"
+                                                                           },
+                                                                           {
+                                                                               "fieldLabel":  "시간",
+                                                                               "fieldName":  "time"
+                                                                           }
+                                                                       ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "6c053871-795f-44c9-b6fd-18d589be1ea5",
+                      "name":  "n8n Form Trigger",
+                      "type":  "n8n-nodes-base.formTrigger",
+                      "typeVersion":  2.5,
+                      "position":  [
+                                       -160,
+                                       112
+                                   ],
+                      "webhookId":  "419a546e-d70a-4dad-bc70-33d5980e3b0e"
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "value":  "gpt-4o-mini",
+                                                         "mode":  "list",
+                                                         "cachedResultName":  "GPT-4O-MINI"
+                                                     },
+                                         "responses":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "content":  "={{ $(\u0027n8n Form Trigger\u0027).item.json.inquiry }}"
+                                                                          },
+                                                                          {
+                                                                              "role":  "system",
+                                                                              "content":  "={{ $json[\u0027System Prompt\u0027] }}"
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.openAi",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       224,
+                                       112
+                                   ],
+                      "id":  "47c844ec-5912-4b67-ab43-c8e71c472c32",
+                      "name":  "Message a model",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**폼** 데이타를 자동으로 AI 로 하여금 분석하게 하기\nSystem Prompt 를 File 로 지정할 수 있도록 하기\n",
+                                         "height":  256,
+                                         "width":  576
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -16,
+                                       48
+                                   ],
+                      "id":  "6f057682-c17b-4be4-9903-d52e5472be89",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "1TdEugjkzz7OWfMzSBT4E-dCa-VmmbYR8mNknYi4WkME",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "system_prompt",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1TdEugjkzz7OWfMzSBT4E-dCa-VmmbYR8mNknYi4WkME/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  "gid=0",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Sheet1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1TdEugjkzz7OWfMzSBT4E-dCa-VmmbYR8mNknYi4WkME/edit#gid=0"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       32,
+                                       112
+                                   ],
+                      "id":  "d3572da3-672e-4f02-9efc-0fa505cb93ef",
+                      "name":  "Get row(s) in sheet",
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "n8n Form Trigger":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Get row(s) in sheet",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Get row(s) in sheet":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Message a model",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  false,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp",
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "35938a69-057a-42af-8643-8b380e02e833",
+    "activeVersionId":  null,
+    "versionCounter":  31,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-06-10T19:44:14.364Z",
+                       "createdAt":  "2026-06-10T19:44:14.364Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "LpP8F3ivDuRtofJM",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,850 @@
+﻿{
+    "updatedAt":  "2026-06-20T23:38:19.403Z",
+    "createdAt":  "2026-06-20T02:16:55.972Z",
+    "id":  "SOMBX0WJssfqU0j1",
+    "name":  "10.스마트 리뷰 자동화 워크플로우",
+    "description":  "Detects new Google reviews, routes by 5-star/1-star, posts responses, sends coupon or urgent alerts.",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  2
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $json.body.starRating }}",
+                                                                                                                    "rightValue":  5,
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "number",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 },
+                                                                                                                    "id":  "b3188269-151f-4ba1-8782-6d5af8a0735f"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  2
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $json.body.starRating }}",
+                                                                                                                    "rightValue":  1,
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "number",
+                                                                                                                                     "operation":  "equals"
+                                                                                                                                 },
+                                                                                                                    "id":  "602778f3-0e6c-4060-b62e-f6d83e32724d"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "looseTypeValidation":  true,
+                                         "options":  {
+                                                         "fallbackOutput":  "extra"
+                                                     }
+                                     },
+                      "id":  "0ad0da58-c4a2-43f9-b5fb-d5e6805489f9",
+                      "name":  "Switch Rating Route",
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.2,
+                      "position":  [
+                                       208,
+                                       400
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ $json.email ?? $json[\u0027이메일\u0027] ?? \u0027\u0027 }}",
+                                                                                   "rightValue":  "",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notEmpty"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "40d490f2-608c-41cd-9e48-a8d7800270e1",
+                      "name":  "IF Email Exists",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1168,
+                                       384
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "alert-title",
+                                                                                     "name":  "alertTitle",
+                                                                                     "value":  "🚨 [긴급] 구글 맵스 1점 리뷰 발생",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "alert-text",
+                                                                                     "name":  "alertText",
+                                                                                     "value":  "=[긴급] 1점 리뷰 수신! 고객명: {{ $json.body.reviewerName }} | 내용: {{ $json.body.reviewComment }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "345fb30d-3817-4f07-afeb-6bc3f615ee41",
+                      "name":  "Build 1Star Alert",
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       480,
+                                       640
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "value":  "gpt-4o-mini",
+                                                         "mode":  "list",
+                                                         "cachedResultName":  "GPT-4O-MINI"
+                                                     },
+                                         "responses":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "content":  "=고객 이름: {{ $(\u0027Webhook\u0027).item.json.body.reviewerName }}\n리뷰 내용: {{ $(\u0027Webhook\u0027).item.json.body.reviewComment }}"
+                                                                          },
+                                                                          {
+                                                                              "role":  "system",
+                                                                              "content":  "너는 매장 점주다. 고객의 5점 리뷰에 공감하며 감사 인사를 전하고, 다음 방문 시 사용 가능한 커피 쿠폰을 제공한다는 내용을 3문장 이내로 작성하라."
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.openAi",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       480,
+                                       384
+                                   ],
+                      "id":  "ed472e67-3cea-44d5-b1f1-76242e557f4e",
+                      "name":  "Message a model",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "review-receive",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+                                                         "allowedOrigins":  "*"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -80,
+                                       400
+                                   ],
+                      "id":  "51c4f74a-240d-4bc1-bd9b-0454dab0dc80",
+                      "name":  "Webhook",
+                      "webhookId":  "bf4c3e3e-ece7-4e48-9f23-d6441650848c"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**https://v0-k-medispa.vercel.app/google-review** \n\n\n\n\n\n\n\n구글 리뷰가 가능하도록 한다면 별도로 google 비지니스 등록이 되어 있어야 한다. 여기서는 외부 웹으로 테스트 했음",
+                                         "height":  320,
+                                         "width":  320
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -176,
+                                       304
+                                   ],
+                      "id":  "6cad148c-2e69-4bec-a770-bde3e2e934c6",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={\n  \"status\": \"success\",\n  \"ai_reply\": \"{{ $(\u0027Message a model\u0027).item.json.output[0].content[0].text }}\"\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1456,
+                                       368
+                                   ],
+                      "id":  "ccb517e0-8b0c-4df1-8e46-6663861fa557",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\n  \"status\": \"success\",\n  \"ai_reply\": \"소중한 의견 감사합니다. 점주에게 긴급 알림이 전송되어 즉시 확인하겠습니다.\"\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       720,
+                                       640
+                                   ],
+                      "id":  "ab3e3065-dd90-4f3f-8c84-7bc419f61d3f",
+                      "name":  "Respond to Webhook1"
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "고객관리2 (Responses)",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  1275732917,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Form Responses 1",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=1275732917"
+                                                       },
+                                         "filtersUI":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "lookupColumn":  "고객이름",
+                                                                              "lookupValue":  "={{ $(\u0027Webhook\u0027).item.json.body.reviewerName }}"
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "options":  {
+                                                         "returnFirstMatch":  true
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       896,
+                                       384
+                                   ],
+                      "id":  "0b927a4d-9bf5-4f13-aa9f-039707d77773",
+                      "name":  "Get row(s) in sheet1",
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**기존의 고객** 인지 조회 (Email 조회한 적이 있었는지)",
+                                         "height":  192
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       832,
+                                       320
+                                   ],
+                      "id":  "0b00d108-8105-4b35-af46-18190fdb9f75",
+                      "name":  "Sticky Note3"
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $(\u0027Get row(s) in sheet1\u0027).item.json[\u0027이메일\u0027] }}",
+                                         "subject":  "소중한 5점 리뷰 감사 무료 커피 쿠폰",
+                                         "message":  "=\u003c!DOCTYPE html\u003e\n\u003chtml\u003e\n\u003chead\u003e\n    \u003cmeta charset=\"UTF-8\"\u003e\n    \u003cstyle\u003e\n        body { font-family: \u0027Arial\u0027, sans-serif; line-height: 1.6; color: #202124; }\n        .container { max-width: 500px; margin: 0 auto; padding: 20px; border: 1px solid #dadce0; border-radius: 8px; }\n        .header { font-size: 18px; font-weight: bold; color: #1a73e8; margin-bottom: 15px; }\n        .coupon-box { border: 2px dashed #1a73e8; padding: 20px; background-color: #f8f9fa; text-align: center; margin: 20px 0; border-radius: 6px; }\n        .coupon-title { font-size: 14px; color: #5f6368; margin: 0 0 10px 0; }\n        .coupon-code { font-size: 24px; font-weight: bold; color: #d93025; letter-spacing: 2px; }\n        .footer { font-size: 13px; color: #5f6368; margin-top: 20px; border-top: 1px solid #e0e0e0; padding-top: 15px; }\n    \u003c/style\u003e\n\u003c/head\u003e\n\u003cbody\u003e\n    \u003cdiv class=\"container\"\u003e\n        \u003cdiv class=\"header\"\u003e무료 쿠폰 발급\u003c/div\u003e\n        \n        \u003cp\u003e\u003cstrong\u003e{{ $json[\u0027고객이름\u0027] }}\u003c/strong\u003e 고객님, 안녕하세요.\u003c/p\u003e\n        \u003cp\u003e매장 이용 후 소중한 \u003cstrong\u003e5점 리뷰\u003c/strong\u003e를 남겨주셔서 진심으로 감사드립니다.\u003c/p\u003e\n        \u003cp\u003e감사의 마음을 담아 다음 방문 시 즉시 사용 가능한 \u003cstrong\u003e무료 커피 쿠폰\u003c/strong\u003e을 보내드립니다.\u003c/p\u003e\n        \n        \u003cdiv class=\"coupon-box\"\u003e\n            \u003cdiv class=\"coupon-title\"\u003e무료 쿠폰 교환 번호\u003c/div\u003e\n            \u003cdiv class=\"coupon-code\"\u003e{{$json.couponCode}}\u003c/div\u003e\n        \u003c/div\u003e\n        \n        \u003cp\u003e매장 결제 시 카운터 직원에게 본 이메일 화면과 쿠폰 번호를 제시해 주시기 바랍니다.\u003c/p\u003e\n        \n        \u003cdiv class=\"footer\"\u003e\n            \u003cp\u003e본 쿠폰은 1회 사용 가능하며, 타 혜택과 중복 적용되지 않습니다.\u003c/p\u003e\n            \u003cp\u003e© The Fry. All rights reserved.\u003c/p\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n\u003c/body\u003e\n\u003c/html\u003e",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1952,
+                                       272
+                                   ],
+                      "id":  "fa1702df-1f60-4e9a-939e-8529abf1c2ed",
+                      "name":  "Send a message1",
+                      "webhookId":  "1991b4a8-21c9-463d-b6ee-ad17ba0378e6",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**쿠폰 발송**",
+                                         "height":  208,
+                                         "width":  224
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1888,
+                                       224
+                                   ],
+                      "id":  "e519e405-f72b-47fc-9690-96fc88e72d7c",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "f542ea84-c6b6-4588-bc9f-c3ddcec47732",
+                                                                                     "name":  "couponCode",
+                                                                                     "value":  "={{ Math.random().toString(36).substring(2, 8).toUpperCase() }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       1712,
+                                       288
+                                   ],
+                      "id":  "6a1748ea-c337-41bc-b4ae-a94b6e758b1b",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**쿠폰 번호** 발행\n",
+                                         "height":  224,
+                                         "width":  176
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1680,
+                                       224
+                                   ],
+                      "id":  "7852781f-6c67-45db-ac9f-d20211515edb",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "append",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "고객관리2 (Responses)",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  1739623283,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Google_Reviews",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=1739623283"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "고객이름":  "={{ $(\u0027Webhook\u0027).item.json.body.reviewerName }}",
+                                                                       "Google쿠폰번호":  "={{ $(\u0027Edit Fields\u0027).item.json.couponCode }}",
+                                                                       "Google쿠폰발행일":  "={{ $now }}"
+                                                                   },
+                                                         "matchingColumns":  [
+
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "고객이름",
+                                                                            "displayName":  "고객이름",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "Google쿠폰번호",
+                                                                            "displayName":  "Google쿠폰번호",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "Google쿠폰발행일",
+                                                                            "displayName":  "Google쿠폰발행일",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       2080,
+                                       624
+                                   ],
+                      "id":  "6f32771a-1cc6-4c24-b241-aca623ae5458",
+                      "name":  "Append row in sheet",
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**쿠폰** 추가",
+                                         "width":  288
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       2032,
+                                       592
+                                   ],
+                      "id":  "bcd666e3-1cb3-4afc-bed9-e7385cba9336",
+                      "name":  "Sticky Note4"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**고객 이름** 중심으로 email 조회",
+                                         "height":  192,
+                                         "width":  256
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1104,
+                                       320
+                                   ],
+                      "id":  "81636589-5d81-471a-b9f4-320aa812dce4",
+                      "name":  "Sticky Note5"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**0: 사용자가 별 5개 리뷰\n1: 사용자가 별 1개 리뷰\nFallback : 2,3,4**",
+                                         "height":  320
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       160,
+                                       304
+                                   ],
+                      "id":  "e0f0f0cd-4a91-4aac-ba18-09f0d833480e",
+                      "name":  "Sticky Note6"
+                  },
+                  {
+                      "parameters":  {
+                                         "select":  "channel",
+                                         "channelId":  {
+                                                           "__rl":  true,
+                                                           "value":  "#긴급-1점리뷰",
+                                                           "mode":  "name"
+                                                       },
+                                         "text":  "=*고객명*: {{ $(\u0027Webhook\u0027).item.json.body.reviewerName }}\n*리뷰 내용*: {{ $(\u0027Webhook\u0027).item.json.body.reviewComment }}\n\n*조치 안내*: \n- 고객과 연락하여 즉시 문제점을 파악해 주세요.\n- 향후 고객 대응 방안을 논의합니다.",
+                                         "otherOptions":  {
+
+                                                          }
+                                     },
+                      "type":  "n8n-nodes-base.slack",
+                      "typeVersion":  2.5,
+                      "position":  [
+                                       1072,
+                                       640
+                                   ],
+                      "id":  "bc87e3c7-16e7-4d60-a83e-30738e8ce425",
+                      "name":  "Send a message",
+                      "webhookId":  "261d39fb-e43a-479e-80ac-f58e9aafc199",
+                      "credentials":  {
+                                          "slackApi":  {
+                                                           "id":  "n0q1pi3bapaa4Lkf",
+                                                           "name":  "Slack account"
+                                                       }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "슬랙으로 보고",
+                                         "height":  240,
+                                         "width":  320
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       976,
+                                       576
+                                   ],
+                      "id":  "1f78915f-5af1-41d7-9b19-afeb2c96531d",
+                      "name":  "Sticky Note7"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\n  \"status\": \"success\",\n  \"ai_reply\": \"고객 정보를 찾을 수 없어 쿠폰 발송이 어렵습니다. 매장 방문 시 직원에게 문의해 주세요.\"\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1456,
+                                       624
+                                   ],
+                      "id":  "60b38e6d-e4a0-44ba-8f0f-2bcd905f377e",
+                      "name":  "Respond to Webhook2"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Email 존재 하지 않음**",
+                                         "height":  240,
+                                         "width":  272
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1392,
+                                       576
+                                   ],
+                      "id":  "53bfdd2d-f3c9-4174-b1a9-c3bc483db285",
+                      "name":  "Sticky Note8"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Email 존재함**\n",
+                                         "height":  192
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1392,
+                                       320
+                                   ],
+                      "id":  "1fbb60ba-b177-4f6b-9643-9ab083bfa8c3",
+                      "name":  "Sticky Note9"
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "value":  "gpt-4o-mini",
+                                                         "mode":  "list",
+                                                         "cachedResultName":  "GPT-4O-MINI"
+                                                     },
+                                         "responses":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "content":  "=아래 고객 리뷰 데이터를 바탕으로 답글 텍스트만 출력하라.\n\n- 고객 이름: {{ $(\u0027Webhook\u0027).item.json.body.reviewerName }}\n- 평점: {{ $(\u0027Webhook\u0027).item.json.body.starRating }}\n- 리뷰 내용: {{ $(\u0027Webhook\u0027).item.json.body.reviewComment }}"
+                                                                          },
+                                                                          {
+                                                                              "role":  "system",
+                                                                              "content":  "당신은 매장의 고객 리뷰를 관리하는 전문 고객 응대 담당자다.\n고객이 2점~4점의 중간 평점을 남겼을 때 아래 원칙에 따라 정중한 답글을 작성한다.\n\n- 핵심 목표: 감사 인사 및 다음 방문 시 5점을 받기 위한 구체적인 개선점 문의\n- 금지 사항: 할인, 쿠폰 등 금전적/물질적 보상 언급 금지\n- 작성 가이드: \n  1. 소중한 시간을 내어 리뷰를 작성해 준 것에 대한 감사 인사\n  2. 평점 및 리뷰 내용에 대한 공감과 수용\n  3. 다음 방문 시 5점 만족을 드리기 위해 어떤 점을 개선하면 좋을지 정중히 질문\n  4. 3~4문장 내외의 간결하고 친절한 톤 유지"
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.openAi",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       464,
+                                       864
+                                   ],
+                      "id":  "a6342387-f05a-4937-8c6b-6b3563a378ce",
+                      "name":  "Message a model2",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={\n  \"status\": \"success\",\n  \"ai_reply\": \"{{ $(\u0027Message a model2\u0027).item.json.output[0].content[0].text }}\"\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       784,
+                                       864
+                                   ],
+                      "id":  "dc4d935f-98cf-42bb-80ee-1c8dac327172",
+                      "name":  "Respond to Webhook3"
+                  }
+              ],
+    "connections":  {
+                        "Switch Rating Route":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Message a model",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "node":  "Build 1Star Alert",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ],
+                                                                 [
+                                                                     {
+                                                                         "node":  "Message a model2",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "IF Email Exists":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Respond to Webhook",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ],
+                                                             [
+                                                                 {
+                                                                     "node":  "Respond to Webhook2",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Build 1Star Alert":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Respond to Webhook1",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "Switch Rating Route",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "Message a model":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Get row(s) in sheet1",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Respond to Webhook":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Edit Fields",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Get row(s) in sheet1":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "IF Email Exists",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "Send a message1":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Append row in sheet",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Send a message1",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Respond to Webhook1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Send a message",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Message a model2":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Respond to Webhook3",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp",
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "7452944f-4a54-4eea-b007-8633ff1ee259",
+    "activeVersionId":  null,
+    "versionCounter":  359,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-06-20T02:16:55.972Z",
+                       "createdAt":  "2026-06-20T02:16:55.972Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "SOMBX0WJssfqU0j1",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}
