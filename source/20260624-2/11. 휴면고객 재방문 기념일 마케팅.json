@@ -1,0 +1,980 @@
+﻿{
+    "updatedAt":  "2026-06-24T04:13:33.406Z",
+    "createdAt":  "2026-06-23T21:17:25.230Z",
+    "id":  "1IyZDzYpFhD2Fz6C",
+    "name":  "11. 휴면고객 재방문 기념일 마케팅",
+    "description":  "매일 09:00 ET 실행 — 마지막 방문 180일 경과 고객 대상 AI 맞춤 메시지 발송 (Gmail 우선, SMS 대체). CASL 수신동의 필터링, Sheets 결과 업데이트.",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "triggerAtHour":  9
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "6e4c9288-79b0-4a03-9468-2e949e876e45",
+                      "name":  "매일 09:00 ET 실행",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       0,
+                                       384
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "고객관리2 (Responses)",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  817965931,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Hair-Customers",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=817965931"
+                                                       },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "a13334d3-5f5c-4192-92bd-e0bee876593c",
+                      "name":  "고객 데이터 읽기",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       224,
+                                       384
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "\nconst today = new Date();\nconst results = [];\n\nfor (const item of $input.all()) {\n  const d = item.json;\n  const consent = String(d[\u0027수신동의여부\u0027] || \u0027\u0027).trim().toUpperCase();\n  const alreadySent = String(d[\u0027재방문유도발송여부\u0027] || \u0027\u0027).trim();\n  const lastVisit = String(d[\u0027마지막방문일\u0027] || \u0027\u0027).trim();\n  const email = String(d[\u0027이메일\u0027] || \u0027\u0027).trim();\n  const phone = String(d[\u0027전화번호\u0027] || \u0027\u0027).trim();\n\n  if (consent !== \u0027Y\u0027) continue;\n  if (alreadySent !== \u0027\u0027) continue;\n  if (!email \u0026\u0026 !phone) continue;\n  if (!lastVisit) continue;\n\n  const visitDate = new Date(lastVisit);\n  const diffMs = today.getTime() - visitDate.getTime();\n  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));\n\n  if (diffDays \u003c 179 || diffDays \u003e 181) continue;\n\n  results.push({ json: { ...d, diffDays } });\n}\n\nreturn results;\n"
+                                     },
+                      "id":  "1bf44700-a6af-4ee9-9667-e895256b62d3",
+                      "name":  "오늘 대상 고객 필터",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       448,
+                                       384
+                                   ],
+                      "alwaysOutputData":  false
+                  },
+                  {
+                      "parameters":  {
+                                         "modelId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "id",
+                                                         "value":  "gpt-4o-mini"
+                                                     },
+                                         "responses":  {
+                                                           "values":  [
+                                                                          {
+                                                                              "role":  "system",
+                                                                              "content":  "당신은 캐나다 토론토 헤어살롱의 친근한 마케팅 어시스턴트입니다. 약 6개월간 방문하지 않은 휴면 고객에게 따뜻하고 개인화된 재방문 메시지를 작성하세요. 고객 이름에 한국어 글자가 포함되거나 한국 이름(예: 김, 박, 이, 최, 정 등)이면 한국어로 작성하고, 그 외에는 영어로 작성하세요. 항상 20% 할인 쿠폰 코드 REVISIT20을 포함하세요. 2~3개의 짧은 단락으로 작성하고, 제목 없이 본문만 반환하세요."
+                                                                          },
+                                                                          {
+                                                                              "content":  "=고객 이름: {{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027고객이름\u0027] }}\n마지막 방문: {{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027마지막방문일\u0027] }}일 전\n주요 서비스: {{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027주요이용서비스\u0027] }}\n방문 횟수: {{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027방문횟수\u0027] }}"
+                                                                          }
+                                                                      ]
+                                                       },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+                                                         "maxTokens":  400,
+                                                         "temperature":  0.7
+                                                     }
+                                     },
+                      "id":  "4f25ca43-5e7a-4dbe-90ef-a0bc5eddc1fe",
+                      "name":  "AI 메시지 생성",
+                      "type":  "@n8n/n8n-nodes-langchain.openAi",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       992,
+                                       32
+                                   ],
+                      "alwaysOutputData":  false,
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ $(\u0027오늘 대상 고객 필터\u0027).item.json[\u0027이메일\u0027] }}",
+                                         "subject":  "={{ $(\u0027오늘 대상 고객 필터\u0027).item.json[\u0027고객이름\u0027] }}님, 오랜만이에요 - 특별 혜택 안내 (REVISIT20)",
+                                         "message":  "=\u003cdiv style=\"font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;line-height:1.6\"\u003e{{ $(\u0027AI 메시지 생성\u0027).item.json.output[0].content[0].text }}\u003c/div\u003e",
+                                         "options":  {
+                                                         "appendAttribution":  false,
+                                                         "senderName":  "Your Hair Salon Toronto"
+                                                     }
+                                     },
+                      "id":  "ed565c25-01ed-4578-ba03-0f4b8f584025",
+                      "name":  "Gmail 발송",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1408,
+                                       0
+                                   ],
+                      "webhookId":  "c19b8c8a-2741-45ee-8620-16c4e2d46dd6",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  3
+                                     },
+                      "id":  "f8297f78-98b4-4a4c-a84f-10756f5bb2bf",
+                      "name":  "3초 대기 (이메일)",
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1568,
+                                       0
+                                   ],
+                      "webhookId":  "e0deb95e-da1e-44c5-b9ed-5810d1aca460"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "고객관리2 (Responses)",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  817965931,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Hair-Customers",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=817965931"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "발송일시":  "={{ $now.toISO() }}",
+                                                                       "재방문유도발송여부":  "Y",
+                                                                       "Timestamp":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json.Timestamp }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "Timestamp"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "Timestamp",
+                                                                            "displayName":  "Timestamp",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "고객이름",
+                                                                            "displayName":  "고객이름",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "전화번호",
+                                                                            "displayName":  "전화번호",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "이메일",
+                                                                            "displayName":  "이메일",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "마지막방문일",
+                                                                            "displayName":  "마지막방문일",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "방문횟수",
+                                                                            "displayName":  "방문횟수",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "주요이용서비스",
+                                                                            "displayName":  "주요이용서비스",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "수신동의여부",
+                                                                            "displayName":  "수신동의여부",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "재방문유도발송여부",
+                                                                            "displayName":  "재방문유도발송여부",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "발송일시",
+                                                                            "displayName":  "발송일시",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "e4b02c33-f695-4d2e-9341-e209939f42e6",
+                      "name":  "Sheets 업데이트 (이메일)",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       1792,
+                                       0
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "30414381-8680-4c63-aeb5-2720fee197f2",
+                      "name":  "고객 1명씩 처리",
+                      "type":  "n8n-nodes-base.splitInBatches",
+                      "typeVersion":  3,
+                      "position":  [
+                                       688,
+                                       384
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "from":  "18455766455",
+                                         "to":  "={{ $(\u0027오늘 대상 고객 필터\u0027).item.json[\u0027전화번호\u0027] }}",
+                                         "message":  "={{ $json.message }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "c6d78eba-fc38-4846-b619-be6c4eac40dd",
+                      "name":  "Twilio SMS 발송",
+                      "type":  "n8n-nodes-base.twilio",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1568,
+                                       192
+                                   ],
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "0YbWryDBNQl9bJeo",
+                                                            "name":  "Twilio account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "amount":  3
+                                     },
+                      "id":  "a74555b8-691a-4733-a677-3e2ee4a04779",
+                      "name":  "3초 대기 (SMS)",
+                      "type":  "n8n-nodes-base.wait",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1792,
+                                       192
+                                   ],
+                      "webhookId":  "200d84be-07aa-4e9b-bdcd-47ebc1c593d3"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "documentId":  {
+                                                            "__rl":  true,
+                                                            "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
+                                                            "mode":  "list",
+                                                            "cachedResultName":  "고객관리2 (Responses)",
+                                                            "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
+                                                        },
+                                         "sheetName":  {
+                                                           "__rl":  true,
+                                                           "value":  817965931,
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "Hair-Customers",
+                                                           "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=817965931"
+                                                       },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "재방문유도발송여부":  "Y",
+                                                                       "발송일시":  "={{ $now.toISO() }}",
+                                                                       "Timestamp":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json.Timestamp }}"
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "Timestamp"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "Timestamp",
+                                                                            "displayName":  "Timestamp",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "고객이름",
+                                                                            "displayName":  "고객이름",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "전화번호",
+                                                                            "displayName":  "전화번호",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "이메일",
+                                                                            "displayName":  "이메일",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "마지막방문일",
+                                                                            "displayName":  "마지막방문일",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "방문횟수",
+                                                                            "displayName":  "방문횟수",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "주요이용서비스",
+                                                                            "displayName":  "주요이용서비스",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "수신동의여부",
+                                                                            "displayName":  "수신동의여부",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "재방문유도발송여부",
+                                                                            "displayName":  "재방문유도발송여부",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "발송일시",
+                                                                            "displayName":  "발송일시",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  true
+                                                                        },
+                                                                        {
+                                                                            "id":  "row_number",
+                                                                            "displayName":  "row_number",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "readOnly":  true,
+                                                                            "removed":  true
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "8a3496d1-cbb6-4f63-9db5-67c5d28b7f3b",
+                      "name":  "Sheets 업데이트 (SMS)",
+                      "type":  "n8n-nodes-base.googleSheets",
+                      "typeVersion":  4.7,
+                      "position":  [
+                                       1792,
+                                       464
+                                   ],
+                      "credentials":  {
+                                          "googleSheetsOAuth2Api":  {
+                                                                        "id":  "ophipSkUUJ8FOlDd",
+                                                                        "name":  "Google Sheets account"
+                                                                    }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**고객 필터링**\n1. 수신 동의\n2. 이미 보낸 적이 없는 사람\n3. 이메일 혹은 전화 둘 중의 하나는 있어야 함\n4. 정확히 179~181일 사이 (180일 ±1일 허용) 고객만 필터링",
+                                         "height":  464,
+                                         "width":  224
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       384,
+                                       128
+                                   ],
+                      "id":  "0e6df385-b0ae-4de3-8278-7b3cb1dd0fc8",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**CASL** 중요: 캐나다 스팸 방지법(Canada Anti-Spam Legislation) — 수신 동의 고객에게만 발송해야 한다는 조항. 시트에 **수신동의여부** 컬럼 추가",
+                                         "height":  464
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       112,
+                                       128
+                                   ],
+                      "id":  "93ca8c74-c18f-40b1-a8f9-5a13ff046e0c",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027전화번호\u0027] }}",
+                                                                                                                    "rightValue":  "",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "notEmpty",
+                                                                                                                                     "singleValue":  true
+                                                                                                                                 },
+                                                                                                                    "id":  "fa2bb926-72d5-40cf-bdc5-8b61608dbfca"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "bd653a13-5bce-4074-86c5-48cb3dbea7cb",
+                                                                                                                    "leftValue":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027전화번호\u0027] }}",
+                                                                                                                    "rightValue":  "",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "empty",
+                                                                                                                                     "singleValue":  true
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "looseTypeValidation":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       944,
+                                       256
+                                   ],
+                      "id":  "5ac6a926-ee70-4ca5-8eda-8d14c31af7f0",
+                      "name":  "Switch1"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "leftValue":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027이메일\u0027] }}",
+                                                                                                                    "rightValue":  "",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "notEmpty",
+                                                                                                                                     "singleValue":  true
+                                                                                                                                 },
+                                                                                                                    "id":  "fa2bb926-72d5-40cf-bdc5-8b61608dbfca"
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "loose",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "bd653a13-5bce-4074-86c5-48cb3dbea7cb",
+                                                                                                                    "leftValue":  "={{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027이메일\u0027] }}",
+                                                                                                                    "rightValue":  "",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "empty",
+                                                                                                                                     "singleValue":  true
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "looseTypeValidation":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       720,
+                                       48
+                                   ],
+                      "id":  "703a6a1e-96cc-49ee-a8ce-10b97c1a5379",
+                      "name":  "Email 있음?"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "0: Email 있음\n1: Email 없음",
+                                         "height":  224,
+                                         "width":  256
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       640,
+                                       -16
+                                   ],
+                      "id":  "6669a84c-679b-412a-b867-6cfc59329ca6",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "0: 전화번호 있음\n1: 전화번호 없음",
+                                         "height":  192
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       912,
+                                       192
+                                   ],
+                      "id":  "89941185-75fb-4164-872f-003badeb18f7",
+                      "name":  "Sticky Note3"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "SMS 용 메시지는 Email 보다 짧게.(한글 20자 내외)",
+                                         "height":  192,
+                                         "width":  288
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1184,
+                                       192
+                                   ],
+                      "id":  "e3f4a05c-3d23-4b9d-a373-df42620e27b8",
+                      "name":  "Sticky Note4"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "0741f28d-f156-4955-924b-2a56bd1bc1c0",
+                                                                                     "name":  "message",
+                                                                                     "value":  "=\"{{ $(\u0027고객 1명씩 처리\u0027).item.json[\u0027고객이름\u0027] }}\" 님, 헤어살롱입니다. \"PROMO1234\" 보내드립니다.",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "includeOtherFields":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       1264,
+                                       240
+                                   ],
+                      "id":  "171ee357-f121-43be-8103-6d75e5b3e52c",
+                      "name":  "Edit Fields"
+                  }
+              ],
+    "connections":  {
+                        "매일 09:00 ET 실행":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "고객 데이터 읽기",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "고객 데이터 읽기":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "오늘 대상 고객 필터",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "오늘 대상 고객 필터":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "고객 1명씩 처리",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "AI 메시지 생성":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Gmail 발송",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Gmail 발송":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "3초 대기 (이메일)",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "3초 대기 (이메일)":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Sheets 업데이트 (이메일)",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Sheets 업데이트 (이메일)":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "고객 1명씩 처리",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "고객 1명씩 처리":  {
+                                          "main":  [
+                                                       [
+
+                                                       ],
+                                                       [
+                                                           {
+                                                               "node":  "Email 있음?",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Twilio SMS 발송":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "3초 대기 (SMS)",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "3초 대기 (SMS)":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Sheets 업데이트 (SMS)",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Sheets 업데이트 (SMS)":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "고객 1명씩 처리",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Switch1":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "Edit Fields",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "Email 있음?":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "AI 메시지 생성",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ],
+                                                       [
+                                                           {
+                                                               "node":  "Switch1",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Twilio SMS 발송",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp",
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "7891f7ea-4f27-40da-9705-08329c5eaeae",
+    "activeVersionId":  null,
+    "versionCounter":  336,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-06-23T21:17:25.230Z",
+                       "createdAt":  "2026-06-23T21:17:25.230Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "1IyZDzYpFhD2Fz6C",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

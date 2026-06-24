@@ -1,0 +1,367 @@
+﻿{
+    "updatedAt":  "2026-06-24T17:43:18.315Z",
+    "createdAt":  "2026-06-24T14:23:44.591Z",
+    "id":  "CfVAbyDfh9ybVaEr",
+    "name":  "12.에러 알림 워크플로우 (Human-in-the-Loop)",
+    "description":  "워크플로우 오류 발생 시 Gmail 상세 리포트 + Slack 팀 알림 + Twilio SMS 사장님 핸드폰 즉시 발송. Error Trigger 기반 재사용 가능한 별도 알림 워크플로우.",
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+
+                                     },
+                      "id":  "738f3eb2-fc4c-4e43-b41c-576400f2f3ad",
+                      "name":  "워크플로우 오류 감지",
+                      "type":  "n8n-nodes-base.errorTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       0,
+                                       0
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "jinisbyun@gmail.com",
+                                         "subject":  "=🚨 [자동화 오류] {{ $json.workflow.name }} — {{ $now.toFormat(\u0027yyyy-MM-dd HH:mm\u0027) }}",
+                                         "message":  "=\u003cdiv style=\"font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;border:1px solid #e0e0e0;border-radius:8px\"\u003e\n  \u003ch2 style=\"color:#d32f2f\"\u003e🚨 자동화 워크플로우 오류 발생\u003c/h2\u003e\n  \u003cp\u003e안녕하세요, 사장님. 자동화 워크플로우에서 오류가 발생했습니다. 즉시 확인이 필요합니다.\u003c/p\u003e\n  \u003ctable style=\"width:100%;border-collapse:collapse\"\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e📋 워크플로우\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.workflow.name }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e⚠️ 실패 노드\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.execution.lastNodeExecuted }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e❌ 오류 내용\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.error.message }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e🕐 발생 시각\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $now.toISO() }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e🔗 실행 ID\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.execution.id }}\u003c/td\u003e\u003c/tr\u003e\n  \u003c/table\u003e\n  \u003cp style=\"margin-top:20px;color:#666\"\u003en8n 대시보드에서 해당 실행 로그를 확인하고 수동 재처리 또는 고객 개별 연락 바랍니다.\u003c/p\u003e\n\u003c/div\u003e",
+                                         "options":  {
+                                                         "appendAttribution":  false,
+                                                         "senderName":  "n8n 자동화 알림"
+                                                     }
+                                     },
+                      "id":  "11936382-2f35-4479-b1ce-d388fd5d0278",
+                      "name":  "관리자 Gmail 오류 알림",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       224,
+                                       0
+                                   ],
+                      "webhookId":  "45bc6799-6bd4-4aef-bd2f-28413d4f2692",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "select":  "channel",
+                                         "channelId":  {
+                                                           "__rl":  true,
+                                                           "value":  "#워크플로우-오류",
+                                                           "mode":  "name"
+                                                       },
+                                         "text":  "=🚨 *자동화 오류 발생*\n\u003e 워크플로우: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.workflow.name }}\n\u003e 실패 노드: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.lastNodeExecuted }}\n\u003e 오류: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.error.message }}\n\u003e 시각: {{ $now.toISO() }}\n\u003e 실행 ID: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.id }}",
+                                         "otherOptions":  {
+                                                              "includeLinkToWorkflow":  false
+                                                          }
+                                     },
+                      "id":  "fc2a0937-f4d2-4514-ad4c-181fd0c44d9d",
+                      "name":  "Slack 오류 알림",
+                      "type":  "n8n-nodes-base.slack",
+                      "typeVersion":  2.5,
+                      "position":  [
+                                       448,
+                                       0
+                                   ],
+                      "webhookId":  "3813701f-4df5-4b1d-921a-6820c7200df7",
+                      "credentials":  {
+                                          "slackApi":  {
+                                                           "id":  "n0q1pi3bapaa4Lkf",
+                                                           "name":  "Slack account"
+                                                       }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "from":  "18455766455",
+                                         "to":  "14165699480",
+                                         "message":  "=[오류] {{ $(\u0027워크플로우 오류 감지\u0027).item.json.workflow.name }}/ 노드: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.lastNodeExecuted }} / 내용: {{ $json.error ? $json.error.message.substring(0, 50) : \u0027상세정보없음\u0027 }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "473135fd-df65-4977-8ad4-155809642b26",
+                      "name":  "Twilio SMS 사장님 알림",
+                      "type":  "n8n-nodes-base.twilio",
+                      "typeVersion":  1,
+                      "position":  [
+                                       672,
+                                       0
+                                   ],
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "0YbWryDBNQl9bJeo",
+                                                            "name":  "Twilio account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Error Trigger 노드** 가 다른 워크플로우 오류를 감지하는 별도 전용 워크플로우\n**연결 방법**: 모든  워크플로우 → **Settings → Error Workflow** → 이 워크플로우 선택 (예를 들어 앞에서 생성했던 휴면고객_재방문...)\n**조건** 반드시 실제 워크플로와 이 Error 를 핸들링하는 워크플로우 모두 publish 해야 한다. 그래야 다른 노드에서 참조할 수 있게 되고 정상적으로 실행된다. 디버그 모드로 Execute Workflow 로 테스트도 할 수 있다.  \n- 여기에서 예제는 \"12-1. 휴면고객 재방문 기념일 마케팅 - 에러 알림 연결\" 와 함께 실행하면 된다.",
+                                         "height":  320,
+                                         "width":  944
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -80,
+                                       -144
+                                   ],
+                      "id":  "e4e46703-b6a4-496d-8ecc-fc50e2f7e481",
+                      "name":  "Sticky Note"
+                  }
+              ],
+    "connections":  {
+                        "워크플로우 오류 감지":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "관리자 Gmail 오류 알림",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "관리자 Gmail 오류 알림":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "Slack 오류 알림",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "Slack 오류 알림":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Twilio SMS 사장님 알림",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "a90388ad-a5fc-42d7-a3f9-eb8e3b20d5a2",
+    "activeVersionId":  "a46e5e2e-2616-4ebb-a1d7-087128ba6989",
+    "versionCounter":  81,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-06-24T14:23:44.591Z",
+                       "createdAt":  "2026-06-24T14:23:44.591Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "CfVAbyDfh9ybVaEr",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-06-24T17:29:28.012Z",
+                          "createdAt":  "2026-06-24T17:29:12.483Z",
+                          "versionId":  "a46e5e2e-2616-4ebb-a1d7-087128ba6989",
+                          "workflowId":  "CfVAbyDfh9ybVaEr",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "id":  "738f3eb2-fc4c-4e43-b41c-576400f2f3ad",
+                                            "name":  "워크플로우 오류 감지",
+                                            "type":  "n8n-nodes-base.errorTrigger",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             0,
+                                                             0
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sendTo":  "jinisbyun@gmail.com",
+                                                               "subject":  "=🚨 [자동화 오류] {{ $json.workflow.name }} — {{ $now.toFormat(\u0027yyyy-MM-dd HH:mm\u0027) }}",
+                                                               "message":  "=\u003cdiv style=\"font-family:Arial,sans-serif;max-width:600px;margin:auto;padding:20px;border:1px solid #e0e0e0;border-radius:8px\"\u003e\n  \u003ch2 style=\"color:#d32f2f\"\u003e🚨 자동화 워크플로우 오류 발생\u003c/h2\u003e\n  \u003cp\u003e안녕하세요, 사장님. 자동화 워크플로우에서 오류가 발생했습니다. 즉시 확인이 필요합니다.\u003c/p\u003e\n  \u003ctable style=\"width:100%;border-collapse:collapse\"\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e📋 워크플로우\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.workflow.name }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e⚠️ 실패 노드\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.execution.lastNodeExecuted }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e❌ 오류 내용\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.error.message }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e🕐 발생 시각\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $now.toISO() }}\u003c/td\u003e\u003c/tr\u003e\n    \u003ctr\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd;background:#f5f5f5;font-weight:bold\"\u003e🔗 실행 ID\u003c/td\u003e\u003ctd style=\"padding:8px;border:1px solid #ddd\"\u003e{{ $json.execution.id }}\u003c/td\u003e\u003c/tr\u003e\n  \u003c/table\u003e\n  \u003cp style=\"margin-top:20px;color:#666\"\u003en8n 대시보드에서 해당 실행 로그를 확인하고 수동 재처리 또는 고객 개별 연락 바랍니다.\u003c/p\u003e\n\u003c/div\u003e",
+                                                               "options":  {
+                                                                               "appendAttribution":  false,
+                                                                               "senderName":  "n8n 자동화 알림"
+                                                                           }
+                                                           },
+                                            "id":  "11936382-2f35-4479-b1ce-d388fd5d0278",
+                                            "name":  "관리자 Gmail 오류 알림",
+                                            "type":  "n8n-nodes-base.gmail",
+                                            "typeVersion":  2.2,
+                                            "position":  [
+                                                             224,
+                                                             0
+                                                         ],
+                                            "webhookId":  "45bc6799-6bd4-4aef-bd2f-28413d4f2692",
+                                            "credentials":  {
+                                                                "gmailOAuth2":  {
+                                                                                    "id":  "BREMduOcSoKZsyd3",
+                                                                                    "name":  "Gmail account"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "select":  "channel",
+                                                               "channelId":  {
+                                                                                 "__rl":  true,
+                                                                                 "value":  "#워크플로우-오류",
+                                                                                 "mode":  "name"
+                                                                             },
+                                                               "text":  "=🚨 *자동화 오류 발생*\n\u003e 워크플로우: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.workflow.name }}\n\u003e 실패 노드: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.lastNodeExecuted }}\n\u003e 오류: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.error.message }}\n\u003e 시각: {{ $now.toISO() }}\n\u003e 실행 ID: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.id }}",
+                                                               "otherOptions":  {
+                                                                                    "includeLinkToWorkflow":  false
+                                                                                }
+                                                           },
+                                            "id":  "fc2a0937-f4d2-4514-ad4c-181fd0c44d9d",
+                                            "name":  "Slack 오류 알림",
+                                            "type":  "n8n-nodes-base.slack",
+                                            "typeVersion":  2.5,
+                                            "position":  [
+                                                             448,
+                                                             0
+                                                         ],
+                                            "webhookId":  "3813701f-4df5-4b1d-921a-6820c7200df7",
+                                            "credentials":  {
+                                                                "slackApi":  {
+                                                                                 "id":  "n0q1pi3bapaa4Lkf",
+                                                                                 "name":  "Slack account"
+                                                                             }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "from":  "18455766455",
+                                                               "to":  "14165699480",
+                                                               "toWhatsapp":  true,
+                                                               "message":  "=[오류] {{ $(\u0027워크플로우 오류 감지\u0027).item.json.workflow.name }}/ 노드: {{ $(\u0027워크플로우 오류 감지\u0027).item.json.execution.lastNodeExecuted }} / 내용: {{ $json.error ? $json.error.message.substring(0, 50) : \u0027상세정보없음\u0027 }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "473135fd-df65-4977-8ad4-155809642b26",
+                                            "name":  "Twilio SMS 사장님 알림",
+                                            "type":  "n8n-nodes-base.twilio",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             672,
+                                                             0
+                                                         ],
+                                            "credentials":  {
+                                                                "twilioApi":  {
+                                                                                  "id":  "0YbWryDBNQl9bJeo",
+                                                                                  "name":  "Twilio account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**Error Trigger 노드** 가 다른 워크플로우 오류를 감지하는 별도 전용 워크플로우\n**연결 방법**: 모든  워크플로우 → **Settings → Error Workflow** → 이 워크플로우 선택 (예를 들어 앞에서 생성했던 휴면고객_재방문...)\n**조건** 반드시 publish 해야 한다. 그래야 다른 노드에서 참조할 수 있게 된다.",
+                                                               "height":  272,
+                                                               "width":  944
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -80,
+                                                             -96
+                                                         ],
+                                            "id":  "e4e46703-b6a4-496d-8ecc-fc50e2f7e481",
+                                            "name":  "Sticky Note"
+                                        }
+                                    ],
+                          "connections":  {
+                                              "워크플로우 오류 감지":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "관리자 Gmail 오류 알림",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                                              "관리자 Gmail 오류 알림":  {
+                                                                      "main":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "Slack 오류 알림",
+                                                                                           "type":  "main",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                                  },
+                                              "Slack 오류 알림":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "Twilio SMS 사장님 알림",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              }
+                                          },
+                          "nodeGroups":  [
+
+                                         ],
+                          "authors":  "Jini Byun",
+                          "name":  "Version a46e5e2e",
+                          "description":  "",
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-06-24T17:29:28.004Z",
+                                                             "id":  29,
+                                                             "workflowId":  "CfVAbyDfh9ybVaEr",
+                                                             "versionId":  "a46e5e2e-2616-4ebb-a1d7-087128ba6989",
+                                                             "event":  "activated",
+                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                                         }
+                                                     ]
+                      }
+}
