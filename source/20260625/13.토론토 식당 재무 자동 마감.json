@@ -1,8 +1,8 @@
 ﻿{
-    "updatedAt":  "2026-06-25T22:35:59.707Z",
+    "updatedAt":  "2026-06-26T00:56:00.449Z",
     "createdAt":  "2026-06-24T21:53:57.721Z",
     "id":  "KqzAJQoKuoVnjImT",
-    "name":  "토론토 식당 재무 자동 마감",
+    "name":  "13.토론토 식당 재무 자동 마감",
     "description":  "매일 23:00 ET — pos/ubereats/stripe CSV 3개 파일 읽기 → 회계 계산(HST·COGS·수수료) → AI 재무 의견 → Slack 보고 → report append → .processed 마킹",
     "active":  false,
     "isArchived":  false,

@@ -28,7 +28,36 @@ backup-n8n-workflows.ps1 사용 방법
    backup-n8n-workflows.ps1
 
 3. 날짜 폴더 직접 지정
-   backup-n8n-workflows.ps1 -DateFolder 20260619 -ApiKey "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI2YTU4MzNjMy0wNjcxLTQ0ZGYtYmUzMS0zZWNiMzUzNjg1YmUiLCJpc3MiOiJuOG4iLCJhdWQiOiJwdWJsaWMtYXBpIiwianRpIjoiZmI5MjllZWEtNWIyYS00ZmYzLWJjYjAtYmUyMDY2ZTUzZjE5IiwiaWF0IjoxNzgxMDMxNDExfQ.W2Wtq7hNMhbfTJN28zjDlwkxbB0_e97I1C52vR6cfz4"
+   backup-n8n-workflows.ps1 -DateFolder 20260619
 
 4. API 키 직접 지정
    backup-n8n-workflows.ps1 -ApiKey "발급받은_API_KEY"
+
+
+==============================================
+backup-single-workflow.ps1 사용 방법 (단일 백업)
+==============================================
+
+핵심 기능
+---------
+- 워크플로우 1개만 선택해서 JSON으로 저장
+- ID 또는 이름으로 지정 가능
+- 저장 위치: source/{워크플로우명}_{ID}.json (기본값)
+- API 키 읽기 방식은 기존 스크립트와 동일
+
+사용법
+------
+1. ID로 백업 (가장 빠름)
+   backup-single-workflow.ps1 -WorkflowId "KqzAJQoKuoVnjImT"
+
+2. 이름으로 백업
+   backup-single-workflow.ps1 -WorkflowName "토론토 식당 재무 자동 마감"
+
+3. 저장 위치 직접 지정
+   backup-single-workflow.ps1 -WorkflowId "KqzAJQoKuoVnjImT" -OutputFile "backup/my_workflow.json"
+
+4. 미리보기 (파일 저장 안 함)
+   backup-single-workflow.ps1 -WorkflowId "KqzAJQoKuoVnjImT" -DryRun
+
+5. API 키 직접 지정
+   backup-single-workflow.ps1 -WorkflowId "KqzAJQoKuoVnjImT" -ApiKey "발급받은_API_KEY"
