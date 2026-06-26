@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:38:04.322Z",
+    "updatedAt":  "2026-06-24T19:25:27.861Z",
     "createdAt":  "2026-06-18T21:07:14.300Z",
     "id":  "oV97655hc4ULIDwk",
     "name":  "09. Chatbot - Chat advanced for CRM",
@@ -123,8 +123,8 @@
                       "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
                       "typeVersion":  1.2,
                       "position":  [
-                                       -16,
-                                       288
+                                       -112,
+                                       80
                                    ],
                       "id":  "eff5c0d8-c6df-478d-b86b-8a99c659344e",
                       "name":  "Embeddings OpenAI1",
@@ -393,6 +393,22 @@
                                                             "name":  "OpenAI account"
                                                         }
                                       }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "0: Info\n1: Booking",
+                                         "height":  192,
+                                         "width":  272,
+                                         "color":  3
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -688,
+                                       -352
+                                   ],
+                      "id":  "744b8a49-6b34-4b90-86ac-976f55b82f28",
+                      "name":  "Sticky Note3"
                   }
               ],
     "connections":  {
@@ -558,9 +574,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "759ac8b6-9e0c-44bf-b07d-b564a2b9414e",
+    "versionId":  "5537b1b6-a8a5-4fe2-a880-8b2dc29026db",
     "activeVersionId":  null,
-    "versionCounter":  223,
+    "versionCounter":  230,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [
