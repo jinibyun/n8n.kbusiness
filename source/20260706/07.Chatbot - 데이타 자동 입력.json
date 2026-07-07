@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:37:05.368Z",
+    "updatedAt":  "2026-06-29T22:43:15.661Z",
     "createdAt":  "2026-06-18T03:40:38.436Z",
     "id":  "fnbi0Av18DMUymrR",
     "name":  "07.Chatbot - 데이타 자동 입력",
@@ -206,7 +206,7 @@
                       "type":  "n8n-nodes-qdrant.qdrant",
                       "typeVersion":  1,
                       "position":  [
-                                       -1696,
+                                       -1648,
                                        -480
                                    ],
                       "id":  "b5886979-ba21-4900-a223-c4f8b85d0d9f",
@@ -256,8 +256,8 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -1808,
-                                       -528
+                                       -1696,
+                                       -544
                                    ],
                       "id":  "74dba217-4a9f-4f7f-9c2c-2496ed928670",
                       "name":  "Sticky Note3"
@@ -326,6 +326,21 @@
                                    ],
                       "id":  "d3f2cdcc-3268-4384-9ac0-645eb10e5ceb",
                       "name":  "Sticky Note6"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**테스트 방법**\n\n이것을 구현하고, `09. Chatbot - Chat advanced for CRM\u0027 을 실행하여 테스트한다.",
+                                         "height":  128,
+                                         "width":  624
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2720,
+                                       16
+                                   ],
+                      "id":  "b3d90514-dab0-4840-bb4b-864e7ea31f44",
+                      "name":  "Sticky Note7"
                   }
               ],
     "connections":  {
@@ -444,9 +459,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "88ef4c8e-543d-4394-a2d5-477bd092d350",
+    "versionId":  "243b820d-6e95-4ced-9096-20c0dc4a298c",
     "activeVersionId":  "40fe500d-748d-4685-b389-5025e1adbade",
-    "versionCounter":  167,
+    "versionCounter":  175,
     "triggerCount":  2,
     "sourceWorkflowId":  null,
     "shared":  [

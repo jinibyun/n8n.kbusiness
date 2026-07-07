@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:36:46.620Z",
+    "updatedAt":  "2026-06-29T22:42:54.011Z",
     "createdAt":  "2026-06-17T14:33:13.226Z",
     "id":  "FXctluaWInzhMdAf",
     "name":  "06.Chatbot - 데이타 수동 입력",
@@ -159,7 +159,7 @@
                   },
                   {
                       "parameters":  {
-                                         "content":  "**qdrant** vector DB 는 여기에서 확인할 수 있다.\n\nhttp://kbusiness.ca:6333/dashboard",
+                                         "content":  "**qdrant** vector DB 는 여기에서 확인할 수 있다.\n\nhttps://qdrant.kbusiness.ca/dashboard",
                                          "height":  112,
                                          "width":  416,
                                          "color":  5
@@ -167,11 +167,54 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -800,
-                                       -608
+                                       -896,
+                                       -704
                                    ],
                       "id":  "2133720e-115f-4f43-8059-422923abe852",
                       "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**주의**\n수엄시간에 데이타가 꼬이지 않게 하기 위해 반드시 qdrant클릭해서 **콜렉션** 이름을 학생 본인의 이름의 설정하게 해야 한다.",
+                                         "height":  208,
+                                         "width":  416,
+                                         "color":  3
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -896,
+                                       -560
+                                   ],
+                      "id":  "52f6becb-7f29-4944-bfed-7bdc76224b71",
+                      "name":  "Sticky Note3"
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -224,
+                                       0
+                                   ],
+                      "id":  "67b33a8f-ed48-4492-aa9a-d68b9103edb0",
+                      "name":  "Sticky Note4"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**테스트 방법**\n\n이것을 구현하고, `08. Chatbot - Chat\u0027 을 실행하여 테스트한다.",
+                                         "width":  480
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1936,
+                                       -368
+                                   ],
+                      "id":  "3c0646bb-1496-4736-b648-e720abe6906a",
+                      "name":  "Sticky Note5"
                   }
               ],
     "connections":  {
@@ -246,9 +289,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "e2c58b8e-6513-4b80-8bd1-22776f6f0b13",
+    "versionId":  "be65620c-a878-4f50-a31b-115712b81b88",
     "activeVersionId":  null,
-    "versionCounter":  141,
+    "versionCounter":  176,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [

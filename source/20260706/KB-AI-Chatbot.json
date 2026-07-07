@@ -1,0 +1,827 @@
+﻿{
+    "updatedAt":  "2026-06-30T00:57:54.326Z",
+    "createdAt":  "2026-06-29T18:01:57.160Z",
+    "id":  "Pfkp2CzLU9lesWSF",
+    "name":  "KB-AI-Chatbot",
+    "description":  "kbusiness.ca 웹사이트 임베드용 한국어 챗봇. Q\u0026A + 상담신청 이메일 처리 (Qdrant RAG + Gmail)",
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "public":  true,
+                                         "mode":  "webhook",
+                                         "options":  {
+                                                         "responseMode":  "lastNode"
+                                                     }
+                                     },
+                      "id":  "5d7edd19-1c35-4df9-874f-77e5812d496e",
+                      "name":  "K Business AI 도우미",
+                      "type":  "@n8n/n8n-nodes-langchain.chatTrigger",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       -176,
+                                       224
+                                   ],
+                      "webhookId":  "f6faeb00-b6ea-49c6-a799-8379d44c1dc3"
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $json.body.chatInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "=1. 역할 및 정체성 (Core Identity)\n\n너는 \u0027kBusiness AI 도우미\u0027이다. 캐나다 토론토 기반 AI 자동화 에이전시의 공식 AI 직원이다.\n\n너의 주된 목적은 사용자의 비즈니스 병목 현상을 진단하고, 적합한 자동화 솔루션을 제안하는 것이다.\n\n2. 답변 원칙 (Operating Principles)\n\n도구 우선 사용 (Tool-First): 사용자의 질문에 답변하기 전, 반드시 \u0027KB 지식 검색\u0027 도구를 사용하여 관련 내용을 조회하라.\n\n검색 기반 답변: 지식베이스에 있는 내용은 내용을 바탕으로 답변하고, 없는 경우 추측하지 말고 \"정확한 정보를 위해 직접 문의해 주세요 → support@kbusiness.ca\"로 안내하라.\n\n한국어 전용: 어떤 언어로 질문이 들어와도 반드시 한국어로만 답변하라. (영어 질문 시: \"현재 kBusiness AI는 한국어 전용 서비스입니다. 한국어로 문의해 주시면 빠르게 안내해 드립니다.\")\n\n톤 앤 매너: 친근하고 전문적이며, 정보는 구조화하여 간결하게 전달하라. 이모지는 1~2개 이내로 제한한다.\n\n3. 상담 신청 플로우 (Consulting Flow - 최우선 순위)\n\n사용자가 상담/컨설팅/문의 의향을 보이면 즉시 이 플로우를 시작한다.\n\n순차 수집: [성함] → [이메일] → [관심 분야(①컨설팅 ②교육 ③기타)] → [문의 내용]을 반드시 하나씩 질문하여 수집한다.\n\n도구 호출: 수집 완료 후 [상담신청 알림 도구]와 [상담신청 확인 도구]를 호출한다.\n\n완료 메시지: \"상담 신청이 접수되었습니다. 영업일 기준 1~2일 이내에 담당자가 직접 연락드릴 예정입니다.\"라고 안내한다.\n\n4. 서비스 범위 제한 및 에스컬레이션 (Scope \u0026 Escalation)\n\n범위 외 안내: 법률/세무/회계 자문, 콘텐츠 제작(SNS 포스팅/디자인), 광고 집행 대행, 하드웨어 설치 등은 서비스 범위 밖이다. 정중히 전문가 문의를 권유하라.\n\n성과 보장 금지: 매출/전환율/ROI 수치를 보장하지 않는다. 모든 수치는 \"예상치/참고용\"임을 명시하라.\n\n에스컬레이션: 견적 요청, 계약서/해지/결제 문제, 긴급 장애 발생 시 반드시 support@kbusiness.ca로 안내하거나 해당 도구를 연결하라.\n\n5. 핵심 정책 및 절대 금지 사항 (Strict Prohibitions)\n\n절대 금지: 수치 보장 발언, 범위 외 업무 안내, USD 결제 안내, 카카오톡/인스타 개인 계정 연동 가능 안내, 신용카드 결제 약속, 경쟁사 비하, 민감 개인정보(카드번호 등) 수집.\n\n보안: 고객 데이터는 학습에 사용되지 않음을 안내하라.\n\n신중함: \"반드시\", \"확실히\" 대신 \"기대할 수 있습니다\", \"예상됩니다\"를 사용하라.\n\n6. RAG 검색 결과 활용 지침 (Search \u0026 Retrieval Guidelines)\n\n검색 결과가 질문과 정확히 일치하지 않아도, 가장 관련 있는 정보를 기반으로 답변을 생성하라.\n\n답변 시 표(Table), 목록(List), 소제목(Heading)을 사용하여 가독성을 높여라.\n\n답변의 근거가 지식베이스에 있다면 내용을 요약하고, 상세 정보는 [지식베이스 URL]을 참조하도록 안내하라.\n\n상담 신청 의향이 감지되면 관련 정보 답변 후 자연스럽게 [섹션 3. 상담 신청 플로우]로 전환하라."
+                                                     }
+                                     },
+                      "id":  "f3284a2a-c8a9-42d5-9308-8daab1fd652d",
+                      "name":  "K Business AI Agent",
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       416,
+                                       208
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "mode":  "list",
+                                                       "value":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "95ed535b-2bf2-4824-a5c1-770f5a043764",
+                      "name":  "OpenAI gpt-4o-mini",
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       160,
+                                       432
+                                   ],
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $json.body.sessionId }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "id":  "9da4f543-65d4-436d-b196-8b7cb3cca1cb",
+                      "name":  "Memory Buffer",
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       336,
+                                       432
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "retrieve-as-tool",
+                                         "toolDescription":  "K Business AI 서비스, 컨설팅, n8n 교육 커리큘럼, 회사 소개 등 관련 문서를 검색한다. 사용자 질문에 답변하기 위해 이 도구를 먼저 사용한다.",
+                                         "qdrantCollection":  {
+                                                                  "__rl":  true,
+                                                                  "mode":  "id",
+                                                                  "value":  "kbusiness_ai"
+                                                              },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9e4f360e-96e4-482a-a67b-b87f256457e6",
+                      "name":  "KB 지식 검색",
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       480,
+                                       432
+                                   ],
+                      "credentials":  {
+                                          "qdrantApi":  {
+                                                            "id":  "XWVNghsEwGPiVqql",
+                                                            "name":  "Qdrant account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "7501c5b9-b1ae-4b97-80ed-52814c8bd00a",
+                      "name":  "OpenAI Embeddings",
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       480,
+                                       640
+                                   ],
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "jinibyunsungmin@gmail.com",
+                                         "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027notification_subject\u0027, \u0027이메일 제목 (예: [K Business AI] 새 상담 신청 - 홍길동)\u0027) }}",
+                                         "emailType":  "text",
+                                         "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027notification_body\u0027, \u0027신청자 정보 이메일 본문 (성함, 이메일, 관심분야, 문의내용, 신청일시)\u0027) }}",
+                                         "options":  {
+                                                         "appendAttribution":  false
+                                                     }
+                                     },
+                      "id":  "a718f188-1f50-4ea1-869d-b8e058ab0564",
+                      "name":  "상담신청 알림 (Jini)",
+                      "type":  "n8n-nodes-base.gmailTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       752,
+                                       416
+                                   ],
+                      "webhookId":  "cf6d0d71-9c84-4c03-a039-8b3abafa9abd",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027customer_email\u0027, \u0027상담 신청자의 이메일 주소\u0027) }}",
+                                         "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027confirmation_subject\u0027, \u0027확인 이메일 제목 (예: [K Business AI] 상담 신청이 접수되었습니다)\u0027) }}",
+                                         "emailType":  "text",
+                                         "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027confirmation_body\u0027, \u0027접수 확인 이메일 본문 (한국어, 신청자 이름 포함)\u0027) }}",
+                                         "options":  {
+                                                         "appendAttribution":  false
+                                                     }
+                                     },
+                      "id":  "6cff8cbe-8341-4be3-a95d-a816ff10c419",
+                      "name":  "상담신청 확인 (고객)",
+                      "type":  "n8n-nodes-base.gmailTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       912,
+                                       400
+                                   ],
+                      "webhookId":  "4e24072a-3f36-4b06-b709-41a5543f4ede",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**KB-Knowledge-Loader** 를 통해 먼저 로드 하고 https://qdrant.kbusiness.ca/dashboard 에서 기본적인 확인을 할 수 있다."
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -512,
+                                       144
+                                   ],
+                      "id":  "f72907e9-a8e7-45f4-ba1c-95531c03ee8f",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "/chat-api",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       80,
+                                       208
+                                   ],
+                      "id":  "5273b19f-531f-48a0-aa19-56d837a1623a",
+                      "name":  "Webhook",
+                      "webhookId":  "faf8e30c-f73b-46ba-b68e-360d5e7b1d16"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**testing** 다음에 이것을 테스트용으로 사용할 때 K Business AI Agent 에 연결한다.",
+                                         "height":  272,
+                                         "width":  256
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -240,
+                                       144
+                                   ],
+                      "id":  "4ba23bd5-496b-4ce3-9355-aa9ccbf3edf4",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "실제 웹 폼에서 POST",
+                                         "height":  272
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       32,
+                                       144
+                                   ],
+                      "id":  "918fa782-d0ec-4c73-9213-935f7979fddb",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={\n  \"answer\": {{ JSON.stringify($json.output) }}\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       768,
+                                       208
+                                   ],
+                      "id":  "da675fd9-4939-4e19-8a12-fa3d746432e7",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "https://hoppscotch.io/  에서 테스트 직후에 웹 폼에서 테스트 가능",
+                                         "height":  96,
+                                         "color":  4
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       224,
+                                       96
+                                   ],
+                      "id":  "6d4cc238-d1d3-4682-8687-1e96a84621e2",
+                      "name":  "Sticky Note3"
+                  }
+              ],
+    "connections":  {
+                        "K Business AI 도우미":  {
+                                                  "main":  [
+                                                               [
+
+                                                               ]
+                                                           ]
+                                              },
+                        "OpenAI gpt-4o-mini":  {
+                                                   "ai_languageModel":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "K Business AI Agent",
+                                                                                    "type":  "ai_languageModel",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                               },
+                        "Memory Buffer":  {
+                                              "ai_memory":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "K Business AI Agent",
+                                                                        "type":  "ai_memory",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                          },
+                        "KB 지식 검색":  {
+                                         "ai_tool":  [
+                                                         [
+                                                             {
+                                                                 "node":  "K Business AI Agent",
+                                                                 "type":  "ai_tool",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                     },
+                        "OpenAI Embeddings":  {
+                                                  "ai_embedding":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "KB 지식 검색",
+                                                                               "type":  "ai_embedding",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                              },
+                        "상담신청 알림 (Jini)":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "K Business AI Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "상담신청 확인 (고객)":  {
+                                             "ai_tool":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "K Business AI Agent",
+                                                                     "type":  "ai_tool",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                         },
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "K Business AI Agent",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "K Business AI Agent":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Respond to Webhook",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+    "activeVersionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+    "versionCounter":  75,
+    "triggerCount":  2,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-06-29T18:01:57.160Z",
+                       "createdAt":  "2026-06-29T18:01:57.160Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "Pfkp2CzLU9lesWSF",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+                 {
+                     "updatedAt":  "2026-06-29T18:12:24.969Z",
+                     "createdAt":  "2026-06-29T18:12:24.969Z",
+                     "id":  "KwHPlJmrmoLJnuC1",
+                     "name":  "k-business"
+                 }
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-06-30T00:59:29.986Z",
+                          "createdAt":  "2026-06-30T00:57:54.329Z",
+                          "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+                          "workflowId":  "Pfkp2CzLU9lesWSF",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "public":  true,
+                                                               "mode":  "webhook",
+                                                               "options":  {
+                                                                               "responseMode":  "lastNode"
+                                                                           }
+                                                           },
+                                            "id":  "5d7edd19-1c35-4df9-874f-77e5812d496e",
+                                            "name":  "K Business AI 도우미",
+                                            "type":  "@n8n/n8n-nodes-langchain.chatTrigger",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             -176,
+                                                             224
+                                                         ],
+                                            "webhookId":  "f6faeb00-b6ea-49c6-a799-8379d44c1dc3"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "={{ $json.body.chatInput }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "=1. 역할 및 정체성 (Core Identity)\n\n너는 \u0027kBusiness AI 도우미\u0027이다. 캐나다 토론토 기반 AI 자동화 에이전시의 공식 AI 직원이다.\n\n너의 주된 목적은 사용자의 비즈니스 병목 현상을 진단하고, 적합한 자동화 솔루션을 제안하는 것이다.\n\n2. 답변 원칙 (Operating Principles)\n\n도구 우선 사용 (Tool-First): 사용자의 질문에 답변하기 전, 반드시 \u0027KB 지식 검색\u0027 도구를 사용하여 관련 내용을 조회하라.\n\n검색 기반 답변: 지식베이스에 있는 내용은 내용을 바탕으로 답변하고, 없는 경우 추측하지 말고 \"정확한 정보를 위해 직접 문의해 주세요 → support@kbusiness.ca\"로 안내하라.\n\n한국어 전용: 어떤 언어로 질문이 들어와도 반드시 한국어로만 답변하라. (영어 질문 시: \"현재 kBusiness AI는 한국어 전용 서비스입니다. 한국어로 문의해 주시면 빠르게 안내해 드립니다.\")\n\n톤 앤 매너: 친근하고 전문적이며, 정보는 구조화하여 간결하게 전달하라. 이모지는 1~2개 이내로 제한한다.\n\n3. 상담 신청 플로우 (Consulting Flow - 최우선 순위)\n\n사용자가 상담/컨설팅/문의 의향을 보이면 즉시 이 플로우를 시작한다.\n\n순차 수집: [성함] → [이메일] → [관심 분야(①컨설팅 ②교육 ③기타)] → [문의 내용]을 반드시 하나씩 질문하여 수집한다.\n\n도구 호출: 수집 완료 후 [상담신청 알림 도구]와 [상담신청 확인 도구]를 호출한다.\n\n완료 메시지: \"상담 신청이 접수되었습니다. 영업일 기준 1~2일 이내에 담당자가 직접 연락드릴 예정입니다.\"라고 안내한다.\n\n4. 서비스 범위 제한 및 에스컬레이션 (Scope \u0026 Escalation)\n\n범위 외 안내: 법률/세무/회계 자문, 콘텐츠 제작(SNS 포스팅/디자인), 광고 집행 대행, 하드웨어 설치 등은 서비스 범위 밖이다. 정중히 전문가 문의를 권유하라.\n\n성과 보장 금지: 매출/전환율/ROI 수치를 보장하지 않는다. 모든 수치는 \"예상치/참고용\"임을 명시하라.\n\n에스컬레이션: 견적 요청, 계약서/해지/결제 문제, 긴급 장애 발생 시 반드시 support@kbusiness.ca로 안내하거나 해당 도구를 연결하라.\n\n5. 핵심 정책 및 절대 금지 사항 (Strict Prohibitions)\n\n절대 금지: 수치 보장 발언, 범위 외 업무 안내, USD 결제 안내, 카카오톡/인스타 개인 계정 연동 가능 안내, 신용카드 결제 약속, 경쟁사 비하, 민감 개인정보(카드번호 등) 수집.\n\n보안: 고객 데이터는 학습에 사용되지 않음을 안내하라.\n\n신중함: \"반드시\", \"확실히\" 대신 \"기대할 수 있습니다\", \"예상됩니다\"를 사용하라.\n\n6. RAG 검색 결과 활용 지침 (Search \u0026 Retrieval Guidelines)\n\n검색 결과가 질문과 정확히 일치하지 않아도, 가장 관련 있는 정보를 기반으로 답변을 생성하라.\n\n답변 시 표(Table), 목록(List), 소제목(Heading)을 사용하여 가독성을 높여라.\n\n답변의 근거가 지식베이스에 있다면 내용을 요약하고, 상세 정보는 [지식베이스 URL]을 참조하도록 안내하라.\n\n상담 신청 의향이 감지되면 관련 정보 답변 후 자연스럽게 [섹션 3. 상담 신청 플로우]로 전환하라."
+                                                                           }
+                                                           },
+                                            "id":  "f3284a2a-c8a9-42d5-9308-8daab1fd652d",
+                                            "name":  "K Business AI Agent",
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             416,
+                                                             208
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "mode":  "list",
+                                                                             "value":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "95ed535b-2bf2-4824-a5c1-770f5a043764",
+                                            "name":  "OpenAI gpt-4o-mini",
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             160,
+                                                             432
+                                                         ],
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sessionIdType":  "customKey",
+                                                               "sessionKey":  "={{ $json.body.sessionId }}",
+                                                               "contextWindowLength":  10
+                                                           },
+                                            "id":  "9da4f543-65d4-436d-b196-8b7cb3cca1cb",
+                                            "name":  "Memory Buffer",
+                                            "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             336,
+                                                             432
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "mode":  "retrieve-as-tool",
+                                                               "toolDescription":  "K Business AI 서비스, 컨설팅, n8n 교육 커리큘럼, 회사 소개 등 관련 문서를 검색한다. 사용자 질문에 답변하기 위해 이 도구를 먼저 사용한다.",
+                                                               "qdrantCollection":  {
+                                                                                        "__rl":  true,
+                                                                                        "mode":  "id",
+                                                                                        "value":  "kbusiness_ai"
+                                                                                    },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "9e4f360e-96e4-482a-a67b-b87f256457e6",
+                                            "name":  "KB 지식 검색",
+                                            "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             480,
+                                                             432
+                                                         ],
+                                            "credentials":  {
+                                                                "qdrantApi":  {
+                                                                                  "id":  "XWVNghsEwGPiVqql",
+                                                                                  "name":  "Qdrant account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "7501c5b9-b1ae-4b97-80ed-52814c8bd00a",
+                                            "name":  "OpenAI Embeddings",
+                                            "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             480,
+                                                             640
+                                                         ],
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sendTo":  "jinibyunsungmin@gmail.com",
+                                                               "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027notification_subject\u0027, \u0027이메일 제목 (예: [K Business AI] 새 상담 신청 - 홍길동)\u0027) }}",
+                                                               "emailType":  "text",
+                                                               "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027notification_body\u0027, \u0027신청자 정보 이메일 본문 (성함, 이메일, 관심분야, 문의내용, 신청일시)\u0027) }}",
+                                                               "options":  {
+                                                                               "appendAttribution":  false
+                                                                           }
+                                                           },
+                                            "id":  "a718f188-1f50-4ea1-869d-b8e058ab0564",
+                                            "name":  "상담신청 알림 (Jini)",
+                                            "type":  "n8n-nodes-base.gmailTool",
+                                            "typeVersion":  2.2,
+                                            "position":  [
+                                                             752,
+                                                             416
+                                                         ],
+                                            "webhookId":  "cf6d0d71-9c84-4c03-a039-8b3abafa9abd",
+                                            "credentials":  {
+                                                                "gmailOAuth2":  {
+                                                                                    "id":  "BREMduOcSoKZsyd3",
+                                                                                    "name":  "Gmail account"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sendTo":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027customer_email\u0027, \u0027상담 신청자의 이메일 주소\u0027) }}",
+                                                               "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027confirmation_subject\u0027, \u0027확인 이메일 제목 (예: [K Business AI] 상담 신청이 접수되었습니다)\u0027) }}",
+                                                               "emailType":  "text",
+                                                               "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027confirmation_body\u0027, \u0027접수 확인 이메일 본문 (한국어, 신청자 이름 포함)\u0027) }}",
+                                                               "options":  {
+                                                                               "appendAttribution":  false
+                                                                           }
+                                                           },
+                                            "id":  "6cff8cbe-8341-4be3-a95d-a816ff10c419",
+                                            "name":  "상담신청 확인 (고객)",
+                                            "type":  "n8n-nodes-base.gmailTool",
+                                            "typeVersion":  2.2,
+                                            "position":  [
+                                                             912,
+                                                             400
+                                                         ],
+                                            "webhookId":  "4e24072a-3f36-4b06-b709-41a5543f4ede",
+                                            "credentials":  {
+                                                                "gmailOAuth2":  {
+                                                                                    "id":  "BREMduOcSoKZsyd3",
+                                                                                    "name":  "Gmail account"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**KB-Knowledge-Loader** 를 통해 먼저 로드 하고 https://qdrant.kbusiness.ca/dashboard 에서 기본적인 확인을 할 수 있다."
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -512,
+                                                             144
+                                                         ],
+                                            "id":  "f72907e9-a8e7-45f4-ba1c-95531c03ee8f",
+                                            "name":  "Sticky Note"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "httpMethod":  "POST",
+                                                               "path":  "/chat-api",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             80,
+                                                             208
+                                                         ],
+                                            "id":  "5273b19f-531f-48a0-aa19-56d837a1623a",
+                                            "name":  "Webhook",
+                                            "webhookId":  "faf8e30c-f73b-46ba-b68e-360d5e7b1d16"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**testing** 다음에 이것을 테스트용으로 사용할 때 K Business AI Agent 에 연결한다.",
+                                                               "height":  272,
+                                                               "width":  256
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -240,
+                                                             144
+                                                         ],
+                                            "id":  "4ba23bd5-496b-4ce3-9355-aa9ccbf3edf4",
+                                            "name":  "Sticky Note1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "실제 웹 폼에서 POST",
+                                                               "height":  272
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             32,
+                                                             144
+                                                         ],
+                                            "id":  "918fa782-d0ec-4c73-9213-935f7979fddb",
+                                            "name":  "Sticky Note2"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "={\n  \"answer\": {{ JSON.stringify($json.output) }}\n}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             768,
+                                                             208
+                                                         ],
+                                            "id":  "da675fd9-4939-4e19-8a12-fa3d746432e7",
+                                            "name":  "Respond to Webhook"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "https://hoppscotch.io/  에서 테스트 직후에 웹 폼에서 테스트 가능",
+                                                               "height":  96,
+                                                               "color":  4
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             224,
+                                                             96
+                                                         ],
+                                            "id":  "6d4cc238-d1d3-4682-8687-1e96a84621e2",
+                                            "name":  "Sticky Note3"
+                                        }
+                                    ],
+                          "connections":  {
+                                              "K Business AI 도우미":  {
+                                                                        "main":  [
+                                                                                     [
+
+                                                                                     ]
+                                                                                 ]
+                                                                    },
+                                              "OpenAI gpt-4o-mini":  {
+                                                                         "ai_languageModel":  [
+                                                                                                  [
+                                                                                                      {
+                                                                                                          "node":  "K Business AI Agent",
+                                                                                                          "type":  "ai_languageModel",
+                                                                                                          "index":  0
+                                                                                                      }
+                                                                                                  ]
+                                                                                              ]
+                                                                     },
+                                              "Memory Buffer":  {
+                                                                    "ai_memory":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "K Business AI Agent",
+                                                                                              "type":  "ai_memory",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                },
+                                              "KB 지식 검색":  {
+                                                               "ai_tool":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "K Business AI Agent",
+                                                                                       "type":  "ai_tool",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                           },
+                                              "OpenAI Embeddings":  {
+                                                                        "ai_embedding":  [
+                                                                                             [
+                                                                                                 {
+                                                                                                     "node":  "KB 지식 검색",
+                                                                                                     "type":  "ai_embedding",
+                                                                                                     "index":  0
+                                                                                                 }
+                                                                                             ]
+                                                                                         ]
+                                                                    },
+                                              "상담신청 알림 (Jini)":  {
+                                                                     "ai_tool":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "K Business AI Agent",
+                                                                                             "type":  "ai_tool",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                 },
+                                              "상담신청 확인 (고객)":  {
+                                                                   "ai_tool":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "K Business AI Agent",
+                                                                                           "type":  "ai_tool",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                               },
+                                              "Webhook":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "K Business AI Agent",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                                              "K Business AI Agent":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Respond to Webhook",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      }
+                                          },
+                          "nodeGroups":  [
+
+                                         ],
+                          "authors":  "Jini Byun",
+                          "name":  "Version 7446dd19",
+                          "description":  "",
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-06-30T00:59:29.973Z",
+                                                             "id":  30,
+                                                             "workflowId":  "Pfkp2CzLU9lesWSF",
+                                                             "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+                                                             "event":  "activated",
+                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                                         }
+                                                     ]
+                      }
+}
