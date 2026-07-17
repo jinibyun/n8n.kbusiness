@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:35:18.906Z",
+    "updatedAt":  "2026-07-11T03:14:43.842Z",
     "createdAt":  "2026-06-13T14:58:41.290Z",
     "id":  "Je091VzW5uYX4xqD",
     "name":  "03.고객정보 수집 - 마케팅",
@@ -389,9 +389,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "d79a3eb4-84e4-4c70-a203-0b9148a822d1",
+    "versionId":  "c79e37cd-d086-4bb0-b3e0-c8289d59adf0",
     "activeVersionId":  null,
-    "versionCounter":  99,
+    "versionCounter":  102,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [

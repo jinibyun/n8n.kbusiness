@@ -1,0 +1,370 @@
+﻿{
+    "updatedAt":  "2026-07-10T02:34:04.699Z",
+    "createdAt":  "2026-07-08T02:07:23.696Z",
+    "id":  "80EhSWD9mYrkJUtr",
+    "name":  "KB-NoShow-Response",
+    "description":  null,
+    "active":  false,
+    "isArchived":  true,
+    "nodes":  [
+                  {
+                      "id":  "f233c811-fdbb-4cc2-b17c-91df844254df",
+                      "name":  "고객 응답 Webhook",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       0,
+                                       96
+                                   ],
+                      "parameters":  {
+                                         "httpMethod":  "GET",
+                                         "path":  "noshow-response",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "webhookId":  "b4a7c757-e301-46a7-ad76-a2f8178628cf"
+                  },
+                  {
+                      "id":  "6baaca7d-825a-492c-abe0-eba13b49031d",
+                      "name":  "응답 분기 (확정 vs 취소)",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       224,
+                                       96
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ $json.query.action }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "equals"
+                                                                                                },
+                                                                                   "rightValue":  "confirm"
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     }
+                  },
+                  {
+                      "id":  "576ed7be-2ccb-4056-97d7-5c886e812adf",
+                      "name":  "Airtable 확정 업데이트",
+                      "type":  "n8n-nodes-base.airtable",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       448,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "resource":  "record",
+                                         "operation":  "update",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "mode":  "id",
+                                                      "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "PLACEHOLDER_AIRTABLE_TABLE_NAME"
+                                                   },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+                                                                                 "id"
+                                                                             ],
+                                                         "value":  {
+                                                                       "id":  "={{ $json.query.id }}",
+                                                                       "status":  "confirmed_by_customer"
+                                                                   }
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "52184e37-3fbd-469c-911f-4dba4bcc767e",
+                      "name":  "확정 SMS 발송",
+                      "type":  "n8n-nodes-base.twilio",
+                      "typeVersion":  1,
+                      "position":  [
+                                       672,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "resource":  "sms",
+                                         "operation":  "send",
+                                         "from":  "PLACEHOLDER_TWILIO_FROM_NUMBER",
+                                         "to":  "={{ $(\u0027고객 응답 Webhook\u0027).item.json.query.phone }}",
+                                         "message":  "={{ \u0027[K Business] \u0027 + $(\u0027고객 응답 Webhook\u0027).item.json.query.name + \u0027님, 예약이 확정되었습니다. 내일 뵙겠습니다!\u0027 }}"
+                                     },
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "0YbWryDBNQl9bJeo",
+                                                            "name":  "Twilio account"
+                                                        }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "id":  "2c22660e-9dac-4364-8263-aa5bb25195c5",
+                      "name":  "Respond OK (확정)",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       896,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\"status\":\"ok\",\"message\":\"예약이 확정되었습니다.\"}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "d7e72024-244a-40a0-ba52-f27450df3fb5",
+                      "name":  "Airtable 취소 업데이트",
+                      "type":  "n8n-nodes-base.airtable",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       448,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "resource":  "record",
+                                         "operation":  "update",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "mode":  "id",
+                                                      "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "PLACEHOLDER_AIRTABLE_TABLE_NAME"
+                                                   },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "matchingColumns":  [
+                                                                                 "id"
+                                                                             ],
+                                                         "value":  {
+                                                                       "id":  "={{ $json.query.id }}",
+                                                                       "status":  "cancelled"
+                                                                   }
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "632c507d-497e-4412-beaf-a67cab131c9c",
+                      "name":  "취소 SMS 발송",
+                      "type":  "n8n-nodes-base.twilio",
+                      "typeVersion":  1,
+                      "position":  [
+                                       672,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "resource":  "sms",
+                                         "operation":  "send",
+                                         "from":  "PLACEHOLDER_TWILIO_FROM_NUMBER",
+                                         "to":  "={{ $(\u0027고객 응답 Webhook\u0027).item.json.query.phone }}",
+                                         "message":  "={{ \u0027[K Business] \u0027 + $(\u0027고객 응답 Webhook\u0027).item.json.query.name + \u0027님, 취소가 완료되었습니다. 재예약: PLACEHOLDER_CALENDLY_RESCHEDULE_LINK\u0027 }}"
+                                     },
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "0YbWryDBNQl9bJeo",
+                                                            "name":  "Twilio account"
+                                                        }
+                                      },
+                      "onError":  "continueRegularOutput"
+                  },
+                  {
+                      "id":  "b1641939-714f-4c0e-aa10-ee37ad40f70f",
+                      "name":  "취소 확인 이메일",
+                      "type":  "n8n-nodes-base.gmail",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       896,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "resource":  "message",
+                                         "operation":  "send",
+                                         "sendTo":  "={{ $(\u0027고객 응답 Webhook\u0027).item.json.query.email ?? \u0027\u0027 }}",
+                                         "subject":  "[K Business] 예약 취소가 완료되었습니다",
+                                         "emailType":  "text",
+                                         "message":  "=안녕하세요, {{ $(\u0027고객 응답 Webhook\u0027).item.json.query.name }}님.\n\n예약 취소가 완료되었습니다.\n\n다음번에 재예약하시려면 아래 링크를 이용해 주세요:\nPLACEHOLDER_CALENDLY_RESCHEDULE_LINK\n\nK Business 드림",
+                                         "options":  {
+                                                         "appendAttribution":  false
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      },
+                      "onError":  "continueRegularOutput",
+                      "webhookId":  "22a1460d-7368-4bbc-b051-c5e85dfc36fc"
+                  },
+                  {
+                      "id":  "8877cce6-854a-47cb-a1de-4322a81921c1",
+                      "name":  "Respond OK (취소)",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1120,
+                                       192
+                                   ],
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\"status\":\"ok\",\"message\":\"취소가 완료되었습니다.\"}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     }
+                  }
+              ],
+    "connections":  {
+                        "고객 응답 Webhook":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "응답 분기 (확정 vs 취소)",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "응답 분기 (확정 vs 취소)":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "Airtable 확정 업데이트",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ],
+                                                              [
+                                                                  {
+                                                                      "node":  "Airtable 취소 업데이트",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Airtable 확정 업데이트":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "확정 SMS 발송",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "확정 SMS 발송":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Respond OK (확정)",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Airtable 취소 업데이트":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "취소 SMS 발송",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "취소 SMS 발송":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "취소 확인 이메일",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "취소 확인 이메일":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Respond OK (취소)",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  null,
+    "versionId":  "3cc909fa-f827-4b2d-9a30-3fa6572b1371",
+    "activeVersionId":  null,
+    "versionCounter":  1,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-08T02:07:23.696Z",
+                       "createdAt":  "2026-07-08T02:07:23.696Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "80EhSWD9mYrkJUtr",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,0 +1,994 @@
+﻿{
+    "updatedAt":  "2026-07-14T21:43:28.836Z",
+    "createdAt":  "2026-07-10T04:52:04.813Z",
+    "id":  "71SjKR4FNRCsktfS",
+    "name":  "Instagram-Comment",
+    "description":  "인스타그램 댓글 감지 → AI Agent가 의도 분석, 첫 DM 발송, Airtable 리드 등록, Telegram 오너 알림까지 자동 처리",
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "1",
+                                                                                     "name":  "instagram_handle",
+                                                                                     "value":  "={{ $json.body.entry[0].changes[0].value.from.username }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "2",
+                                                                                     "name":  "comment_text",
+                                                                                     "value":  "={{ $json.body.entry[0].changes[0].value.text }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "3",
+                                                                                     "name":  "post_context",
+                                                                                     "value":  "={{ $json.body.entry[0].changes[0].value.media.id }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "4",
+                                                                                     "name":  "subscriber_id",
+                                                                                     "value":  "={{ $json.body.entry[0].changes[0].value.from.id }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "5",
+                                                                                     "name":  "timestamp",
+                                                                                     "value":  "={{ $now.toISO() }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "e775c960-c33a-49b5-93cf-25b1e9b910cc",
+                      "name":  "데이터 정규화",
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       208,
+                                       144
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=고객: {{ $json.instagram_handle }}\n댓글: {{ $json.comment_text }}\n게시물: {{ $json.post_context }}\nsubscriber_id: {{ $json.subscriber_id }}\n시각: {{ $json.timestamp }}",
+                                         "options":  {
+                                                         "systemMessage":  "당신은 인스타그램 첫 고객 응대 전문 AI입니다. 모든 응답과 DM은 한국어로 작성합니다.\n\n아래 순서대로 도구를 호출하세요:\n\n1. [Airtable 리드 조회] 호출\n   filterByFormula: {instagram_handle}=\"\u003c실제 핸들값\u003e\"\n   → 기존 고객 여부 + contact_count 확인\n\n2. 의도 분류: booking(예약) / price(가격) / info(정보) / other\n\n3. 개인화 DM 메시지 작성\n   - 댓글 내용 언급 필수, 친근하고 전문적인 한국어 (템플릿 느낌 금지)\n   - booking → 예약 링크: PLACEHOLDER_BOOKING_LINK\n   - price → 가격 안내: PLACEHOLDER_PRICE_INFO\n   - info/other → 웰컴 메시지 + 추가 문의 유도\n\n4. [Instagram DM 발송] 호출\n   subscriber_id: 입력값 그대로 / message_text: 위에서 작성한 DM\n\n5. [Airtable 리드 저장] 호출\n   - 신규: contact_count=1, status=new, last_post_context 포함\n   - 기존: contact_count = 이전값+1, is_vip=(3 이상이면 true)\n   - last_contact_at: 현재 시각\n\n6. [Telegram 오너 알림] 호출\n   메시지:\n   📱 새 인스타 리드\n   👤 \u003chandle\u003e | 💬 \"\u003c댓글\u003e\" | 🏷️ \u003cintent\u003e\n   ✅ DM 발송 완료",
+                                                         "maxIterations":  10,
+                                                         "returnIntermediateSteps":  false
+                                                     }
+                                     },
+                      "id":  "623cbde0-3f8e-4b90-9026-7c0fa84f5b64",
+                      "name":  "인스타 첫 응대 Agent",
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       800,
+                                       144
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "5e2bb371-3d15-4809-a3be-2111c29a9dc1",
+                      "name":  "GPT-4o-mini",
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       496,
+                                       368
+                                   ],
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $json.instagram_handle }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "id":  "3ec525af-defd-4ae1-87cc-38f0178fd94d",
+                      "name":  "대화 메모리",
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       672,
+                                       368
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "search",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "value":  "appG5Gb8Bfw3QfiJp",
+                                                      "mode":  "list",
+                                                      "cachedResultName":  "Instagram-Leads",
+                                                      "cachedResultUrl":  "https://airtable.com/appG5Gb8Bfw3QfiJp"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "value":  "tbleYVWzMTzGR34lG",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "leads",
+                                                       "cachedResultUrl":  "https://airtable.com/appG5Gb8Bfw3QfiJp/tbleYVWzMTzGR34lG"
+                                                   },
+                                         "filterByFormula":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Filter_By_Formula\u0027, `고객의 instagram_handle로 검색하는 Airtable 필터. 예: {instagram_handle}=\"hong_gildong\"`, \u0027string\u0027) }}",
+                                         "returnAll":  false,
+                                         "limit":  1,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "09dc327c-9a95-4510-b864-c19612f83c66",
+                      "name":  "Airtable 리드 조회",
+                      "type":  "n8n-nodes-base.airtableTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       832,
+                                       368
+                                   ],
+                      "credentials":  {
+                                          "airtableTokenApi":  {
+                                                                   "id":  "zeyUKU4fNPlRM3JY",
+                                                                   "name":  "Airtable Personal Access Token account"
+                                                               }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "description":  "Airtable instagram_leads 테이블에 신규 리드를 생성하거나 기존 리드를 업데이트합니다.",
+                                         "jsCode":  "const d = JSON.parse(query);\nconst B = \u0027Instagram-Leads\u0027;\nconst T = \u0027leads\u0027;\nconst K = \u0027patJqHEOkCGDZjMgJ.21b9974a5b60cc28d9ad1370c2b2d03d160c525311d421ecd11e7865433a720a\u0027;\nconst authHdr = { Authorization: \u0027Bearer \u0027 + K };\nconst jsonHdr = { \u0027Content-Type\u0027: \u0027application/json\u0027, Authorization: \u0027Bearer \u0027 + K };\nconst formula = encodeURIComponent(\u0027{instagram_handle}=\"\u0027 + d.instagram_handle + \u0027\"\u0027);\nconst sr = await fetch(\u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027?filterByFormula=\u0027 + formula + \u0027\u0026maxRecords=1\u0027, { headers: authHdr });\nconst sd = await sr.json();\nconst ex = sd.records \u0026\u0026 sd.records[0];\nconst fields = {\n  instagram_handle: d.instagram_handle,\n  subscriber_id: d.subscriber_id || \u0027\u0027,\n  intent: d.intent || \u0027other\u0027,\n  status: d.status || \u0027new\u0027,\n  contact_count: typeof d.contact_count === \u0027number\u0027 ? d.contact_count : 1,\n  is_vip: !!d.is_vip,\n  last_contact_at: new Date().toISOString(),\n  notes: d.notes || \u0027\u0027\n};\nif (!ex) {\n  fields.last_post_context = d.post_context || \u0027\u0027;\n}\nconst method = ex ? \u0027PATCH\u0027 : \u0027POST\u0027;\nconst url = ex ? \u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027/\u0027 + ex.id : \u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T;\nconst body = ex ? { fields: fields } : { records: [{ fields: fields }] };\nconst wr = await fetch(url, { method: method, headers: jsonHdr, body: JSON.stringify(body) });\nreturn ex ? \u0027업데이트 완료: \u0027 + d.instagram_handle : \u0027신규 저장 완료: \u0027 + d.instagram_handle;",
+                                         "specifyInputSchema":  true,
+                                         "jsonSchemaExample":  "{\"instagram_handle\":\"@hong_gildong\",\"subscriber_id\":\"MC123\",\"first_comment\":\"예약 어떻게 해요?\",\"post_context\":\"여름 프로모션\",\"intent\":\"booking\",\"status\":\"new\",\"contact_count\":1,\"is_vip\":false,\"notes\":\"\"}"
+                                     },
+                      "id":  "66866c6c-d2a6-474a-8557-8e7eac8a3d07",
+                      "name":  "Airtable 리드 저장",
+                      "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       992,
+                                       368
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "8427663927",
+                                         "text":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027message\u0027, \u0027사장님에게 보낼 알림 메시지. 리드 정보와 AI 처리 결과를 포함합니다.\u0027) }}",
+                                         "additionalFields":  {
+                                                                  "appendAttribution":  false
+                                                              }
+                                     },
+                      "id":  "8430a06d-09c2-4793-9544-75f45201f694",
+                      "name":  "Telegram 오너 알림",
+                      "type":  "n8n-nodes-base.telegramTool",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1312,
+                                       368
+                                   ],
+                      "webhookId":  "28b10373-06c5-4463-a964-622c1fb62d22",
+                      "credentials":  {
+                                          "telegramApi":  {
+                                                              "id":  "UgLv8sdOITOYXuvp",
+                                                              "name":  "Telegram account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "path":  "9db4gfeb-305c-4711-83f4-9389e49a6918",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       128,
+                                       -112
+                                   ],
+                      "id":  "71df3fb1-bb56-4cbe-aadf-b54a1732cb5f",
+                      "name":  "Webhook2",
+                      "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "text",
+                                         "responseBody":  "={{ $json.query.hub_challenge }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       480,
+                                       -112
+                                   ],
+                      "id":  "5a482d36-a8c5-450d-9478-822fa25d4338",
+                      "name":  "Respond to Webhook1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "### Meta API TESTING ###\nInstagram 연결 테스팅\n\n- 이 부분만 활성화 (아래는 비활성화)\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
+                                         "height":  256,
+                                         "width":  400
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -448,
+                                       -208
+                                   ],
+                      "id":  "7ccde161-d2b0-4ae7-b9c9-e35f793726f5",
+                      "name":  "Sticky Note10",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Meta App - Messenger** 의 신호 수신 - 네가 임의로 대답하지 말고, 다음 노드가 정답(hub.challenge)을 보낼 때까지 응답을 보류해라\"라고 지시. 이는 FB 와 여기 n8n 과의 기초 인증 과정",
+                                         "height":  256,
+                                         "width":  640
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       16,
+                                       -208
+                                   ],
+                      "id":  "636b2c8a-e0d7-4a91-a461-3f5b1e491a09",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "9db4gfeb-305c-4711-83f4-9389e49a6918",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -128,
+                                       144
+                                   ],
+                      "id":  "40f07b3e-02ab-4d05-ab9e-92a36fd7fb47",
+                      "name":  "Webhook",
+                      "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "text",
+                                         "responseBody":  "={{ \"EVENT_RECEIVED\" }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       256,
+                                       384
+                                   ],
+                      "id":  "10f97f08-7927-400f-af91-6e7b4d1b93fb",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://graph.facebook.com/v25.0/26665028499840110/messages",
+                                         "sendQuery":  true,
+                                         "queryParameters":  {
+                                                                 "parameters":  [
+                                                                                    {
+                                                                                        "name":  "access_token",
+                                                                                        "value":  "IGAAOyZAeBTZAppBZAFpPdE5NOWY2eTN1S3lPYnMzbC1pcHF3dzVQVFNIWGpVb2xFaXh2NEppc3M3SzExWDN6ZAmRFcmRmdVE5bVR4bG41OG1JNVZAmT3pWQjZAlcUFCOWVhMDZAIS3ZAKVDdLTTR4eU0xWXVHWXI0SVktOUpBNzBXdjNsNAZDZD"
+                                                                                    }
+                                                                                ]
+                                                             },
+                                         "sendHeaders":  true,
+                                         "headerParameters":  {
+                                                                  "parameters":  [
+                                                                                     {
+                                                                                         "name":  "Content-Type",
+                                                                                         "value":  "application/json"
+                                                                                     }
+                                                                                 ]
+                                                              },
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={\n  \"recipient\": { \"id\": \"{{ $json(\u0027subscriber_id\u0027) }}\" },\n  \"message\": { \"text\": \"{{ $json(\u0027comment_text\u0027) }}\" }\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequestTool",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1136,
+                                       368
+                                   ],
+                      "id":  "894b3e90-d923-4419-8c48-ea1769f08ada",
+                      "name":  "HTTP Request1"
+                  }
+              ],
+    "connections":  {
+                        "데이터 정규화":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "Respond to Webhook",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         },
+                                                         {
+                                                             "node":  "인스타 첫 응대 Agent",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "GPT-4o-mini":  {
+                                            "ai_languageModel":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "인스타 첫 응대 Agent",
+                                                                             "type":  "ai_languageModel",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                        },
+                        "대화 메모리":  {
+                                       "ai_memory":  [
+                                                         [
+                                                             {
+                                                                 "node":  "인스타 첫 응대 Agent",
+                                                                 "type":  "ai_memory",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                   },
+                        "Airtable 리드 조회":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "인스타 첫 응대 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "Airtable 리드 저장":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "인스타 첫 응대 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "Telegram 오너 알림":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "인스타 첫 응대 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "Webhook2":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "Respond to Webhook1",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "데이터 정규화",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "인스타 첫 응대 Agent":  {
+                                               "main":  [
+                                                            [
+
+                                                            ]
+                                                        ]
+                                           },
+                        "HTTP Request1":  {
+                                              "ai_tool":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "인스타 첫 응대 Agent",
+                                                                      "type":  "ai_tool",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                          }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp",
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+                    "Webhook":  [
+                                    {
+                                        "json":  {
+                                                     "headers":  {
+                                                                     "connection":  "close",
+                                                                     "host":  "n8n.kbusiness.ca",
+                                                                     "x-forwarded-scheme":  "https",
+                                                                     "x-forwarded-proto":  "https",
+                                                                     "x-forwarded-for":  "66.220.149.112",
+                                                                     "x-real-ip":  "66.220.149.112",
+                                                                     "content-length":  "308",
+                                                                     "x-hub-signature":  "sha1=565fc6825514f817e0479cc63b1de26d8792a414",
+                                                                     "x-hub-signature-256":  "sha256=343bfd9d1166876c33eae1ecc2947ad6fb8a5b3524552491d78f6a4954b1065c",
+                                                                     "content-type":  "application/json",
+                                                                     "user-agent":  "Webhooks/1.0 (https://fb.me/webhooks)",
+                                                                     "accept":  "*/*"
+                                                                 },
+                                                     "params":  {
+
+                                                                },
+                                                     "query":  {
+
+                                                               },
+                                                     "body":  {
+                                                                  "entry":  [
+                                                                                {
+                                                                                    "id":  "0",
+                                                                                    "time":  1783733018,
+                                                                                    "changes":  [
+                                                                                                    {
+                                                                                                        "field":  "comments",
+                                                                                                        "value":  {
+                                                                                                                      "from":  {
+                                                                                                                                   "id":  "232323232",
+                                                                                                                                   "username":  "test"
+                                                                                                                               },
+                                                                                                                      "media":  {
+                                                                                                                                    "id":  "123123123",
+                                                                                                                                    "media_product_type":  "FEED"
+                                                                                                                                },
+                                                                                                                      "id":  "17865799348089039",
+                                                                                                                      "parent_id":  "1231231234",
+                                                                                                                      "text":  "This is an example."
+                                                                                                                  }
+                                                                                                    }
+                                                                                                ]
+                                                                                }
+                                                                            ],
+                                                                  "object":  "instagram"
+                                                              },
+                                                     "webhookUrl":  "https://n8n.kbusiness.ca/webhook-test/9db4gfeb-305c-4711-83f4-9389e49a6918",
+                                                     "executionMode":  "test"
+                                                 },
+                                        "pairedItem":  {
+                                                           "item":  0
+                                                       }
+                                    }
+                                ]
+                },
+    "versionId":  "88270e20-c03f-4a40-b472-eac12400a956",
+    "activeVersionId":  "8f9e5eb2-2a31-4495-98fc-77abf2a7f94b",
+    "versionCounter":  156,
+    "triggerCount":  2,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-10T04:52:04.813Z",
+                       "createdAt":  "2026-07-10T04:52:04.813Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "71SjKR4FNRCsktfS",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-07-11T01:15:36.577Z",
+                          "createdAt":  "2026-07-11T01:15:29.639Z",
+                          "versionId":  "8f9e5eb2-2a31-4495-98fc-77abf2a7f94b",
+                          "workflowId":  "71SjKR4FNRCsktfS",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "assignments":  {
+                                                                                   "assignments":  [
+                                                                                                       {
+                                                                                                           "id":  "1",
+                                                                                                           "name":  "instagram_handle",
+                                                                                                           "value":  "={{ $json.body?.instagram_handle ?? $json.instagram_handle ?? \"\" }}",
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                                       {
+                                                                                                           "id":  "2",
+                                                                                                           "name":  "comment_text",
+                                                                                                           "value":  "={{ $json.body?.comment_text ?? $json.comment_text ?? \"\" }}",
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                                       {
+                                                                                                           "id":  "3",
+                                                                                                           "name":  "post_context",
+                                                                                                           "value":  "={{ $json.body?.post_caption ?? $json.post_caption ?? \"\" }}",
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                                       {
+                                                                                                           "id":  "4",
+                                                                                                           "name":  "subscriber_id",
+                                                                                                           "value":  "={{ $json.body?.subscriber_id ?? $json.subscriber_id ?? \"\" }}",
+                                                                                                           "type":  "string"
+                                                                                                       },
+                                                                                                       {
+                                                                                                           "id":  "5",
+                                                                                                           "name":  "timestamp",
+                                                                                                           "value":  "={{ $now.toISO() }}",
+                                                                                                           "type":  "string"
+                                                                                                       }
+                                                                                                   ]
+                                                                               },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "e775c960-c33a-49b5-93cf-25b1e9b910cc",
+                                            "name":  "데이터 정규화",
+                                            "type":  "n8n-nodes-base.set",
+                                            "typeVersion":  3.4,
+                                            "position":  [
+                                                             64,
+                                                             224
+                                                         ]
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "=고객: {{ $json.instagram_handle }}\n댓글: {{ $json.comment_text }}\n게시물: {{ $json.post_context }}\nsubscriber_id: {{ $json.subscriber_id }}\n시각: {{ $json.timestamp }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "당신은 인스타그램 첫 고객 응대 전문 AI입니다. 모든 응답과 DM은 한국어로 작성합니다.\n\n아래 순서대로 도구를 호출하세요:\n\n1. [Airtable 리드 조회] 호출\n   filterByFormula: {instagram_handle}=\"\u003c실제 핸들값\u003e\"\n   → 기존 고객 여부 + contact_count 확인\n\n2. 의도 분류: booking(예약) / price(가격) / info(정보) / other\n\n3. 개인화 DM 메시지 작성\n   - 댓글 내용 언급 필수, 친근하고 전문적인 한국어 (템플릿 느낌 금지)\n   - booking → 예약 링크: PLACEHOLDER_BOOKING_LINK\n   - price → 가격 안내: PLACEHOLDER_PRICE_INFO\n   - info/other → 웰컴 메시지 + 추가 문의 유도\n\n4. [ManyChat DM 발송] 호출\n   subscriber_id: 입력값 그대로 / message_text: 위에서 작성한 DM\n\n5. [Airtable 리드 저장] 호출\n   - 신규: contact_count=1, status=new, first_comment/post_context 포함\n   - 기존: contact_count = 이전값+1, is_vip=(3 이상이면 true)\n   - last_interaction: 현재 시각\n\n6. [Telegram 오너 알림] 호출\n   메시지:\n   📱 새 인스타 리드\n   👤 \u003chandle\u003e | 💬 \"\u003c댓글\u003e\" | 🏷️ \u003cintent\u003e\n   ✅ DM 발송 완료",
+                                                                               "maxIterations":  10,
+                                                                               "returnIntermediateSteps":  false
+                                                                           }
+                                                           },
+                                            "id":  "623cbde0-3f8e-4b90-9026-7c0fa84f5b64",
+                                            "name":  "인스타 첫 응대 Agent",
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             928,
+                                                             144
+                                                         ],
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "mode":  "id",
+                                                                             "value":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "5e2bb371-3d15-4809-a3be-2111c29a9dc1",
+                                            "name":  "GPT-4o-mini",
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             496,
+                                                             368
+                                                         ],
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sessionIdType":  "customKey",
+                                                               "sessionKey":  "={{ $json.instagram_handle }}",
+                                                               "contextWindowLength":  10
+                                                           },
+                                            "id":  "3ec525af-defd-4ae1-87cc-38f0178fd94d",
+                                            "name":  "대화 메모리",
+                                            "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             672,
+                                                             368
+                                                         ],
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "search",
+                                                               "base":  {
+                                                                            "__rl":  true,
+                                                                            "mode":  "id",
+                                                                            "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                                        },
+                                                               "table":  {
+                                                                             "__rl":  true,
+                                                                             "mode":  "id",
+                                                                             "value":  "PLACEHOLDER_AIRTABLE_TABLE_ID"
+                                                                         },
+                                                               "filterByFormula":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027filterByFormula\u0027, \u0027고객의 instagram_handle로 검색하는 Airtable 필터. 예: {instagram_handle}=\"@hong_gildong\"\u0027) }}",
+                                                               "returnAll":  false,
+                                                               "limit":  1,
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "id":  "09dc327c-9a95-4510-b864-c19612f83c66",
+                                            "name":  "Airtable 리드 조회",
+                                            "type":  "n8n-nodes-base.airtableTool",
+                                            "typeVersion":  2.2,
+                                            "position":  [
+                                                             832,
+                                                             368
+                                                         ],
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "description":  "Airtable instagram_leads 테이블에 신규 리드를 생성하거나 기존 리드를 업데이트합니다.",
+                                                               "jsCode":  "const d = JSON.parse(query);\nconst B = \u0027PLACEHOLDER_AIRTABLE_BASE_ID\u0027;\nconst T = \u0027PLACEHOLDER_AIRTABLE_TABLE_ID\u0027;\nconst K = \u0027PLACEHOLDER_AIRTABLE_API_KEY\u0027;\nconst authHdr = { Authorization: \u0027Bearer \u0027 + K };\nconst jsonHdr = { \u0027Content-Type\u0027: \u0027application/json\u0027, Authorization: \u0027Bearer \u0027 + K };\nconst formula = encodeURIComponent(\u0027{instagram_handle}=\"\u0027 + d.instagram_handle + \u0027\"\u0027);\nconst sr = await fetch(\u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027?filterByFormula=\u0027 + formula + \u0027\u0026maxRecords=1\u0027, { headers: authHdr });\nconst sd = await sr.json();\nconst ex = sd.records \u0026\u0026 sd.records[0];\nconst fields = {\n  instagram_handle: d.instagram_handle,\n  subscriber_id: d.subscriber_id || \u0027\u0027,\n  intent: d.intent || \u0027other\u0027,\n  status: d.status || \u0027new\u0027,\n  contact_count: typeof d.contact_count === \u0027number\u0027 ? d.contact_count : 1,\n  is_vip: !!d.is_vip,\n  last_interaction: new Date().toISOString(),\n  notes: d.notes || \u0027\u0027\n};\nif (!ex) {\n  fields.first_comment = d.first_comment || \u0027\u0027;\n  fields.post_context = d.post_context || \u0027\u0027;\n}\nconst method = ex ? \u0027PATCH\u0027 : \u0027POST\u0027;\nconst url = ex ? \u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027/\u0027 + ex.id : \u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T;\nconst body = ex ? { fields: fields } : { records: [{ fields: fields }] };\nconst wr = await fetch(url, { method: method, headers: jsonHdr, body: JSON.stringify(body) });\nreturn ex ? \u0027업데이트 완료: \u0027 + d.instagram_handle : \u0027신규 저장 완료: \u0027 + d.instagram_handle;",
+                                                               "specifyInputSchema":  true,
+                                                               "jsonSchemaExample":  "{\"instagram_handle\":\"@hong_gildong\",\"subscriber_id\":\"MC123\",\"first_comment\":\"예약 어떻게 해요?\",\"post_context\":\"여름 프로모션\",\"intent\":\"booking\",\"status\":\"new\",\"contact_count\":1,\"is_vip\":false,\"notes\":\"\"}"
+                                                           },
+                                            "id":  "66866c6c-d2a6-474a-8557-8e7eac8a3d07",
+                                            "name":  "Airtable 리드 저장",
+                                            "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             992,
+                                                             368
+                                                         ],
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "description":  "ManyChat API를 통해 인스타그램 DM을 발송합니다. subscriber_id와 message_text가 필요합니다.",
+                                                               "jsCode":  "const d = JSON.parse(query);\nconst r = await fetch(\u0027https://api.manychat.com/fb/sending/sendContent\u0027, {\n  method: \u0027POST\u0027,\n  headers: { \u0027Content-Type\u0027: \u0027application/json\u0027, Authorization: \u0027Bearer PLACEHOLDER_MANYCHAT_API_KEY\u0027 },\n  body: JSON.stringify({\n    subscriber_id: d.subscriber_id,\n    data: { version: \u0027v2\u0027, content: { messages: [{ type: \u0027text\u0027, text: d.message_text }] } }\n  })\n});\nconst res = await r.json();\nif (res.status !== \u0027success\u0027) return \u0027DM 발송 실패: \u0027 + JSON.stringify(res);\nreturn \u0027DM 발송 완료: \u0027 + d.subscriber_id;",
+                                                               "specifyInputSchema":  true,
+                                                               "jsonSchemaExample":  "{\"subscriber_id\":\"MANYCHAT_SUB_ID\",\"message_text\":\"안녕하세요! 문의 주셔서 감사합니다.\"}"
+                                                           },
+                                            "id":  "523baa22-a1f9-4fb7-98aa-06012af0245b",
+                                            "name":  "ManyChat DM 발송",
+                                            "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             1152,
+                                                             368
+                                                         ],
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "chatId":  "PLACEHOLDER_TELEGRAM_CHAT_ID",
+                                                               "text":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027message\u0027, \u0027사장님에게 보낼 알림 메시지. 리드 정보와 AI 처리 결과를 포함합니다.\u0027) }}",
+                                                               "additionalFields":  {
+                                                                                        "appendAttribution":  false
+                                                                                    }
+                                                           },
+                                            "id":  "8430a06d-09c2-4793-9544-75f45201f694",
+                                            "name":  "Telegram 오너 알림",
+                                            "type":  "n8n-nodes-base.telegramTool",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             1328,
+                                                             368
+                                                         ],
+                                            "webhookId":  "28b10373-06c5-4463-a964-622c1fb62d22",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "path":  "9db4gfeb-305c-4711-83f4-9389e49a6918",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             128,
+                                                             -80
+                                                         ],
+                                            "id":  "71df3fb1-bb56-4cbe-aadf-b54a1732cb5f",
+                                            "name":  "Webhook2",
+                                            "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "text",
+                                                               "responseBody":  "={{ $json.query.hub_challenge }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             480,
+                                                             -80
+                                                         ],
+                                            "id":  "5a482d36-a8c5-450d-9478-822fa25d4338",
+                                            "name":  "Respond to Webhook1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "### Meta API TESTING ###\nInstagram 연결 테스팅\n\n- 이 부분만 활성화 (아래는 비활성화)\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
+                                                               "height":  256,
+                                                               "width":  400
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -464,
+                                                             -208
+                                                         ],
+                                            "id":  "7ccde161-d2b0-4ae7-b9c9-e35f793726f5",
+                                            "name":  "Sticky Note10",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**Meta App - Messenger** 의 신호 수신 - 네가 임의로 대답하지 말고, 다음 노드가 정답(hub.challenge)을 보낼 때까지 응답을 보류해라\"라고 지시. 이는 FB 와 여기 n8n 과의 기초 인증 과정",
+                                                               "height":  256,
+                                                               "width":  640
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             16,
+                                                             -208
+                                                         ],
+                                            "id":  "636b2c8a-e0d7-4a91-a461-3f5b1e491a09",
+                                            "name":  "Sticky Note2"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "httpMethod":  "POST",
+                                                               "path":  "9db4gfeb-305c-4711-83f4-9389e49a6918",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             -208,
+                                                             224
+                                                         ],
+                                            "id":  "40f07b3e-02ab-4d05-ab9e-92a36fd7fb47",
+                                            "name":  "Webhook",
+                                            "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "text",
+                                                               "responseBody":  "={{ $json.query.hub_challenge }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             256,
+                                                             224
+                                                         ],
+                                            "id":  "10f97f08-7927-400f-af91-6e7b4d1b93fb",
+                                            "name":  "Respond to Webhook"
+                                        }
+                                    ],
+                          "connections":  {
+                                              "데이터 정규화":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "Respond to Webhook",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                                              "GPT-4o-mini":  {
+                                                                  "ai_languageModel":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "인스타 첫 응대 Agent",
+                                                                                                   "type":  "ai_languageModel",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                              },
+                                              "대화 메모리":  {
+                                                             "ai_memory":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "인스타 첫 응대 Agent",
+                                                                                       "type":  "ai_memory",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                         },
+                                              "Airtable 리드 조회":  {
+                                                                     "ai_tool":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "인스타 첫 응대 Agent",
+                                                                                             "type":  "ai_tool",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                 },
+                                              "Airtable 리드 저장":  {
+                                                                     "ai_tool":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "인스타 첫 응대 Agent",
+                                                                                             "type":  "ai_tool",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                 },
+                                              "ManyChat DM 발송":  {
+                                                                     "ai_tool":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "인스타 첫 응대 Agent",
+                                                                                             "type":  "ai_tool",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                 },
+                                              "Telegram 오너 알림":  {
+                                                                     "ai_tool":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "인스타 첫 응대 Agent",
+                                                                                             "type":  "ai_tool",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                 },
+                                              "Webhook2":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Respond to Webhook1",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                                              "Webhook":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "데이터 정규화",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                                              "인스타 첫 응대 Agent":  {
+                                                                     "main":  [
+                                                                                  [
+
+                                                                                  ]
+                                                                              ]
+                                                                 }
+                                          },
+                          "nodeGroups":  [
+
+                                         ],
+                          "authors":  "Jini Byun",
+                          "name":  "Version 8f9e5eb2",
+                          "description":  "",
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-07-11T01:15:36.569Z",
+                                                             "id":  34,
+                                                             "workflowId":  "71SjKR4FNRCsktfS",
+                                                             "versionId":  "8f9e5eb2-2a31-4495-98fc-77abf2a7f94b",
+                                                             "event":  "activated",
+                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                                         }
+                                                     ]
+                      }
+}

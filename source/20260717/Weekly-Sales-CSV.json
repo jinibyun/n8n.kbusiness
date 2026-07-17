@@ -1,0 +1,945 @@
+﻿{
+    "updatedAt":  "2026-07-14T21:43:47.697Z",
+    "createdAt":  "2026-07-12T22:42:51.243Z",
+    "id":  "sD1AomYmaicqx63V",
+    "name":  "Weekly-Sales-CSV",
+    "description":  "Weekly sales xlsx → flat CSV 변환. Google Drive xlsx 다운로드 → 가로 구조 변환(Code) → CSV 업로드 (매일 23:00 KST)",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "cronExpression",
+                                                                           "expression":  "0 14 * * *"
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "2a34b21a-f3c6-4a8f-80fa-5b3100d213ee",
+                      "name":  "매일 오후 11시 실행",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -448,
+                                       -320
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "download",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "value":  "={{ $json.id }}",
+                                                        "mode":  "id"
+                                                    },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "78b4e682-8b62-4313-9c8c-4e6564eb82cf",
+                      "name":  "Weekly Sales xlsx 다운로드",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       528,
+                                       -320
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "xlsx",
+                                         "options":  {
+                                                         "headerRow":  false,
+                                                         "includeEmptyCells":  true
+                                                     }
+                                     },
+                      "id":  "6ab6a816-b103-4818-8d20-e0815d7c0712",
+                      "name":  "xlsx → JSON rows",
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       784,
+                                       -320
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const allItems = $input.all();\n\n// 1. 행 데이터 배열 추출 함수\nfunction getRow(item) { return item?.json?.row || []; }\n\nconst r0 = getRow(allItems[0]); // 첫 번째 행: 날짜\nconst r1 = getRow(allItems[1]); // 두 번째 행: 요일\n\n// 2. 데이터가 존재하는 날짜 컬럼 인덱스 수집 (C열 = 인덱스 2부터 시작)\nconst dateCols = [];\nfor (let i = 2; i \u003c r0.length; i++) {\n    if (r0[i] !== null \u0026\u0026 r0[i] !== undefined \u0026\u0026 r0[i] !== \u0027\u0027) {\n        dateCols.push(i);\n    }\n}\n\n// 3. 엑셀 항목 매핑 (A열 라벨 기준) 및 수수료율(B열) 추출\nconst MR = {\n    ubereats_commission_rate: 0,\n    doordash_commission_rate: 0\n};\nlet inAppsFeeSection = false;\n\nfor (let rowI = 0; rowI \u003c allItems.length; rowI++) {\n    const rowData = getRow(allItems[rowI]);\n    const rawVal = rowData[0]; // A열 라벨\n    if (!rawVal) continue;\n    \n    const lb = String(rawVal).trim().toLowerCase();\n    \n    // APPS fee 구역 진입 감지\n    if (lb === \u0027apps fee\u0027) {\n        inAppsFeeSection = true;\n        continue;\n    }\n    \n    // B열(인덱스 1)에 기재된 수수료율(%) 추출 (예: \"23%\")\n    const colB = String(rowData[1] || \u0027\u0027).trim();\n    const rateMatch = colB.match(/(\\d+)%/);\n    \n    // Weekly 병합 셀 항목 매핑 추가\n    if (lb.startsWith(\u0027weekly total sales\u0027)) MR.weekly_total_sales = rowI;\n    else if (lb.startsWith(\u0027weekly cash total\u0027)) MR.weekly_cash_total = rowI;\n    else if (lb.startsWith(\u0027weekly sales after com\u0027)) MR.weekly_sales_after_commission = rowI;\n    \n    // 일반 매출 항목 매핑\n    else if (lb.startsWith(\u0027gross sale\u0027)) MR.gross_sale = rowI;\n    else if (lb.startsWith(\u0027card without tips\u0027)) MR.card_without_tips = rowI;\n    else if (lb.startsWith(\u0027card with tips\u0027)) MR.card_with_tips = rowI;\n    else if (lb.startsWith(\u0027paid out\u0027)) MR.paid_out = rowI;\n    else if (lb.startsWith(\u0027cash sale\u0027)) MR.cash_sale_incl_gross = rowI;\n    \n    // 배달앱 섹션 분리 (매출 vs 수수료)\n    else if (lb.startsWith(\u0027ubereats\u0027)) {\n        if (inAppsFeeSection) {\n            MR.ubereats_commission = rowI;\n            if (rateMatch) MR.ubereats_commission_rate = parseInt(rateMatch[1], 10) / 100;\n        } else {\n            MR.ubereats = rowI;\n        }\n    }\n    else if (lb.startsWith(\u0027doordash\u0027)) {\n        if (inAppsFeeSection) {\n            MR.doordash_commission = rowI;\n            if (rateMatch) MR.doordash_commission_rate = parseInt(rateMatch[1], 10) / 100;\n        } else {\n            MR.doordash = rowI;\n        }\n    }\n    \n    // 기타 합계 항목 매핑\n    else if (lb.startsWith(\u0027cash and carry\u0027)) MR.cash_and_carry = rowI;\n    else if (lb.startsWith(\u0027total sale\u0027) \u0026\u0026 !lb.includes(\u0027after\u0027)) MR.total_sale = rowI;\n    else if (lb.startsWith(\u0027cash expenses\u0027)) MR.cash_expenses = rowI;\n    else if (lb.startsWith(\u0027cash left\u0027)) MR.cash_left = rowI;\n    else if (lb.startsWith(\u0027actual cash\u0027)) MR.actual_cash = rowI;\n    else if (lb.startsWith(\u0027total cash\u0027)) MR.total_cash = rowI;\n    else if (lb.startsWith(\u0027balance\u0027)) MR.balance = rowI;\n    else if (lb.startsWith(\u0027total comissions\u0027) || lb.startsWith(\u0027total commissions\u0027)) MR.total_commissions = rowI;\n    else if (lb.startsWith(\u0027total sale after comiss\u0027) || lb.startsWith(\u0027total sale after commiss\u0027)) MR.total_sale_after_commission = rowI;\n}\n\n// 4. 값 추출 및 숫자 변환 헬퍼\nfunction v(ix, ci) {\n    if (ix === undefined) return 0;\n    const val = getRow(allItems[ix])[ci];\n    if (val === null || val === undefined || val === \u0027\u0027) return 0;\n    if (typeof val === \u0027number\u0027) return val;\n    \n    const n = parseFloat(String(val).replace(/[$,\\s]/g, \u0027\u0027));\n    return isNaN(n) ? 0 : n;\n}\n\n// Weekly 병합 셀(Merged Cell) 유지를 위한 상태 변수\nlet cur_weekly_total = 0;\nlet cur_weekly_cash = 0;\nlet cur_weekly_after_com = 0;\n\n// 5. 최종 JSON 배열 조립 (총 25개 컬럼)\nreturn dateCols.map(ci =\u003e {\n    // 엑셀 날짜 일련번호 변환\n    const excelDate = r0[ci];\n    const dateStr = typeof excelDate === \u0027number\u0027 \n        ? new Date(Date.UTC(1899, 11, 30) + excelDate * 86400000).toISOString().split(\u0027T\u0027)[0]\n        : String(excelDate).trim();\n\n    // 병합 셀 Fill-Forward 처리 (새로운 값이 있으면 업데이트, 빈칸이면 이전 값 유지)\n    if (MR.weekly_total_sales !== undefined) {\n        const raw = getRow(allItems[MR.weekly_total_sales])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_total = v(MR.weekly_total_sales, ci);\n    }\n    if (MR.weekly_cash_total !== undefined) {\n        const raw = getRow(allItems[MR.weekly_cash_total])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_cash = v(MR.weekly_cash_total, ci);\n    }\n    if (MR.weekly_sales_after_commission !== undefined) {\n        const raw = getRow(allItems[MR.weekly_sales_after_commission])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_after_com = v(MR.weekly_sales_after_commission, ci);\n    }\n\n    return {\n        json: {\n            sale_date: dateStr,\n            day_of_week: String(r1[ci] || \u0027\u0027).trim(),\n            gross_sale: v(MR.gross_sale, ci),\n            card_without_tips: v(MR.card_without_tips, ci),\n            paid_out: v(MR.paid_out, ci),\n            card_with_tips: v(MR.card_with_tips, ci),\n            cash_sale_incl_gross: v(MR.cash_sale_incl_gross, ci),\n            ubereats: v(MR.ubereats, ci),\n            doordash: v(MR.doordash, ci),\n            cash_and_carry: v(MR.cash_and_carry, ci),\n            total_sale: v(MR.total_sale, ci),\n            cash_expenses: v(MR.cash_expenses, ci),\n            cash_left: v(MR.cash_left, ci),\n            actual_cash: v(MR.actual_cash, ci),\n            total_cash: v(MR.total_cash, ci),\n            balance: v(MR.balance, ci),\n            ubereats_commission_rate: MR.ubereats_commission_rate,\n            ubereats_commission: v(MR.ubereats_commission, ci),\n            doordash_commission_rate: MR.doordash_commission_rate,\n            doordash_commission: v(MR.doordash_commission, ci),\n            total_commissions: v(MR.total_commissions, ci),\n            total_sale_after_commission: v(MR.total_sale_after_commission, ci),\n            // 추가된 Weekly 항목 3개\n            weekly_total_sales: cur_weekly_total,\n            weekly_cash_total: cur_weekly_cash,\n            weekly_sales_after_commission: cur_weekly_after_com\n        }\n    };\n});"
+                                     },
+                      "id":  "e03931f5-9156-468d-b1a5-f1d1acbdb721",
+                      "name":  "xlsx→CSV 변환 (가로→세로)",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       1008,
+                                       -320
+                                   ],
+                      "alwaysOutputData":  false
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+                                                         "fileName":  "PLACEHOLDER_GDRIVE_FILE_NAME.csv",
+                                                         "headerRow":  true
+                                                     }
+                                     },
+                      "id":  "f9d42350-4141-4fd0-a925-1ebe422994b9",
+                      "name":  "JSON → CSV",
+                      "type":  "n8n-nodes-base.convertToFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       1408,
+                                       -320
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "name":  "={{ $(\u0027xlsx→CSV 변환 (가로→세로)\u0027).first().json.sale_date }}-{{ $(\u0027xlsx→CSV 변환 (가로→세로)\u0027).last().json.sale_date }}.csv",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "value":  "18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "kibo_sushi",
+                                                          "cachedResultUrl":  "https://drive.google.com/drive/folders/18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "7e6c660b-a5b1-4cc6-b96f-6e3f4e2f5f3f",
+                      "name":  "CSV → Google Drive 업로드",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1616,
+                                       -320
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict",
+                                                                            "version":  3
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "id":  "bbf34d6a-b13e-4487-8682-8f13b521a02b",
+                                                                                   "leftValue":  "={{ $json.id }}",
+                                                                                   "rightValue":  3,
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notEmpty",
+                                                                                                    "singleValue":  true
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       192,
+                                       -320
+                                   ],
+                      "id":  "67cd61ed-2eaa-43a9-a4d7-9394880aa842",
+                      "name":  "If"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**파일** 체크",
+                                         "height":  288
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       160,
+                                       -384
+                                   ],
+                      "id":  "96316254-9fb3-4ebd-b5f3-392e0a225ac1",
+                      "name":  "Sticky Note5"
+                  },
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "cronExpression",
+                                                                           "expression":  "0 14 * * *"
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "3b7d0697-0e13-4a26-a286-f3303903889a",
+                      "name":  "매일 오후 11시 실행1",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -176,
+                                       -720
+                                   ],
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "download",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "value":  "1wwowfFYVx9r18jIYv9zOMbvtdMsNTh14",
+                                                        "mode":  "list",
+                                                        "cachedResultName":  "st(AutoRecovered).xlsx",
+                                                        "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/1wwowfFYVx9r18jIYv9zOMbvtdMsNTh14/edit?usp=drivesdk\u0026ouid=112256402739678045653\u0026rtpof=true\u0026sd=true"
+                                                    },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "c5123a9a-9fac-4df8-94ad-1b887f6640a8",
+                      "name":  "Weekly Sales xlsx 다운로드1",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       128,
+                                       -720
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "xlsx",
+                                         "options":  {
+                                                         "headerRow":  false,
+                                                         "includeEmptyCells":  true
+                                                     }
+                                     },
+                      "id":  "6c933559-0cb5-454b-bb5e-c730ea6688ba",
+                      "name":  "xlsx → JSON rows1",
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       384,
+                                       -720
+                                   ],
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "const allItems = $input.all();\n\n// 1. 행 데이터 배열 추출 함수\nfunction getRow(item) { return item?.json?.row || []; }\n\nconst r0 = getRow(allItems[0]); // 첫 번째 행: 날짜\nconst r1 = getRow(allItems[1]); // 두 번째 행: 요일\n\n// 2. 데이터가 존재하는 날짜 컬럼 인덱스 수집 (C열 = 인덱스 2부터 시작)\nconst dateCols = [];\nfor (let i = 2; i \u003c r0.length; i++) {\n    if (r0[i] !== null \u0026\u0026 r0[i] !== undefined \u0026\u0026 r0[i] !== \u0027\u0027) {\n        dateCols.push(i);\n    }\n}\n\n// 3. 엑셀 항목 매핑 (A열 라벨 기준) 및 수수료율(B열) 추출\nconst MR = {\n    ubereats_commission_rate: 0,\n    doordash_commission_rate: 0\n};\nlet inAppsFeeSection = false;\n\nfor (let rowI = 0; rowI \u003c allItems.length; rowI++) {\n    const rowData = getRow(allItems[rowI]);\n    const rawVal = rowData[0]; // A열 라벨\n    if (!rawVal) continue;\n    \n    const lb = String(rawVal).trim().toLowerCase();\n    \n    // APPS fee 구역 진입 감지\n    if (lb === \u0027apps fee\u0027) {\n        inAppsFeeSection = true;\n        continue;\n    }\n    \n    // B열(인덱스 1)에 기재된 수수료율(%) 추출 (예: \"23%\")\n    const colB = String(rowData[1] || \u0027\u0027).trim();\n    const rateMatch = colB.match(/(\\d+)%/);\n    \n    // Weekly 병합 셀 항목 매핑 추가\n    if (lb.startsWith(\u0027weekly total sales\u0027)) MR.weekly_total_sales = rowI;\n    else if (lb.startsWith(\u0027weekly cash total\u0027)) MR.weekly_cash_total = rowI;\n    else if (lb.startsWith(\u0027weekly sales after com\u0027)) MR.weekly_sales_after_commission = rowI;\n    \n    // 일반 매출 항목 매핑\n    else if (lb.startsWith(\u0027gross sale\u0027)) MR.gross_sale = rowI;\n    else if (lb.startsWith(\u0027card without tips\u0027)) MR.card_without_tips = rowI;\n    else if (lb.startsWith(\u0027card with tips\u0027)) MR.card_with_tips = rowI;\n    else if (lb.startsWith(\u0027paid out\u0027)) MR.paid_out = rowI;\n    else if (lb.startsWith(\u0027cash sale\u0027)) MR.cash_sale_incl_gross = rowI;\n    \n    // 배달앱 섹션 분리 (매출 vs 수수료)\n    else if (lb.startsWith(\u0027ubereats\u0027)) {\n        if (inAppsFeeSection) {\n            MR.ubereats_commission = rowI;\n            if (rateMatch) MR.ubereats_commission_rate = parseInt(rateMatch[1], 10) / 100;\n        } else {\n            MR.ubereats = rowI;\n        }\n    }\n    else if (lb.startsWith(\u0027doordash\u0027)) {\n        if (inAppsFeeSection) {\n            MR.doordash_commission = rowI;\n            if (rateMatch) MR.doordash_commission_rate = parseInt(rateMatch[1], 10) / 100;\n        } else {\n            MR.doordash = rowI;\n        }\n    }\n    \n    // 기타 합계 항목 매핑\n    else if (lb.startsWith(\u0027cash and carry\u0027)) MR.cash_and_carry = rowI;\n    else if (lb.startsWith(\u0027total sale\u0027) \u0026\u0026 !lb.includes(\u0027after\u0027)) MR.total_sale = rowI;\n    else if (lb.startsWith(\u0027cash expenses\u0027)) MR.cash_expenses = rowI;\n    else if (lb.startsWith(\u0027cash left\u0027)) MR.cash_left = rowI;\n    else if (lb.startsWith(\u0027actual cash\u0027)) MR.actual_cash = rowI;\n    else if (lb.startsWith(\u0027total cash\u0027)) MR.total_cash = rowI;\n    else if (lb.startsWith(\u0027balance\u0027)) MR.balance = rowI;\n    else if (lb.startsWith(\u0027total comissions\u0027) || lb.startsWith(\u0027total commissions\u0027)) MR.total_commissions = rowI;\n    else if (lb.startsWith(\u0027total sale after comiss\u0027) || lb.startsWith(\u0027total sale after commiss\u0027)) MR.total_sale_after_commission = rowI;\n}\n\n// 4. 값 추출 및 숫자 변환 헬퍼\nfunction v(ix, ci) {\n    if (ix === undefined) return 0;\n    const val = getRow(allItems[ix])[ci];\n    if (val === null || val === undefined || val === \u0027\u0027) return 0;\n    if (typeof val === \u0027number\u0027) return val;\n    \n    const n = parseFloat(String(val).replace(/[$,\\s]/g, \u0027\u0027));\n    return isNaN(n) ? 0 : n;\n}\n\n// Weekly 병합 셀(Merged Cell) 유지를 위한 상태 변수\nlet cur_weekly_total = 0;\nlet cur_weekly_cash = 0;\nlet cur_weekly_after_com = 0;\n\n// 5. 최종 JSON 배열 조립 (총 25개 컬럼)\nreturn dateCols.map(ci =\u003e {\n    // 엑셀 날짜 일련번호 변환\n    const excelDate = r0[ci];\n    const dateStr = typeof excelDate === \u0027number\u0027 \n        ? new Date(Date.UTC(1899, 11, 30) + excelDate * 86400000).toISOString().split(\u0027T\u0027)[0]\n        : String(excelDate).trim();\n\n    // 병합 셀 Fill-Forward 처리 (새로운 값이 있으면 업데이트, 빈칸이면 이전 값 유지)\n    if (MR.weekly_total_sales !== undefined) {\n        const raw = getRow(allItems[MR.weekly_total_sales])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_total = v(MR.weekly_total_sales, ci);\n    }\n    if (MR.weekly_cash_total !== undefined) {\n        const raw = getRow(allItems[MR.weekly_cash_total])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_cash = v(MR.weekly_cash_total, ci);\n    }\n    if (MR.weekly_sales_after_commission !== undefined) {\n        const raw = getRow(allItems[MR.weekly_sales_after_commission])[ci];\n        if (raw !== null \u0026\u0026 raw !== undefined \u0026\u0026 raw !== \u0027\u0027) cur_weekly_after_com = v(MR.weekly_sales_after_commission, ci);\n    }\n\n    return {\n        json: {\n            sale_date: dateStr,\n            day_of_week: String(r1[ci] || \u0027\u0027).trim(),\n            gross_sale: v(MR.gross_sale, ci),\n            card_without_tips: v(MR.card_without_tips, ci),\n            paid_out: v(MR.paid_out, ci),\n            card_with_tips: v(MR.card_with_tips, ci),\n            cash_sale_incl_gross: v(MR.cash_sale_incl_gross, ci),\n            ubereats: v(MR.ubereats, ci),\n            doordash: v(MR.doordash, ci),\n            cash_and_carry: v(MR.cash_and_carry, ci),\n            total_sale: v(MR.total_sale, ci),\n            cash_expenses: v(MR.cash_expenses, ci),\n            cash_left: v(MR.cash_left, ci),\n            actual_cash: v(MR.actual_cash, ci),\n            total_cash: v(MR.total_cash, ci),\n            balance: v(MR.balance, ci),\n            ubereats_commission_rate: MR.ubereats_commission_rate,\n            ubereats_commission: v(MR.ubereats_commission, ci),\n            doordash_commission_rate: MR.doordash_commission_rate,\n            doordash_commission: v(MR.doordash_commission, ci),\n            total_commissions: v(MR.total_commissions, ci),\n            total_sale_after_commission: v(MR.total_sale_after_commission, ci),\n            // 추가된 Weekly 항목 3개\n            weekly_total_sales: cur_weekly_total,\n            weekly_cash_total: cur_weekly_cash,\n            weekly_sales_after_commission: cur_weekly_after_com\n        }\n    };\n});"
+                                     },
+                      "id":  "b9f82ada-bdfd-4442-803c-1e2fa47aa228",
+                      "name":  "xlsx→CSV 변환 (가로→세로)1",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       608,
+                                       -720
+                                   ],
+                      "alwaysOutputData":  false,
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+                                                         "fileName":  "PLACEHOLDER_GDRIVE_FILE_NAME.csv",
+                                                         "headerRow":  true
+                                                     }
+                                     },
+                      "id":  "fcbf20c1-079a-40d6-aa95-5fc723fcacb7",
+                      "name":  "JSON → CSV1",
+                      "type":  "n8n-nodes-base.convertToFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       832,
+                                       -720
+                                   ],
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "name":  "PLACEHOLDER_GDRIVE_FILE_NAME.csv",
+                                         "driveId":  {
+                                                         "__rl":  true,
+                                                         "mode":  "list",
+                                                         "value":  "My Drive"
+                                                     },
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "value":  "18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "kibo_sushi",
+                                                          "cachedResultUrl":  "https://drive.google.com/drive/folders/18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "9f2bb7d1-4ae6-4e36-9fac-af0cdb6a7648",
+                      "name":  "CSV → Google Drive 업로드1",
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1056,
+                                       -720
+                                   ],
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "fileFolder",
+                                         "searchMethod":  "=query",
+                                         "queryString":  "name contains \u0027.xlsx\u0027 and not name contains \u0027.processed\u0027",
+                                         "limit":  1,
+                                         "filter":  {
+                                                        "folderId":  {
+                                                                         "__rl":  true,
+                                                                         "value":  "18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9",
+                                                                         "mode":  "list",
+                                                                         "cachedResultName":  "kibo_sushi",
+                                                                         "cachedResultUrl":  "https://drive.google.com/drive/folders/18lCmwjZcT7Z_A3FyCEbW-X_UH2q5RwR9"
+                                                                     }
+                                                    },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       -128,
+                                       -320
+                                   ],
+                      "id":  "fd0944e6-4e33-4ce6-95be-6fe98d6bcf31",
+                      "name":  "Search files and folders1",
+                      "alwaysOutputData":  true,
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "file search",
+                                         "height":  304,
+                                         "width":  272
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -192,
+                                       -384
+                                   ],
+                      "id":  "91bea303-38cf-461f-b30c-a277e813d928",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "fileId":  {
+                                                        "__rl":  true,
+                                                        "value":  "={{ $(\u0027Search files and folders1\u0027).first().json.id }}",
+                                                        "mode":  "id"
+                                                    },
+                                         "newUpdatedFileName":  "={{ $(\u0027Search files and folders1\u0027).first().json.name }}.processed",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleDrive",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1824,
+                                       -320
+                                   ],
+                      "id":  "f75d1bde-4c1f-47ba-ad3d-01bc4d25e9d9",
+                      "name":  "Update file",
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**비활성화** 되어 있는 노드는 테스트용. 아래의 섹션이 실질적 진행이 담긴 섹션이므로 이 부분은 순수하게 다운, 변경, 업로드가 안됐을 때만 처리 할 것",
+                                         "height":  176,
+                                         "width":  320
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -560,
+                                       -720
+                                   ],
+                      "id":  "61d5d841-3165-49e8-bfa9-72f9a26b2845",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "upsert",
+                                         "schema":  {
+                                                        "__rl":  true,
+                                                        "mode":  "list",
+                                                        "value":  "public"
+                                                    },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "value":  "sales_records_new",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "sales_records_new"
+                                                   },
+                                         "columns":  {
+                                                         "mappingMode":  "autoMapInputData",
+                                                         "value":  {
+                                                                       "id":  0,
+                                                                       "gross_sale":  0,
+                                                                       "card_without_tips":  0,
+                                                                       "paid_out":  0,
+                                                                       "card_with_tips":  0,
+                                                                       "cash_sale_incl_gross":  0,
+                                                                       "ubereats":  0,
+                                                                       "doordash":  0,
+                                                                       "cash_and_carry":  0,
+                                                                       "total_sale":  0,
+                                                                       "cash_expenses":  0,
+                                                                       "cash_left":  0,
+                                                                       "actual_cash":  0,
+                                                                       "total_cash":  0,
+                                                                       "balance":  0,
+                                                                       "ubereats_commission_rate":  0,
+                                                                       "ubereats_commission":  0,
+                                                                       "doordash_commission_rate":  0,
+                                                                       "doordash_commission":  0,
+                                                                       "total_commissions":  0,
+                                                                       "total_sale_after_commission":  0,
+                                                                       "weekly_total_sales":  0,
+                                                                       "weekly_cash_total":  0,
+                                                                       "weekly_sales_after_commission":  0
+                                                                   },
+                                                         "matchingColumns":  [
+                                                                                 "sale_date"
+                                                                             ],
+                                                         "schema":  [
+                                                                        {
+                                                                            "id":  "id",
+                                                                            "displayName":  "id",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  true,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "sale_date",
+                                                                            "displayName":  "sale_date",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "dateTime",
+                                                                            "canBeUsedToMatch":  true,
+                                                                            "removed":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "day_of_week",
+                                                                            "displayName":  "day_of_week",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "string",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "gross_sale",
+                                                                            "displayName":  "gross_sale",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "card_without_tips",
+                                                                            "displayName":  "card_without_tips",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "paid_out",
+                                                                            "displayName":  "paid_out",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "card_with_tips",
+                                                                            "displayName":  "card_with_tips",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "cash_sale_incl_gross",
+                                                                            "displayName":  "cash_sale_incl_gross",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "ubereats",
+                                                                            "displayName":  "ubereats",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "doordash",
+                                                                            "displayName":  "doordash",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "cash_and_carry",
+                                                                            "displayName":  "cash_and_carry",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "total_sale",
+                                                                            "displayName":  "total_sale",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "cash_expenses",
+                                                                            "displayName":  "cash_expenses",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "cash_left",
+                                                                            "displayName":  "cash_left",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "actual_cash",
+                                                                            "displayName":  "actual_cash",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "total_cash",
+                                                                            "displayName":  "total_cash",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "balance",
+                                                                            "displayName":  "balance",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "ubereats_commission_rate",
+                                                                            "displayName":  "ubereats_commission_rate",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "ubereats_commission",
+                                                                            "displayName":  "ubereats_commission",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "doordash_commission_rate",
+                                                                            "displayName":  "doordash_commission_rate",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "doordash_commission",
+                                                                            "displayName":  "doordash_commission",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "total_commissions",
+                                                                            "displayName":  "total_commissions",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "total_sale_after_commission",
+                                                                            "displayName":  "total_sale_after_commission",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "weekly_total_sales",
+                                                                            "displayName":  "weekly_total_sales",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "weekly_cash_total",
+                                                                            "displayName":  "weekly_cash_total",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "weekly_sales_after_commission",
+                                                                            "displayName":  "weekly_sales_after_commission",
+                                                                            "required":  true,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "number",
+                                                                            "canBeUsedToMatch":  false
+                                                                        },
+                                                                        {
+                                                                            "id":  "updated_at",
+                                                                            "displayName":  "updated_at",
+                                                                            "required":  false,
+                                                                            "defaultMatch":  false,
+                                                                            "display":  true,
+                                                                            "type":  "dateTime",
+                                                                            "canBeUsedToMatch":  false
+                                                                        }
+                                                                    ],
+                                                         "attemptToConvertTypes":  false,
+                                                         "convertFieldsToString":  false
+                                                     },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.postgres",
+                      "typeVersion":  2.6,
+                      "position":  [
+                                       1200,
+                                       -320
+                                   ],
+                      "id":  "b3047488-7e34-4d9c-a334-ee1cc3b829f4",
+                      "name":  "Insert or update rows in a table",
+                      "credentials":  {
+                                          "postgres":  {
+                                                           "id":  "whuctzn3nFikHQu0",
+                                                           "name":  "Postgres account"
+                                                       }
+                                      }
+                  }
+              ],
+    "connections":  {
+                        "매일 오후 11시 실행":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Search files and folders1",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Weekly Sales xlsx 다운로드":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "xlsx → JSON rows",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "xlsx → JSON rows":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "xlsx→CSV 변환 (가로→세로)",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "xlsx→CSV 변환 (가로→세로)":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Insert or update rows in a table",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "JSON → CSV":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "CSV → Google Drive 업로드",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "If":  {
+                                   "main":  [
+                                                [
+                                                    {
+                                                        "node":  "Weekly Sales xlsx 다운로드",
+                                                        "type":  "main",
+                                                        "index":  0
+                                                    }
+                                                ],
+                                                [
+
+                                                ]
+                                            ]
+                               },
+                        "매일 오후 11시 실행1":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Weekly Sales xlsx 다운로드1",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Weekly Sales xlsx 다운로드1":  {
+                                                        "main":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "xlsx → JSON rows1",
+                                                                             "type":  "main",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                    },
+                        "xlsx → JSON rows1":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "xlsx→CSV 변환 (가로→세로)1",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "xlsx→CSV 변환 (가로→세로)1":  {
+                                                     "main":  [
+                                                                  [
+                                                                      {
+                                                                          "node":  "JSON → CSV1",
+                                                                          "type":  "main",
+                                                                          "index":  0
+                                                                      }
+                                                                  ]
+                                                              ]
+                                                 },
+                        "JSON → CSV1":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "CSV → Google Drive 업로드1",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Search files and folders1":  {
+                                                          "main":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "If",
+                                                                               "type":  "main",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                      },
+                        "CSV → Google Drive 업로드":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Update file",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Insert or update rows in a table":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "JSON → CSV",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  {
+                       "node:매일 오후 11시 실행":  {
+                                                 "recurrenceRules":  [
+
+                                                                     ]
+                                             }
+                   },
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp",
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "b84995f4-5e4c-4f83-ab81-8e2fac739fdc",
+    "activeVersionId":  null,
+    "versionCounter":  172,
+    "triggerCount":  1,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-12T22:42:51.243Z",
+                       "createdAt":  "2026-07-12T22:42:51.243Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "sD1AomYmaicqx63V",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

@@ -1,10 +1,10 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:35:22.463Z",
+    "updatedAt":  "2026-07-15T02:52:58.869Z",
     "createdAt":  "2026-06-15T03:21:51.123Z",
     "id":  "yIclqNGcvnYvmT9p",
     "name":  "05.고객정보 수집 - 마케팅3-실제 FB 메신저 연동",
     "description":  null,
-    "active":  true,
+    "active":  false,
     "isArchived":  false,
     "nodes":  [
                   {
@@ -18,8 +18,8 @@
                       "type":  "n8n-nodes-base.webhook",
                       "typeVersion":  2.1,
                       "position":  [
-                                       -1680,
-                                       -704
+                                       -1696,
+                                       -1008
                                    ],
                       "id":  "6752f097-0df0-44da-a6f1-39b0b061d831",
                       "name":  "Webhook2",
@@ -36,23 +36,23 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       -1328,
-                                       -704
+                                       -1344,
+                                       -1008
                                    ],
                       "id":  "a96c7835-1e8f-4d58-82b7-fb40ac7c5db7",
                       "name":  "Respond to Webhook1"
                   },
                   {
                       "parameters":  {
-                                         "content":  "### Meta API TESTING ###\nFB - Messenger 연결 테스팅\n\n- 이 부분만 활성화 (아래는 비활성화)\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
+                                         "content":  "### Meta API TESTING 1  of 2 ###\nFB - Messenger 연결 테스팅 **only**\n\n- 이 부분만 활성화 (아래는 비활성화)\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 복잡한 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
                                          "height":  256,
                                          "width":  400
                                      },
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -2272,
-                                       -832
+                                       -2288,
+                                       -1136
                                    ],
                       "id":  "d7a5b8a5-3e59-40c3-bc20-239eed30dc28",
                       "name":  "Sticky Note10",
@@ -67,8 +67,8 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -1824,
-                                       -832
+                                       -1840,
+                                       -1136
                                    ],
                       "id":  "5f06d020-73de-4dad-9423-a17b63dcbf34",
                       "name":  "Sticky Note2"
@@ -85,12 +85,13 @@
                       "type":  "n8n-nodes-base.webhook",
                       "typeVersion":  2.1,
                       "position":  [
-                                       -1680,
+                                       -1696,
                                        -464
                                    ],
                       "id":  "b8317f14-d506-4fd5-be49-10988dc5b0c3",
                       "name":  "Webhook3",
-                      "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
+                      "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -101,7 +102,7 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -2272,
+                                       -2288,
                                        -544
                                    ],
                       "id":  "f9e46393-68f0-4c3c-8ac7-a1c0f693a326",
@@ -119,11 +120,12 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       -1328,
+                                       -1344,
                                        -464
                                    ],
                       "id":  "ce459e33-08d1-46d3-955d-cfa7be709120",
-                      "name":  "Respond to Webhook2"
+                      "name":  "Respond to Webhook2",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -134,11 +136,12 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -1824,
+                                       -1840,
                                        -544
                                    ],
                       "id":  "aaaf11c7-5ba9-4887-917c-55e01fec09fa",
-                      "name":  "Sticky Note3"
+                      "name":  "Sticky Note3",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -167,7 +170,8 @@
                                        -656
                                    ],
                       "id":  "5983c789-2125-4aea-8fce-23a2641e13b9",
-                      "name":  "HTTP Request"
+                      "name":  "HTTP Request",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -181,7 +185,8 @@
                                        -736
                                    ],
                       "id":  "96ea1ee8-4d50-4a61-b6cd-15173284d6f4",
-                      "name":  "Sticky Note"
+                      "name":  "Sticky Note",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -350,7 +355,8 @@
                                                                         "id":  "ophipSkUUJ8FOlDd",
                                                                         "name":  "Google Sheets account"
                                                                     }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -365,7 +371,8 @@
                                        -736
                                    ],
                       "id":  "b5ab3881-1ca0-4f00-a53c-12890de9ac75",
-                      "name":  "Sticky Note1"
+                      "name":  "Sticky Note1",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -454,7 +461,8 @@
                                    ],
                       "id":  "5fdbbc2c-639a-4165-8172-23c560f03c19",
                       "name":  "Switch",
-                      "alwaysOutputData":  true
+                      "alwaysOutputData":  true,
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -498,7 +506,8 @@
                                                                         "id":  "ophipSkUUJ8FOlDd",
                                                                         "name":  "Google Sheets account"
                                                                     }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -695,7 +704,8 @@
                                                                         "id":  "ophipSkUUJ8FOlDd",
                                                                         "name":  "Google Sheets account"
                                                                     }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -724,7 +734,8 @@
                                        -448
                                    ],
                       "id":  "686be5f7-1d70-4b1f-8304-4a5a20e0bf82",
-                      "name":  "HTTP Request1"
+                      "name":  "HTTP Request1",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -739,7 +750,8 @@
                                        -288
                                    ],
                       "id":  "ed09666b-97bd-458b-904a-962250cc8016",
-                      "name":  "Sticky Note9"
+                      "name":  "Sticky Note9",
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -782,7 +794,8 @@
                                                             "id":  "LpurHLLxN4l8QZpP",
                                                             "name":  "OpenAI account"
                                                         }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -818,7 +831,8 @@
                                                                         "id":  "ophipSkUUJ8FOlDd",
                                                                         "name":  "Google Sheets account"
                                                                     }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -1001,7 +1015,8 @@
                                                                         "id":  "ophipSkUUJ8FOlDd",
                                                                         "name":  "Google Sheets account"
                                                                     }
-                                      }
+                                      },
+                      "disabled":  true
                   },
                   {
                       "parameters":  {
@@ -1030,7 +1045,75 @@
                                        -240
                                    ],
                       "id":  "c263b6b1-683f-467f-99a8-5ef3d54d9653",
-                      "name":  "HTTP Request2"
+                      "name":  "HTTP Request2",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "9db4dfeb-305c-47d5-83f4-9389e49a6918",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -1696,
+                                       -752
+                                   ],
+                      "id":  "feb02c04-8e96-4b6c-9c52-18a50910a6be",
+                      "name":  "Webhook",
+                      "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{ \"status\": \"ok\" }",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       -1344,
+                                       -752
+                                   ],
+                      "id":  "8018ad74-7f92-4674-b079-d5dcdc690b14",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Meta App - Messenger** 의 신호 수신 - 위의 Get 방식을 Post 방식으로 바꾼다\n",
+                                         "height":  224,
+                                         "width":  640
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1840,
+                                       -832
+                                   ],
+                      "id":  "78ec1d15-6c46-4371-9c3d-a0e4e05be3be",
+                      "name":  "Sticky Note5"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "### Meta API TESTING 2 of 2 ###\nFB - Messenger 실제 메시지 주고 받음 테스팅. 확인은 Executions 에서.\n\n- 위, 아래는 비활성화\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 복잡한 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
+                                         "height":  256,
+                                         "width":  400
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2288,
+                                       -832
+                                   ],
+                      "id":  "01d286cc-9988-4b11-91fa-13c25455c144",
+                      "name":  "Sticky Note12",
+                      "disabled":  true
                   }
               ],
     "connections":  {
@@ -1164,7 +1247,18 @@
                                                                       }
                                                                   ]
                                                               ]
-                                                 }
+                                                 },
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "Respond to Webhook",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    }
                     },
     "settings":  {
                      "executionOrder":  "v1",
@@ -1180,10 +1274,10 @@
     "pinData":  {
 
                 },
-    "versionId":  "2d8e86ad-f221-4be3-8a75-8112fe1a8823",
-    "activeVersionId":  "041a5da3-9496-4cbf-9271-9171d7a14d5a",
-    "versionCounter":  423,
-    "triggerCount":  2,
+    "versionId":  "7d18e38d-1b5c-4290-825b-8ba232866eea",
+    "activeVersionId":  null,
+    "versionCounter":  456,
+    "triggerCount":  1,
     "sourceWorkflowId":  null,
     "shared":  [
                    {
@@ -1210,779 +1304,5 @@
     "tags":  [
 
              ],
-    "activeVersion":  {
-                          "updatedAt":  "2026-06-17T02:51:31.564Z",
-                          "createdAt":  "2026-06-17T02:48:42.141Z",
-                          "versionId":  "041a5da3-9496-4cbf-9271-9171d7a14d5a",
-                          "workflowId":  "yIclqNGcvnYvmT9p",
-                          "nodes":  [
-                                        {
-                                            "parameters":  {
-                                                               "path":  "9db4dfeb-305c-47d5-83f4-9389e49a6918",
-                                                               "responseMode":  "responseNode",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.webhook",
-                                            "typeVersion":  2.1,
-                                            "position":  [
-                                                             -1680,
-                                                             -704
-                                                         ],
-                                            "id":  "6752f097-0df0-44da-a6f1-39b0b061d831",
-                                            "name":  "Webhook2",
-                                            "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "respondWith":  "text",
-                                                               "responseBody":  "={{ $json.query.hub_challenge }}",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.respondToWebhook",
-                                            "typeVersion":  1.5,
-                                            "position":  [
-                                                             -1328,
-                                                             -704
-                                                         ],
-                                            "id":  "a96c7835-1e8f-4d58-82b7-fb40ac7c5db7",
-                                            "name":  "Respond to Webhook1"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "### Meta API TESTING ###\nFB - Messenger 연결 테스팅\n\n- 이 부분만 활성화 (아래는 비활성화)\n- 그냥 Test URL 로 해도 됨\n- 테스팅 성공후에는 아래의 부분도 함께 활성화 하고publish 함. 그 에따라 developers.facebook.com 의 fallback url 도 production url 로 수정할 것\n",
-                                                               "height":  256,
-                                                               "width":  400
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -2272,
-                                                             -832
-                                                         ],
-                                            "id":  "d7a5b8a5-3e59-40c3-bc20-239eed30dc28",
-                                            "name":  "Sticky Note10",
-                                            "disabled":  true
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "**Meta App - Messenger** 의 신호 수신 - 네가 임의로 대답하지 말고, 다음 노드가 정답(hub.challenge)을 보낼 때까지 응답을 보류해라\"라고 지시. 이는 FB 와 여기 n8n 과의 기초 인증 과정\n",
-                                                               "height":  256,
-                                                               "width":  640
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -1824,
-                                                             -832
-                                                         ],
-                                            "id":  "5f06d020-73de-4dad-9423-a17b63dcbf34",
-                                            "name":  "Sticky Note2"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "httpMethod":  "POST",
-                                                               "path":  "9db4dfeb-305c-47d5-83f4-9389e49a6918",
-                                                               "responseMode":  "responseNode",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.webhook",
-                                            "typeVersion":  2.1,
-                                            "position":  [
-                                                             -1680,
-                                                             -464
-                                                         ],
-                                            "id":  "b8317f14-d506-4fd5-be49-10988dc5b0c3",
-                                            "name":  "Webhook3",
-                                            "webhookId":  "9db4dfeb-305c-47d5-83f4-9389e49a6918"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "### 실제 ###\n위의 FB - Messenger 연결 테스팅이 끝나게 되면 다음과 같이 재 세팅한다.",
-                                                               "height":  224,
-                                                               "width":  400
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -2272,
-                                                             -544
-                                                         ],
-                                            "id":  "f9e46393-68f0-4c3c-8ac7-a1c0f693a326",
-                                            "name":  "Sticky Note11",
-                                            "disabled":  true
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "respondWith":  "json",
-                                                               "responseBody":  "{ \"status\": \"ok\" }",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.respondToWebhook",
-                                            "typeVersion":  1.5,
-                                            "position":  [
-                                                             -1328,
-                                                             -464
-                                                         ],
-                                            "id":  "ce459e33-08d1-46d3-955d-cfa7be709120",
-                                            "name":  "Respond to Webhook2"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "**Meta App - Messenger** 의 신호 수신 - 위의 Get 방식을 Post 방식으로 바꾼다\n",
-                                                               "height":  224,
-                                                               "width":  640
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -1824,
-                                                             -544
-                                                         ],
-                                            "id":  "aaaf11c7-5ba9-4887-917c-55e01fec09fa",
-                                            "name":  "Sticky Note3"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "method":  "POST",
-                                                               "url":  "https://graph.facebook.com/v19.0/me/messages",
-                                                               "sendQuery":  true,
-                                                               "queryParameters":  {
-                                                                                       "parameters":  [
-                                                                                                          {
-                                                                                                              "name":  "access_token",
-                                                                                                              "value":  "EAAS57ZA5a0u0BRlqAlSZB4nnqbq4VdjixLAWPJ0XRRuhaaS6xsNRr1OBFCCbUsimZBQS7Gfmod3XVKs7gswawGMDZAw5lvpACE64hq8EG318vYpExfpI0f7wKEvYEzZAa5lvCIgquJRuAFZBlFykUZB1uhBa7bw1hEKnGdkKh9XZColZAUOyiKnkDxUhbRsaxDfAjTSdf9NWNtcMeTz0U2Vf7UAZDZD"
-                                                                                                          }
-                                                                                                      ]
-                                                                                   },
-                                                               "sendBody":  true,
-                                                               "specifyBody":  "json",
-                                                               "jsonBody":  "={\n  \"recipient\": {\n    \"id\": \"{{ $json.body.entry[0].messaging[0].sender.id }}\"\n  },\n  \"message\": {\n    \"text\": \"안녕하세요! 빠른 도움을 위해 아래 정보를 한 번에 보내주세요 😊\\n\\n이름 / 전화번호 / 이메일 / 카톡ID\"\n  }\n}",
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.httpRequest",
-                                            "typeVersion":  4.4,
-                                            "position":  [
-                                                             -592,
-                                                             -256
-                                                         ],
-                                            "id":  "5983c789-2125-4aea-8fce-23a2641e13b9",
-                                            "name":  "HTTP Request"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "**이름, 연락처** 등 바로 응답",
-                                                               "height":  224
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -656,
-                                                             -336
-                                                         ],
-                                            "id":  "96ea1ee8-4d50-4a61-b6cd-15173284d6f4",
-                                            "name":  "Sticky Note"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "append",
-                                                               "documentId":  {
-                                                                                  "__rl":  true,
-                                                                                  "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
-                                                                                  "mode":  "list",
-                                                                                  "cachedResultName":  "고객관리2 (Responses)",
-                                                                                  "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
-                                                                              },
-                                                               "sheetName":  {
-                                                                                 "__rl":  true,
-                                                                                 "value":  1275732917,
-                                                                                 "mode":  "list",
-                                                                                 "cachedResultName":  "Form Responses 1",
-                                                                                 "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=1275732917"
-                                                                             },
-                                                               "columns":  {
-                                                                               "mappingMode":  "defineBelow",
-                                                                               "value":  {
-                                                                                             "Timestamp":  "={{ new Date().toISOString() }}",
-                                                                                             "문의채널":  "FB메신저",
-                                                                                             "FB메신저단계":  "1",
-                                                                                             "FB메신저_Sender_Id":  "={{ $(\u0027Webhook3\u0027).item.json.body.entry[0].messaging[0].sender.id }}"
-                                                                                         },
-                                                                               "matchingColumns":  [
-
-                                                                                                   ],
-                                                                               "schema":  [
-                                                                                              {
-                                                                                                  "id":  "Timestamp",
-                                                                                                  "displayName":  "Timestamp",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "고객이름",
-                                                                                                  "displayName":  "고객이름",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "전화번호",
-                                                                                                  "displayName":  "전화번호",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "이메일",
-                                                                                                  "displayName":  "이메일",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "문의내용",
-                                                                                                  "displayName":  "문의내용",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "카테고리",
-                                                                                                  "displayName":  "카테고리",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "문의채널",
-                                                                                                  "displayName":  "문의채널",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "AI 답변 결과",
-                                                                                                  "displayName":  "AI 답변 결과",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "발송상태",
-                                                                                                  "displayName":  "발송상태",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "인스타ID",
-                                                                                                  "displayName":  "인스타ID",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "FB메신저단계",
-                                                                                                  "displayName":  "FB메신저단계",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "FB메신저_Sender_Id",
-                                                                                                  "displayName":  "FB메신저_Sender_Id",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true
-                                                                                              }
-                                                                                          ],
-                                                                               "attemptToConvertTypes":  false,
-                                                                               "convertFieldsToString":  false
-                                                                           },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  4.7,
-                                            "position":  [
-                                                             -272,
-                                                             -256
-                                                         ],
-                                            "id":  "8b25a3ca-ac02-4c0b-a6ab-eb338903ef2c",
-                                            "name":  "Append row in sheet",
-                                            "alwaysOutputData":  true,
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id":  "ophipSkUUJ8FOlDd",
-                                                                                              "name":  "Google Sheets account"
-                                                                                          }
-                                                            }
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "**1차** 클라이언트 메시지",
-                                                               "height":  224,
-                                                               "width":  272
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -336,
-                                                             -336
-                                                         ],
-                                            "id":  "b5ab3881-1ca0-4f00-a53c-12890de9ac75",
-                                            "name":  "Sticky Note1"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "rules":  {
-                                                                             "values":  [
-                                                                                            {
-                                                                                                "conditions":  {
-                                                                                                                   "options":  {
-                                                                                                                                   "caseSensitive":  true,
-                                                                                                                                   "leftValue":  "",
-                                                                                                                                   "typeValidation":  "loose",
-                                                                                                                                   "version":  3
-                                                                                                                               },
-                                                                                                                   "conditions":  [
-                                                                                                                                      {
-                                                                                                                                          "leftValue":  "={{ $json.FB메신저단계 }}",
-                                                                                                                                          "rightValue":  "1",
-                                                                                                                                          "operator":  {
-                                                                                                                                                           "type":  "string",
-                                                                                                                                                           "operation":  "equals"
-                                                                                                                                                       },
-                                                                                                                                          "id":  "c30fd47e-a180-421a-aaff-e07442ce0cc6"
-                                                                                                                                      }
-                                                                                                                                  ],
-                                                                                                                   "combinator":  "and"
-                                                                                                               }
-                                                                                            },
-                                                                                            {
-                                                                                                "conditions":  {
-                                                                                                                   "options":  {
-                                                                                                                                   "caseSensitive":  true,
-                                                                                                                                   "leftValue":  "",
-                                                                                                                                   "typeValidation":  "loose",
-                                                                                                                                   "version":  3
-                                                                                                                               },
-                                                                                                                   "conditions":  [
-                                                                                                                                      {
-                                                                                                                                          "id":  "001005ba-4bf0-47ff-a003-66cf235f7f42",
-                                                                                                                                          "leftValue":  "={{ $json.FB메신저단계 }}",
-                                                                                                                                          "rightValue":  "2",
-                                                                                                                                          "operator":  {
-                                                                                                                                                           "type":  "string",
-                                                                                                                                                           "operation":  "equals",
-                                                                                                                                                           "name":  "filter.operator.equals"
-                                                                                                                                                       }
-                                                                                                                                      }
-                                                                                                                                  ],
-                                                                                                                   "combinator":  "and"
-                                                                                                               }
-                                                                                            }
-                                                                                        ]
-                                                                         },
-                                                               "looseTypeValidation":  true,
-                                                               "options":  {
-                                                                               "fallbackOutput":  "extra"
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.switch",
-                                            "typeVersion":  3.4,
-                                            "position":  [
-                                                             -928,
-                                                             -464
-                                                         ],
-                                            "id":  "5fdbbc2c-639a-4165-8172-23c560f03c19",
-                                            "name":  "Switch",
-                                            "alwaysOutputData":  true
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "documentId":  {
-                                                                                  "__rl":  true,
-                                                                                  "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
-                                                                                  "mode":  "list",
-                                                                                  "cachedResultName":  "고객관리2 (Responses)",
-                                                                                  "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
-                                                                              },
-                                                               "sheetName":  {
-                                                                                 "__rl":  true,
-                                                                                 "value":  1275732917,
-                                                                                 "mode":  "list",
-                                                                                 "cachedResultName":  "Form Responses 1",
-                                                                                 "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=1275732917"
-                                                                             },
-                                                               "filtersUI":  {
-                                                                                 "values":  [
-                                                                                                {
-                                                                                                    "lookupColumn":  "FB메신저_Sender_Id",
-                                                                                                    "lookupValue":  "={{ $json.body.entry[0].messaging[0].sender.id }}"
-                                                                                                }
-                                                                                            ]
-                                                                             },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  4.7,
-                                            "position":  [
-                                                             -1136,
-                                                             -464
-                                                         ],
-                                            "id":  "dd76baed-54cf-47b6-bc27-d7e9e8a640c6",
-                                            "name":  "Get row(s) in sheet1",
-                                            "alwaysOutputData":  true,
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id":  "ophipSkUUJ8FOlDd",
-                                                                                              "name":  "Google Sheets account"
-                                                                                          }
-                                                            }
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "content":  "0: FB메신저단계 1\n1: FB메신저단계 2\n\nFallback: 신규",
-                                                               "height":  400,
-                                                               "width":  256
-                                                           },
-                                            "type":  "n8n-nodes-base.stickyNote",
-                                            "typeVersion":  1,
-                                            "position":  [
-                                                             -960,
-                                                             -592
-                                                         ],
-                                            "id":  "422de38b-30f0-49a4-81b6-09d6b30eb8d6",
-                                            "name":  "Sticky Note4"
-                                        },
-                                        {
-                                            "parameters":  {
-                                                               "operation":  "update",
-                                                               "documentId":  {
-                                                                                  "__rl":  true,
-                                                                                  "value":  "12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg",
-                                                                                  "mode":  "list",
-                                                                                  "cachedResultName":  "고객관리2 (Responses)",
-                                                                                  "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit?usp=drivesdk"
-                                                                              },
-                                                               "sheetName":  {
-                                                                                 "__rl":  true,
-                                                                                 "value":  1275732917,
-                                                                                 "mode":  "list",
-                                                                                 "cachedResultName":  "Form Responses 1",
-                                                                                 "cachedResultUrl":  "https://docs.google.com/spreadsheets/d/12EmlY4Z3cjBgg_Zx5LlBccvbGDZIv9NmmS26YjITJdg/edit#gid=1275732917"
-                                                                             },
-                                                               "columns":  {
-                                                                               "mappingMode":  "defineBelow",
-                                                                               "value":  {
-                                                                                             "row_number":  "={{ $json.row_number }}"
-                                                                                         },
-                                                                               "matchingColumns":  [
-                                                                                                       "row_number"
-                                                                                                   ],
-                                                                               "schema":  [
-                                                                                              {
-                                                                                                  "id":  "Timestamp",
-                                                                                                  "displayName":  "Timestamp",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "고객이름",
-                                                                                                  "displayName":  "고객이름",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "전화번호",
-                                                                                                  "displayName":  "전화번호",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "이메일",
-                                                                                                  "displayName":  "이메일",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "문의내용",
-                                                                                                  "displayName":  "문의내용",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "카테고리",
-                                                                                                  "displayName":  "카테고리",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "문의채널",
-                                                                                                  "displayName":  "문의채널",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "AI 답변 결과",
-                                                                                                  "displayName":  "AI 답변 결과",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "발송상태",
-                                                                                                  "displayName":  "발송상태",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "인스타ID",
-                                                                                                  "displayName":  "인스타ID",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "FB메신저단계",
-                                                                                                  "displayName":  "FB메신저단계",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "FB메신저_Sender_Id",
-                                                                                                  "displayName":  "FB메신저_Sender_Id",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "string",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "removed":  false
-                                                                                              },
-                                                                                              {
-                                                                                                  "id":  "row_number",
-                                                                                                  "displayName":  "row_number",
-                                                                                                  "required":  false,
-                                                                                                  "defaultMatch":  false,
-                                                                                                  "display":  true,
-                                                                                                  "type":  "number",
-                                                                                                  "canBeUsedToMatch":  true,
-                                                                                                  "readOnly":  true,
-                                                                                                  "removed":  false
-                                                                                              }
-                                                                                          ],
-                                                                               "attemptToConvertTypes":  false,
-                                                                               "convertFieldsToString":  false
-                                                                           },
-                                                               "options":  {
-
-                                                                           }
-                                                           },
-                                            "type":  "n8n-nodes-base.googleSheets",
-                                            "typeVersion":  4.7,
-                                            "position":  [
-                                                             -624,
-                                                             -736
-                                                         ],
-                                            "id":  "40294c73-eed6-4106-95ae-42f5cc1d6827",
-                                            "name":  "Update row in sheet",
-                                            "credentials":  {
-                                                                "googleSheetsOAuth2Api":  {
-                                                                                              "id":  "ophipSkUUJ8FOlDd",
-                                                                                              "name":  "Google Sheets account"
-                                                                                          }
-                                                            }
-                                        }
-                                    ],
-                          "connections":  {
-                                              "Webhook2":  {
-                                                               "main":  [
-                                                                            [
-                                                                                {
-                                                                                    "node":  "Respond to Webhook1",
-                                                                                    "type":  "main",
-                                                                                    "index":  0
-                                                                                }
-                                                                            ]
-                                                                        ]
-                                                           },
-                                              "Webhook3":  {
-                                                               "main":  [
-                                                                            [
-                                                                                {
-                                                                                    "node":  "Respond to Webhook2",
-                                                                                    "type":  "main",
-                                                                                    "index":  0
-                                                                                }
-                                                                            ]
-                                                                        ]
-                                                           },
-                                              "Respond to Webhook2":  {
-                                                                          "main":  [
-                                                                                       [
-                                                                                           {
-                                                                                               "node":  "Get row(s) in sheet1",
-                                                                                               "type":  "main",
-                                                                                               "index":  0
-                                                                                           }
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "HTTP Request":  {
-                                                                   "main":  [
-                                                                                [
-                                                                                    {
-                                                                                        "node":  "Append row in sheet",
-                                                                                        "type":  "main",
-                                                                                        "index":  0
-                                                                                    }
-                                                                                ]
-                                                                            ]
-                                                               },
-                                              "Append row in sheet":  {
-                                                                          "main":  [
-                                                                                       [
-
-                                                                                       ]
-                                                                                   ]
-                                                                      },
-                                              "Get row(s) in sheet1":  {
-                                                                           "main":  [
-                                                                                        [
-                                                                                            {
-                                                                                                "node":  "Switch",
-                                                                                                "type":  "main",
-                                                                                                "index":  0
-                                                                                            }
-                                                                                        ]
-                                                                                    ]
-                                                                       },
-                                              "Switch":  {
-                                                             "main":  [
-                                                                          [
-                                                                              {
-                                                                                  "node":  "Update row in sheet",
-                                                                                  "type":  "main",
-                                                                                  "index":  0
-                                                                              }
-                                                                          ],
-                                                                          [
-
-                                                                          ],
-                                                                          [
-                                                                              {
-                                                                                  "node":  "HTTP Request",
-                                                                                  "type":  "main",
-                                                                                  "index":  0
-                                                                              }
-                                                                          ]
-                                                                      ]
-                                                         }
-                                          },
-                          "nodeGroups":  [
-
-                                         ],
-                          "authors":  "Jini Byun",
-                          "name":  "Version 041a5da3",
-                          "description":  "",
-                          "autosaved":  true,
-                          "workflowPublishHistory":  [
-                                                         {
-                                                             "createdAt":  "2026-06-17T02:51:31.544Z",
-                                                             "id":  20,
-                                                             "workflowId":  "yIclqNGcvnYvmT9p",
-                                                             "versionId":  "041a5da3-9496-4cbf-9271-9171d7a14d5a",
-                                                             "event":  "activated",
-                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
-                                                         }
-                                                     ]
-                      }
+    "activeVersion":  null
 }

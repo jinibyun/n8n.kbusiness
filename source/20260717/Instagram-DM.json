@@ -1,0 +1,351 @@
+﻿{
+    "updatedAt":  "2026-07-14T21:43:38.726Z",
+    "createdAt":  "2026-07-10T04:52:52.947Z",
+    "id":  "AHQx0ccvpLX17Pqj",
+    "name":  "Instagram-DM",
+    "description":  "인스타그램 DM 수신 → AI Agent가 대화 이력을 기억하며 자연스럽게 이어받아 답장 발송, 리드 상태 업데이트, 예약 확정 시 Telegram 오너 알림",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "kb-instagram-dm",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "0d222d31-0878-45de-a286-b3774c301634",
+                      "name":  "DM Webhook",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       0,
+                                       112
+                                   ],
+                      "webhookId":  "ec592ae0-b419-4207-bac6-01a27ee7bbb8"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "1",
+                                                                                     "name":  "instagram_handle",
+                                                                                     "value":  "={{ $json.body?.instagram_handle ?? $json.instagram_handle ?? \"\" }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "2",
+                                                                                     "name":  "message_text",
+                                                                                     "value":  "={{ $json.body?.message_text ?? $json.message_text ?? \"\" }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "3",
+                                                                                     "name":  "subscriber_id",
+                                                                                     "value":  "={{ $json.body?.subscriber_id ?? $json.subscriber_id ?? \"\" }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "4",
+                                                                                     "name":  "timestamp",
+                                                                                     "value":  "={{ $now.toISO() }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "7d14540f-83ad-4b09-b3cf-07dacf413b20",
+                      "name":  "데이터 정규화",
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       224,
+                                       112
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=고객: {{ $json.instagram_handle }}\n메시지: {{ $json.message_text }}\nsubscriber_id: {{ $json.subscriber_id }}\n시각: {{ $json.timestamp }}",
+                                         "options":  {
+                                                         "systemMessage":  "당신은 인스타그램 고객 대화 전문 AI입니다. 모든 응답과 DM은 한국어로 작성합니다.\n이전 대화 맥락을 기억하며 자연스럽게 이어받아 응대하세요.\n\n아래 순서대로 도구를 호출하세요:\n\n1. [Airtable 리드 조회] 호출\n   filterByFormula: {instagram_handle}=\"\u003c실제 핸들값\u003e\"\n   → 리드 정보(status, intent, contact_count, is_vip) 확인\n\n2. 고객 메시지 의도 파악:\n   - 특정 날짜/시간 문의 → 가능 여부 안내 (PLACEHOLDER_BOOKING_LINK)\n   - 예약 확정 → 확인 메시지 + status: converted\n   - 추가 질문 → 정확히 답변\n   - 모르는 내용 → \"확인 후 안내드릴게요\"\n\n3. [ManyChat DM 답장] 호출\n   - 이전 대화 흐름을 자연스럽게 이어받은 답장 작성\n   - 친근하고 전문적인 한국어\n\n4. [Airtable 리드 업데이트] 호출\n   - status: new→talking, 예약확정→converted\n   - contact_count: 이전값+1\n   - is_vip: contact_count \u003e= 3 이면 true\n   - notes: 대화 요약\n\n5. 아래 경우에만 [Telegram 오너 알림] 호출:\n   - 예약 확정 시:\n     🎉 예약 확정! 👤 \u003chandle\u003e 📅 \u003c예약내용\u003e ✅ Airtable 업데이트 완료\n   - VIP 고객 (contact_count \u003e= 3) 시:\n     ⭐ VIP 고객 문의! 👤 \u003chandle\u003e (\u003cn\u003e회 문의) 💬 \"\u003c메시지\u003e\" → 직접 응대 권장",
+                                                         "maxIterations":  10,
+                                                         "returnIntermediateSteps":  false
+                                                     }
+                                     },
+                      "id":  "63e67acd-e127-47d6-ae46-8beb59e9be09",
+                      "name":  "대화 지속 Agent",
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       704,
+                                       112
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "f919d9ce-07f6-4f3e-b8fd-0d894d731c81",
+                      "name":  "GPT-4o-mini",
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       448,
+                                       336
+                                   ],
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $json.instagram_handle }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "id":  "a193d5ee-bcb8-4bb4-80f4-eaace08e31ac",
+                      "name":  "대화 메모리",
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       576,
+                                       336
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "search",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "mode":  "id",
+                                                      "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "PLACEHOLDER_AIRTABLE_TABLE_ID"
+                                                   },
+                                         "filterByFormula":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027filterByFormula\u0027, \u0027고객의 instagram_handle로 검색하는 Airtable 필터. 예: {instagram_handle}=\"@hong_gildong\"\u0027) }}",
+                                         "returnAll":  false,
+                                         "limit":  1,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "id":  "09648ce0-4eca-4d45-9e3e-a21cf68e72f2",
+                      "name":  "Airtable 리드 조회",
+                      "type":  "n8n-nodes-base.airtableTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       704,
+                                       336
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "description":  "Airtable instagram_leads 테이블에서 기존 리드의 status, contact_count, is_vip, notes를 업데이트합니다.",
+                                         "jsCode":  "const d = JSON.parse(query);\nconst B = \u0027PLACEHOLDER_AIRTABLE_BASE_ID\u0027;\nconst T = \u0027PLACEHOLDER_AIRTABLE_TABLE_ID\u0027;\nconst K = \u0027PLACEHOLDER_AIRTABLE_API_KEY\u0027;\nconst authHdr = { Authorization: \u0027Bearer \u0027 + K };\nconst jsonHdr = { \u0027Content-Type\u0027: \u0027application/json\u0027, Authorization: \u0027Bearer \u0027 + K };\nconst formula = encodeURIComponent(\u0027{instagram_handle}=\"\u0027 + d.instagram_handle + \u0027\"\u0027);\nconst sr = await fetch(\u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027?filterByFormula=\u0027 + formula + \u0027\u0026maxRecords=1\u0027, { headers: authHdr });\nconst sd = await sr.json();\nconst ex = sd.records \u0026\u0026 sd.records[0];\nif (!ex) return \u0027리드 없음: \u0027 + d.instagram_handle;\nconst fields = {\n  status: d.status || ex.fields.status,\n  contact_count: typeof d.contact_count === \u0027number\u0027 ? d.contact_count : (ex.fields.contact_count || 1),\n  is_vip: typeof d.is_vip === \u0027boolean\u0027 ? d.is_vip : !!ex.fields.is_vip,\n  last_interaction: new Date().toISOString(),\n  notes: d.notes || ex.fields.notes || \u0027\u0027\n};\nconst wr = await fetch(\u0027https://api.airtable.com/v0/\u0027 + B + \u0027/\u0027 + T + \u0027/\u0027 + ex.id, {\n  method: \u0027PATCH\u0027,\n  headers: jsonHdr,\n  body: JSON.stringify({ fields: fields })\n});\nreturn \u0027리드 업데이트 완료: \u0027 + d.instagram_handle + \u0027 → status=\u0027 + fields.status;",
+                                         "specifyInputSchema":  true,
+                                         "jsonSchemaExample":  "{\"instagram_handle\":\"@hong_gildong\",\"status\":\"talking\",\"contact_count\":2,\"is_vip\":false,\"notes\":\"화요일 오후 2시 예약 문의\"}"
+                                     },
+                      "id":  "5924328a-b62e-4123-a45a-67381b032400",
+                      "name":  "Airtable 리드 업데이트",
+                      "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       832,
+                                       336
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "description":  "ManyChat API를 통해 고객에게 인스타그램 DM 답장을 발송합니다. subscriber_id와 message_text가 필요합니다.",
+                                         "jsCode":  "const d = JSON.parse(query);\nconst r = await fetch(\u0027https://api.manychat.com/fb/sending/sendContent\u0027, {\n  method: \u0027POST\u0027,\n  headers: { \u0027Content-Type\u0027: \u0027application/json\u0027, Authorization: \u0027Bearer PLACEHOLDER_MANYCHAT_API_KEY\u0027 },\n  body: JSON.stringify({\n    subscriber_id: d.subscriber_id,\n    data: { version: \u0027v2\u0027, content: { messages: [{ type: \u0027text\u0027, text: d.message_text }] } }\n  })\n});\nconst res = await r.json();\nif (res.status !== \u0027success\u0027) return \u0027DM 발송 실패: \u0027 + JSON.stringify(res);\nreturn \u0027DM 답장 발송 완료: \u0027 + d.subscriber_id;",
+                                         "specifyInputSchema":  true,
+                                         "jsonSchemaExample":  "{\"subscriber_id\":\"MANYCHAT_SUB_ID\",\"message_text\":\"화요일 오후 2시, 4시 가능합니다!\"}"
+                                     },
+                      "id":  "1127e483-f6a1-4268-8ac9-8f655ccd4537",
+                      "name":  "ManyChat DM 답장",
+                      "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       960,
+                                       336
+                                   ]
+                  },
+                  {
+                      "parameters":  {
+                                         "chatId":  "PLACEHOLDER_TELEGRAM_CHAT_ID",
+                                         "text":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027message\u0027, \u0027예약 확정 또는 VIP 고객 발생 시 사장님에게 보낼 긴급 알림 메시지.\u0027) }}",
+                                         "additionalFields":  {
+                                                                  "appendAttribution":  false
+                                                              }
+                                     },
+                      "id":  "cbcfa46e-c06c-47ca-8076-365df3e5c871",
+                      "name":  "Telegram 오너 알림",
+                      "type":  "n8n-nodes-base.telegramTool",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       1088,
+                                       336
+                                   ],
+                      "webhookId":  "09714347-3269-4d53-8dd6-3712c9614b60"
+                  }
+              ],
+    "connections":  {
+                        "DM Webhook":  {
+                                           "main":  [
+                                                        [
+                                                            {
+                                                                "node":  "데이터 정규화",
+                                                                "type":  "main",
+                                                                "index":  0
+                                                            }
+                                                        ]
+                                                    ]
+                                       },
+                        "데이터 정규화":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "대화 지속 Agent",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "GPT-4o-mini":  {
+                                            "ai_languageModel":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "대화 지속 Agent",
+                                                                             "type":  "ai_languageModel",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                        },
+                        "대화 메모리":  {
+                                       "ai_memory":  [
+                                                         [
+                                                             {
+                                                                 "node":  "대화 지속 Agent",
+                                                                 "type":  "ai_memory",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                   },
+                        "Airtable 리드 조회":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "대화 지속 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "Airtable 리드 업데이트":  {
+                                                 "ai_tool":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "대화 지속 Agent",
+                                                                         "type":  "ai_tool",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                             },
+                        "ManyChat DM 답장":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "대화 지속 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           },
+                        "Telegram 오너 알림":  {
+                                               "ai_tool":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "대화 지속 Agent",
+                                                                       "type":  "ai_tool",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                           }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true,
+                     "binaryMode":  "separate"
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "4046f25f-3183-4d4a-8b29-0360ae65d804",
+    "activeVersionId":  null,
+    "versionCounter":  2,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-10T04:52:52.947Z",
+                       "createdAt":  "2026-07-10T04:52:52.947Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "AHQx0ccvpLX17Pqj",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

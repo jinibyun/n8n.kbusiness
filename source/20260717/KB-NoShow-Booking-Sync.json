@@ -1,0 +1,230 @@
+﻿{
+    "updatedAt":  "2026-07-10T02:34:04.699Z",
+    "createdAt":  "2026-07-08T02:06:20.135Z",
+    "id":  "iRAWhsTIi6DrZ1r5",
+    "name":  "KB-NoShow-Booking-Sync",
+    "description":  null,
+    "active":  false,
+    "isArchived":  true,
+    "nodes":  [
+                  {
+                      "id":  "23d463ad-2b65-4226-9e14-0188160223cf",
+                      "name":  "Calendly 예약 수신",
+                      "type":  "n8n-nodes-base.calendlyTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       0,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "authentication":  "apiKey",
+                                         "events":  [
+                                                        "invitee.created"
+                                                    ]
+                                     },
+                      "webhookId":  "3a374624-7f49-4c3d-9031-5a0d21d2de32"
+                  },
+                  {
+                      "id":  "2acd62a8-76aa-4ad2-8346-c4663264d586",
+                      "name":  "예약 데이터 추출",
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       224,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "mode":  "runOnceForAllItems",
+                                         "jsCode":  "const body = $input.first().json.body ?? $input.first().json;\nconst payload = body.payload ?? body;\nreturn [{\n  json: {\n    calendly_event_id: payload.event?.uuid ?? \u0027\u0027,\n    customer_name: payload.invitee?.name ?? \u0027\u0027,\n    customer_email: payload.invitee?.email ?? \u0027\u0027,\n    customer_phone: payload.invitee?.text_reminder_number ?? \u0027\u0027,\n    appointment_time: payload.event?.start_time ?? \u0027\u0027,\n    service_type: payload.event_type?.name ?? \u0027Appointment\u0027,\n    status: \u0027confirmed\u0027,\n    reminder_sent: false,\n    no_show_count: 0,\n    is_flagged: false\n  }\n}];"
+                                     }
+                  },
+                  {
+                      "id":  "b87aa4e4-bc3f-4992-a992-70a7e1e8b7b5",
+                      "name":  "중복 예약 확인",
+                      "type":  "n8n-nodes-base.airtable",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       448,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "resource":  "record",
+                                         "operation":  "search",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "mode":  "id",
+                                                      "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "PLACEHOLDER_AIRTABLE_TABLE_NAME"
+                                                   },
+                                         "filterByFormula":  "={calendly_event_id} = \u0027{{ $json.calendly_event_id }}\u0027",
+                                         "returnAll":  false,
+                                         "limit":  1
+                                     },
+                      "alwaysOutputData":  true
+                  },
+                  {
+                      "id":  "4ad3815d-dc9a-4016-820a-8d912e8f62bc",
+                      "name":  "신규 예약 여부",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       672,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "loose",
+                                                                            "version":  2
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ $json.id }}",
+                                                                                   "operator":  {
+                                                                                                    "type":  "string",
+                                                                                                    "operation":  "notExists"
+                                                                                                },
+                                                                                   "rightValue":  ""
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     }
+                  },
+                  {
+                      "id":  "9f88e6de-b7fa-4918-8fc6-4c2041d1e92c",
+                      "name":  "Airtable 예약 레코드 생성",
+                      "type":  "n8n-nodes-base.airtable",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       896,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "resource":  "record",
+                                         "operation":  "create",
+                                         "base":  {
+                                                      "__rl":  true,
+                                                      "mode":  "id",
+                                                      "value":  "PLACEHOLDER_AIRTABLE_BASE_ID"
+                                                  },
+                                         "table":  {
+                                                       "__rl":  true,
+                                                       "mode":  "id",
+                                                       "value":  "PLACEHOLDER_AIRTABLE_TABLE_NAME"
+                                                   },
+                                         "columns":  {
+                                                         "mappingMode":  "defineBelow",
+                                                         "value":  {
+                                                                       "calendly_event_id":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.calendly_event_id }}",
+                                                                       "customer_name":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.customer_name }}",
+                                                                       "customer_email":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.customer_email }}",
+                                                                       "customer_phone":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.customer_phone }}",
+                                                                       "appointment_time":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.appointment_time }}",
+                                                                       "service_type":  "={{ $(\u0027예약 데이터 추출\u0027).item.json.service_type }}",
+                                                                       "status":  "confirmed",
+                                                                       "reminder_sent":  false,
+                                                                       "no_show_count":  0,
+                                                                       "is_flagged":  false
+                                                                   }
+                                                     }
+                                     }
+                  }
+              ],
+    "connections":  {
+                        "Calendly 예약 수신":  {
+                                               "main":  [
+                                                            [
+                                                                {
+                                                                    "node":  "예약 데이터 추출",
+                                                                    "type":  "main",
+                                                                    "index":  0
+                                                                }
+                                                            ]
+                                                        ]
+                                           },
+                        "예약 데이터 추출":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "중복 예약 확인",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "중복 예약 확인":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "신규 예약 여부",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "신규 예약 여부":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "Airtable 예약 레코드 생성",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  null,
+    "versionId":  "a6e7d2c6-bfb4-4ad7-a75d-c0340778ea4b",
+    "activeVersionId":  null,
+    "versionCounter":  1,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-08T02:06:20.135Z",
+                       "createdAt":  "2026-07-08T02:06:20.135Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "iRAWhsTIi6DrZ1r5",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

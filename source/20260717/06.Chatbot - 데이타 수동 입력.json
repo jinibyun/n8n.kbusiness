@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-24T19:22:12.613Z",
+    "updatedAt":  "2026-07-16T00:04:52.628Z",
     "createdAt":  "2026-06-17T14:33:13.226Z",
     "id":  "FXctluaWInzhMdAf",
     "name":  "06.Chatbot - 데이타 수동 입력",
@@ -30,7 +30,7 @@
                       "typeVersion":  1,
                       "position":  [
                                        -1952,
-                                       -656
+                                       -640
                                    ],
                       "id":  "a1ca2e74-355c-4900-9f8c-a536806de6ad",
                       "name":  "Sticky Note"
@@ -159,7 +159,7 @@
                   },
                   {
                       "parameters":  {
-                                         "content":  "**qdrant** vector DB 는 여기에서 확인할 수 있다.\n\nhttp://kbusiness.ca:6333/dashboard",
+                                         "content":  "**qdrant** vector DB 는 여기에서 확인할 수 있다.\n\nhttps://qdrant.kbusiness.ca/dashboard",
                                          "height":  112,
                                          "width":  416,
                                          "color":  5
@@ -168,7 +168,7 @@
                       "typeVersion":  1,
                       "position":  [
                                        -896,
-                                       -688
+                                       -704
                                    ],
                       "id":  "2133720e-115f-4f43-8059-422923abe852",
                       "name":  "Sticky Note2"
@@ -188,19 +188,6 @@
                                    ],
                       "id":  "52f6becb-7f29-4944-bfed-7bdc76224b71",
                       "name":  "Sticky Note3"
-                  },
-                  {
-                      "parameters":  {
-
-                                     },
-                      "type":  "n8n-nodes-base.stickyNote",
-                      "typeVersion":  1,
-                      "position":  [
-                                       -224,
-                                       0
-                                   ],
-                      "id":  "67b33a8f-ed48-4492-aa9a-d68b9103edb0",
-                      "name":  "Sticky Note4"
                   },
                   {
                       "parameters":  {
@@ -289,9 +276,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "c7891799-229b-4850-8f00-ae04016576a2",
+    "versionId":  "99dc5376-9ce6-4e55-91f2-375b2bfc9152",
     "activeVersionId":  null,
-    "versionCounter":  173,
+    "versionCounter":  179,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [
