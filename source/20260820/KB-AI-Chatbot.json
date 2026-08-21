@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-30T00:57:54.326Z",
+    "updatedAt":  "2026-07-30T20:12:36.178Z",
     "createdAt":  "2026-06-29T18:01:57.160Z",
     "id":  "Pfkp2CzLU9lesWSF",
     "name":  "KB-AI-Chatbot",
@@ -92,8 +92,9 @@
                                          "toolDescription":  "K Business AI 서비스, 컨설팅, n8n 교육 커리큘럼, 회사 소개 등 관련 문서를 검색한다. 사용자 질문에 답변하기 위해 이 도구를 먼저 사용한다.",
                                          "qdrantCollection":  {
                                                                   "__rl":  true,
-                                                                  "mode":  "id",
-                                                                  "value":  "kbusiness_ai"
+                                                                  "value":  "my_business",
+                                                                  "mode":  "list",
+                                                                  "cachedResultName":  "my_business"
                                                               },
                                          "options":  {
 
@@ -109,8 +110,8 @@
                                    ],
                       "credentials":  {
                                           "qdrantApi":  {
-                                                            "id":  "XWVNghsEwGPiVqql",
-                                                            "name":  "Qdrant account"
+                                                            "id":  "38FZYAovbavrkGDf",
+                                                            "name":  "Qdrant account - cloud"
                                                         }
                                       }
                   },
@@ -394,9 +395,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
-    "activeVersionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
-    "versionCounter":  75,
+    "versionId":  "7c765bcb-553e-4a7f-98c7-e69fed84cdff",
+    "activeVersionId":  "7c765bcb-553e-4a7f-98c7-e69fed84cdff",
+    "versionCounter":  78,
     "triggerCount":  2,
     "sourceWorkflowId":  null,
     "shared":  [
@@ -430,9 +431,9 @@
                  }
              ],
     "activeVersion":  {
-                          "updatedAt":  "2026-06-30T00:59:29.986Z",
-                          "createdAt":  "2026-06-30T00:57:54.329Z",
-                          "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+                          "updatedAt":  "2026-07-30T20:13:53.289Z",
+                          "createdAt":  "2026-07-30T20:12:36.181Z",
+                          "versionId":  "7c765bcb-553e-4a7f-98c7-e69fed84cdff",
                           "workflowId":  "Pfkp2CzLU9lesWSF",
                           "nodes":  [
                                         {
@@ -520,8 +521,9 @@
                                                                "toolDescription":  "K Business AI 서비스, 컨설팅, n8n 교육 커리큘럼, 회사 소개 등 관련 문서를 검색한다. 사용자 질문에 답변하기 위해 이 도구를 먼저 사용한다.",
                                                                "qdrantCollection":  {
                                                                                         "__rl":  true,
-                                                                                        "mode":  "id",
-                                                                                        "value":  "kbusiness_ai"
+                                                                                        "value":  "my_business",
+                                                                                        "mode":  "list",
+                                                                                        "cachedResultName":  "my_business"
                                                                                     },
                                                                "options":  {
 
@@ -537,8 +539,8 @@
                                                          ],
                                             "credentials":  {
                                                                 "qdrantApi":  {
-                                                                                  "id":  "XWVNghsEwGPiVqql",
-                                                                                  "name":  "Qdrant account"
+                                                                                  "id":  "38FZYAovbavrkGDf",
+                                                                                  "name":  "Qdrant account - cloud"
                                                                               }
                                                             }
                                         },
@@ -810,15 +812,15 @@
 
                                          ],
                           "authors":  "Jini Byun",
-                          "name":  "Version 7446dd19",
+                          "name":  "Version 7c765bcb",
                           "description":  "",
                           "autosaved":  true,
                           "workflowPublishHistory":  [
                                                          {
-                                                             "createdAt":  "2026-06-30T00:59:29.973Z",
-                                                             "id":  30,
+                                                             "createdAt":  "2026-07-30T20:13:53.281Z",
+                                                             "id":  82,
                                                              "workflowId":  "Pfkp2CzLU9lesWSF",
-                                                             "versionId":  "7446dd19-b3ba-41b3-9347-3260dd28768b",
+                                                             "versionId":  "7c765bcb-553e-4a7f-98c7-e69fed84cdff",
                                                              "event":  "activated",
                                                              "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
                                                          }

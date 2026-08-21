@@ -1,8 +1,8 @@
 ﻿{
-    "updatedAt":  "2026-07-08T02:56:06.644Z",
+    "updatedAt":  "2026-07-30T20:07:13.172Z",
     "createdAt":  "2026-06-29T18:01:26.365Z",
     "id":  "THgzh1ZN0JbBLkrr",
-    "name":  "KB-Knowledge-Loader",
+    "name":  "KB-Knowledge-Loader-NOTUSED",
     "description":  "kbusiness_ai Qdrant 컬렉션에 K Business AI 소개 문서를 적재하는 지식베이스 로더",
     "active":  false,
     "isArchived":  false,

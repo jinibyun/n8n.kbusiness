@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-07-01T03:40:51.535Z",
+    "updatedAt":  "2026-07-30T02:51:14.186Z",
     "createdAt":  "2026-06-30T23:29:04.150Z",
     "id":  "0N8UYKi5C9Pk96NX",
     "name":  "KB-Form-Email-Notification",
@@ -78,7 +78,7 @@
                                          "sendTo":  "support@kbusiness.ca",
                                          "subject":  "={{ \u0027[K Business AI] 새 클라이언트 상담 신청 - \u0027 + $json.data.name }}",
                                          "emailType":  "text",
-                                         "message":  "=성함: {{ $json.data.name }}\n이메일: {{ $json.data.email }}\n연락처: {{ $json.data.phone }}\n업종: {{ $json.data.business_type }}\n문의 내용:\n{{ $json.data.problem_description }}\n\n신청 일시: {{ $json.data.created_at }}",
+                                         "message":  "=성함: {{ $json.data.name }}\n이메일: {{ $json.data.email }}\n연락처: {{ $json.data.phone }}\n업종: {{ $json.data.business_type }}\n-------------------------------------\n문의 내용(문제):\n{{ $json.data.problem_description }}\n-------------------------------------\n문의 내용(상세 요구 사항):\n{{ $json.data.requirements }}\n--------------------------------------\n신청 일시: {{ $json.data.created_at }}",
                                          "options":  {
                                                          "appendAttribution":  false
                                                      }
@@ -179,7 +179,8 @@
                                          "fromEmail":  "support@kbusiness.ca",
                                          "toEmail":  "={{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}",
                                          "subject":  "[K Business AI] 상담 신청이 접수되었습니다",
-                                         "text":  "=안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.name }}님.\n\nK Business AI에 상담을 신청해 주셔서 감사합니다.\n빠른 시일 내에 이메일({{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }})로 연락드리겠습니다.\n\n문의하신 내용:\n{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.problem_description }}\n\nK Business AI 드림"
+                                         "text":  "=",
+                                         "html":  "=\u003cdiv style=\"max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \u0027Malgun Gothic\u0027, \u0027Apple SD Gothic Neo\u0027, sans-serif; color: #1f2937; line-height: 1.6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 32px;\"\u003e\n    \n    \u003cp style=\"font-size: 18px; margin-top: 0; margin-bottom: 24px;\"\u003e\n        \u003cstrong\u003e안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.name }}님.\u003c/strong\u003e\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 12px;\"\u003e\n        \u003cstrong\u003eK Business AI\u003c/strong\u003e에 상담을 신청해 주셔서 감사합니다.\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 32px;\"\u003e\n        빠른 시일 내에 이메일(\u003ca href=\"mailto:{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}\" style=\"color: #2563eb; text-decoration: none;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}\u003c/a\u003e)로 연락드리겠습니다.\n    \u003c/p\u003e\n    \n    \u003cdiv style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 4px; margin-bottom: 32px;\"\u003e\n        \u003cdiv style=\"margin-bottom: 20px;\"\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 내용 (겪고 있는 문제):\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.problem_description }}\u003c/p\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 내용 (상세 요구 사항):\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.requirements }}\u003c/p\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 0; color: #475569;\"\u003e\n        감사합니다.\u003cbr\u003e\n        \u003cstrong\u003eK Business AI 드림\u003c/strong\u003e\n    \u003c/p\u003e\n    \n\u003c/div\u003e"
                                      },
                       "type":  "n8n-nodes-base.mailgun",
                       "typeVersion":  1,
@@ -201,7 +202,8 @@
                                          "fromEmail":  "support@kbusiness.ca",
                                          "toEmail":  "={{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}",
                                          "subject":  "[K Business AI] 교육 문의가 접수되었습니다",
-                                         "text":  "=안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_name }}님.\n\nK Business AI 교육 문의를 접수하였습니다.\n빠른 시일 내에 이메일({{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }})로 연락드리겠습니다.\n\n문의하신 과정: {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.message }}\n희망 시작 시기: {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.preferred_start }}\n\nK Business AI 드림"
+                                         "text":  "=",
+                                         "html":  "=\u003cdiv style=\"max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \u0027Malgun Gothic\u0027, \u0027Apple SD Gothic Neo\u0027, sans-serif; color: #1f2937; line-height: 1.6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 32px;\"\u003e\n    \n    \u003cp style=\"font-size: 18px; margin-top: 0; margin-bottom: 24px;\"\u003e\n        \u003cstrong\u003e안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_name }}님.\u003c/strong\u003e\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 12px;\"\u003e\n        \u003cstrong\u003eK Business AI\u003c/strong\u003e 교육 문의를 접수하였습니다.\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 32px;\"\u003e\n        빠른 시일 내에 이메일(\u003ca href=\"mailto:{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}\" style=\"color: #2563eb; text-decoration: none;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}\u003c/a\u003e)로 연락드리겠습니다.\n    \u003c/p\u003e\n    \n    \u003cdiv style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 4px; margin-bottom: 32px;\"\u003e\n        \u003cdiv style=\"margin-bottom: 20px;\"\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 과정:\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.message }}\u003c/p\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                희망 시작 시기:\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.preferred_start }}\u003c/p\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 0; color: #475569;\"\u003e\n        감사합니다.\u003cbr\u003e\n        \u003cstrong\u003eK Business AI 드림\u003c/strong\u003e\n    \u003c/p\u003e\n    \n\u003c/div\u003e"
                                      },
                       "type":  "n8n-nodes-base.mailgun",
                       "typeVersion":  1,
@@ -322,9 +324,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "862090b3-a713-4dda-bec7-cca120f239ef",
-    "activeVersionId":  "862090b3-a713-4dda-bec7-cca120f239ef",
-    "versionCounter":  65,
+    "versionId":  "6ba64cbb-d226-4360-b86c-b74e29f1ea21",
+    "activeVersionId":  "6ba64cbb-d226-4360-b86c-b74e29f1ea21",
+    "versionCounter":  93,
     "triggerCount":  1,
     "sourceWorkflowId":  null,
     "shared":  [
@@ -358,9 +360,9 @@
                  }
              ],
     "activeVersion":  {
-                          "updatedAt":  "2026-07-01T03:42:31.718Z",
-                          "createdAt":  "2026-07-01T03:40:51.537Z",
-                          "versionId":  "862090b3-a713-4dda-bec7-cca120f239ef",
+                          "updatedAt":  "2026-07-30T02:51:24.518Z",
+                          "createdAt":  "2026-07-30T02:51:14.189Z",
+                          "versionId":  "6ba64cbb-d226-4360-b86c-b74e29f1ea21",
                           "workflowId":  "0N8UYKi5C9Pk96NX",
                           "nodes":  [
                                         {
@@ -434,7 +436,7 @@
                                                                "sendTo":  "support@kbusiness.ca",
                                                                "subject":  "={{ \u0027[K Business AI] 새 클라이언트 상담 신청 - \u0027 + $json.data.name }}",
                                                                "emailType":  "text",
-                                                               "message":  "=성함: {{ $json.data.name }}\n이메일: {{ $json.data.email }}\n연락처: {{ $json.data.phone }}\n업종: {{ $json.data.business_type }}\n문의 내용:\n{{ $json.data.problem_description }}\n\n신청 일시: {{ $json.data.created_at }}",
+                                                               "message":  "=성함: {{ $json.data.name }}\n이메일: {{ $json.data.email }}\n연락처: {{ $json.data.phone }}\n업종: {{ $json.data.business_type }}\n-------------------------------------\n문의 내용(문제):\n{{ $json.data.problem_description }}\n-------------------------------------\n문의 내용(상세 요구 사항):\n{{ $json.data.requirements }}\n--------------------------------------\n신청 일시: {{ $json.data.created_at }}",
                                                                "options":  {
                                                                                "appendAttribution":  false
                                                                            }
@@ -535,7 +537,8 @@
                                                                "fromEmail":  "support@kbusiness.ca",
                                                                "toEmail":  "={{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}",
                                                                "subject":  "[K Business AI] 상담 신청이 접수되었습니다",
-                                                               "text":  "=안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.name }}님.\n\nK Business AI에 상담을 신청해 주셔서 감사합니다.\n빠른 시일 내에 이메일({{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }})로 연락드리겠습니다.\n\n문의하신 내용:\n{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.problem_description }}\n\nK Business AI 드림"
+                                                               "text":  "=",
+                                                               "html":  "=\u003cdiv style=\"max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \u0027Malgun Gothic\u0027, \u0027Apple SD Gothic Neo\u0027, sans-serif; color: #1f2937; line-height: 1.6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 32px;\"\u003e\n    \n    \u003cp style=\"font-size: 18px; margin-top: 0; margin-bottom: 24px;\"\u003e\n        \u003cstrong\u003e안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.name }}님.\u003c/strong\u003e\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 12px;\"\u003e\n        \u003cstrong\u003eK Business AI\u003c/strong\u003e에 상담을 신청해 주셔서 감사합니다.\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 32px;\"\u003e\n        빠른 시일 내에 이메일(\u003ca href=\"mailto:{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}\" style=\"color: #2563eb; text-decoration: none;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.email }}\u003c/a\u003e)로 연락드리겠습니다.\n    \u003c/p\u003e\n    \n    \u003cdiv style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 4px; margin-bottom: 32px;\"\u003e\n        \u003cdiv style=\"margin-bottom: 20px;\"\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 내용 (겪고 있는 문제):\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.problem_description }}\u003c/p\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 내용 (상세 요구 사항):\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.requirements }}\u003c/p\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 0; color: #475569;\"\u003e\n        감사합니다.\u003cbr\u003e\n        \u003cstrong\u003eK Business AI 드림\u003c/strong\u003e\n    \u003c/p\u003e\n    \n\u003c/div\u003e"
                                                            },
                                             "type":  "n8n-nodes-base.mailgun",
                                             "typeVersion":  1,
@@ -557,7 +560,8 @@
                                                                "fromEmail":  "support@kbusiness.ca",
                                                                "toEmail":  "={{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}",
                                                                "subject":  "[K Business AI] 교육 문의가 접수되었습니다",
-                                                               "text":  "=안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_name }}님.\n\nK Business AI 교육 문의를 접수하였습니다.\n빠른 시일 내에 이메일({{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }})로 연락드리겠습니다.\n\n문의하신 과정: {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.message }}\n희망 시작 시기: {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.preferred_start }}\n\nK Business AI 드림"
+                                                               "text":  "=",
+                                                               "html":  "=\u003cdiv style=\"max-width: 600px; margin: 0 auto; font-family: -apple-system, BlinkMacSystemFont, \u0027Malgun Gothic\u0027, \u0027Apple SD Gothic Neo\u0027, sans-serif; color: #1f2937; line-height: 1.6; border: 1px solid #e5e7eb; border-radius: 8px; padding: 32px;\"\u003e\n    \n    \u003cp style=\"font-size: 18px; margin-top: 0; margin-bottom: 24px;\"\u003e\n        \u003cstrong\u003e안녕하세요, {{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_name }}님.\u003c/strong\u003e\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 12px;\"\u003e\n        \u003cstrong\u003eK Business AI\u003c/strong\u003e 교육 문의를 접수하였습니다.\n    \u003c/p\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 32px;\"\u003e\n        빠른 시일 내에 이메일(\u003ca href=\"mailto:{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}\" style=\"color: #2563eb; text-decoration: none;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.contact_email }}\u003c/a\u003e)로 연락드리겠습니다.\n    \u003c/p\u003e\n    \n    \u003cdiv style=\"background-color: #f8fafc; border: 1px solid #e2e8f0; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 4px; margin-bottom: 32px;\"\u003e\n        \u003cdiv style=\"margin-bottom: 20px;\"\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                문의하신 과정:\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.message }}\u003c/p\u003e\n        \u003c/div\u003e\n        \n        \u003cdiv\u003e\n            \u003cp style=\"margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: bold;\"\u003e\n                희망 시작 시기:\n            \u003c/p\u003e\n            \u003cp style=\"margin: 0; font-size: 15px; color: #334155; white-space: pre-wrap;\"\u003e{{ $(\u0027Form Submission Webhook\u0027).item.json.body.data.preferred_start }}\u003c/p\u003e\n        \u003c/div\u003e\n    \u003c/div\u003e\n    \n    \u003cp style=\"font-size: 15px; margin-bottom: 0; color: #475569;\"\u003e\n        감사합니다.\u003cbr\u003e\n        \u003cstrong\u003eK Business AI 드림\u003c/strong\u003e\n    \u003c/p\u003e\n    \n\u003c/div\u003e"
                                                            },
                                             "type":  "n8n-nodes-base.mailgun",
                                             "typeVersion":  1,
@@ -665,15 +669,15 @@
 
                                          ],
                           "authors":  "Jini Byun",
-                          "name":  "Version 862090b3",
+                          "name":  "Version 6ba64cbb",
                           "description":  "",
                           "autosaved":  true,
                           "workflowPublishHistory":  [
                                                          {
-                                                             "createdAt":  "2026-07-01T03:42:31.709Z",
-                                                             "id":  31,
+                                                             "createdAt":  "2026-07-30T02:51:24.510Z",
+                                                             "id":  78,
                                                              "workflowId":  "0N8UYKi5C9Pk96NX",
-                                                             "versionId":  "862090b3-a713-4dda-bec7-cca120f239ef",
+                                                             "versionId":  "6ba64cbb-d226-4360-b86c-b74e29f1ea21",
                                                              "event":  "activated",
                                                              "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
                                                          }

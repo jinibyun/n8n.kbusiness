@@ -1,0 +1,1587 @@
+﻿{
+    "updatedAt":  "2026-08-01T15:02:50.674Z",
+    "createdAt":  "2026-07-27T19:43:28.617Z",
+    "id":  "yZ5C3pXUdAXzjNw2",
+    "name":  "09. Chatbot - Chat advanced for CRM",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "public":  true,
+                                         "mode":  "webhook",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.chatTrigger",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       -1312,
+                                       -304
+                                   ],
+                      "id":  "56055c1a-cc2e-4ff3-abd2-70da67d2d3e0",
+                      "name":  "When chat message received",
+                      "webhookId":  "d07fcf4b-1789-401e-8979-7c0c44d12026"
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "=너는 kBusiness AI의 전문 교육 상담 및 비즈니스 자동화 에이전트다.\n사용자의 질문에 대해 검색된 문서(Context)의 내용을 절대 임의로 축약하거나 요약하지 말고, 가장 구체적이고 상세하게 풀어서 설명하라.\n\n[절대 금지 규칙]\n1. \"웹사이트를 확인하세요\", \"/education 링크를 참고하세요\" 등 사용자에게 정보 탐색을 떠넘기거나 회피하지 마라. 네가 직접 설명하라.\n2. 문서의 \u0027목차\u0027나 \u0027구조(이 섹션에는 ~가 있습니다)\u0027를 설명하지 마라.\n3. 검색된 데이터에 있는 실제 핵심 정보(예: 8주 완성 커리큘럼, 플랜별 가격, 기술 스택 등)를 빠짐없이 직접 나열하라.\n4. 검색된 문서에 없는 내용은 절대 지어내지 말고 \"해당 정보가 없습니다\"라고 답변하라."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       -336,
+                                       -272
+                                   ],
+                      "id":  "955d4ab4-9285-443a-8e07-1a35d8ff9c37",
+                      "name":  "AI Agent"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -496,
+                                       -112
+                                   ],
+                      "id":  "e50cc2c3-df65-40ed-aaea-3ccd5dba9532",
+                      "name":  "OpenAI Chat Model",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       -368,
+                                       -64
+                                   ],
+                      "id":  "3bff37cf-bc96-4dbf-90a3-8fe16ffc3732",
+                      "name":  "Simple Memory"
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "retrieve-as-tool",
+                                         "toolDescription":  "너는 kBusiness AI의 전문 고객 상담 AI 에이전트다.\n반드시 제공된 컨텍스트(Context) 데이터를 기반으로 가장 구체적이고 상세하게 답변해라.\n\n[절대 금지 규칙]\n- \"이 섹션에는 ~가 적혀 있습니다\", \"~가 포함되어 있습니다\" 같은 문서 구조를 설명하는 메타 발언을 절대 하지 마라.\n- 검색된 내용에 있는 실제 서비스 이름, 가격, 프로세스 등의 알맹이 정보를 직접 나열해라.\n- 컨텍스트에 없는 내용을 지어내지 마라.",
+                                         "qdrantCollection":  {
+                                                                  "__rl":  true,
+                                                                  "value":  "my_business",
+                                                                  "mode":  "list",
+                                                                  "cachedResultName":  "my_business"
+                                                              },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -224,
+                                       -48
+                                   ],
+                      "id":  "9db9ae17-0f11-4372-aab3-0c95a5383177",
+                      "name":  "search_business_data",
+                      "credentials":  {
+                                          "qdrantApi":  {
+                                                            "id":  "38FZYAovbavrkGDf",
+                                                            "name":  "Qdrant account - cloud"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       -112,
+                                       80
+                                   ],
+                      "id":  "54bf34dd-e144-411b-a129-ce81dd8183ce",
+                      "name":  "Embeddings OpenAI1",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Chat Test**\n앞의 Insert 과정이 진행됐으면, 여기서는 Chat 을 통해 확인한다.",
+                                         "height":  560,
+                                         "width":  1440,
+                                         "color":  4
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1424,
+                                       -48
+                                   ],
+                      "id":  "a36e3689-4e08-4359-b0da-20abb17ff83b",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**AI 로 하여금** 조회 뿐만 아니라 **실제** 일을 시키는 과정중 하나이다",
+                                         "height":  528,
+                                         "width":  1056
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       96,
+                                       -704
+                                   ],
+                      "id":  "12c8657e-571c-40c7-bcdc-fe3f5bc97c68",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "rules":  {
+                                                       "values":  [
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "d8a7a810-7b81-4390-b7f2-9ea8c4880926",
+                                                                                                                    "leftValue":  "={{ JSON.parse($(\u0027AI Agent2\u0027).item.json.output).intent }}",
+                                                                                                                    "rightValue":  "INFO",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals",
+                                                                                                                                     "name":  "filter.operator.equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      },
+                                                                      {
+                                                                          "conditions":  {
+                                                                                             "options":  {
+                                                                                                             "caseSensitive":  true,
+                                                                                                             "leftValue":  "",
+                                                                                                             "typeValidation":  "strict",
+                                                                                                             "version":  3
+                                                                                                         },
+                                                                                             "conditions":  [
+                                                                                                                {
+                                                                                                                    "id":  "0910b3b8-e976-4425-9cc8-fd86668a97f1",
+                                                                                                                    "leftValue":  "={{ JSON.parse($(\u0027AI Agent2\u0027).item.json.output).intent }}",
+                                                                                                                    "rightValue":  "BOOKING",
+                                                                                                                    "operator":  {
+                                                                                                                                     "type":  "string",
+                                                                                                                                     "operation":  "equals",
+                                                                                                                                     "name":  "filter.operator.equals"
+                                                                                                                                 }
+                                                                                                                }
+                                                                                                            ],
+                                                                                             "combinator":  "and"
+                                                                                         }
+                                                                      }
+                                                                  ]
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.switch",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       -608,
+                                       -304
+                                   ],
+                      "id":  "e8d543cc-e8b5-4121-a88f-1f71fed47063",
+                      "name":  "Switch"
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "=너는 상담 예약을 전담하는 AI 어시스턴트다. \n대화 맥락을 기억하며, 한 번에 하나씩 질문하여 예약 정보를 수집한다.\n\n[시스템 환경 및 변수]\n- 현재 시간: {{ $now }} (기준 타임존: America/Toronto)\n- start_time: 시작 시간 (ISO 8601 형식)\n- end_time: 종료 시간 (ISO 8601 형식, 미지정 시 시작 시간으로부터 1시간 뒤)\n- summary: \"[상담 예약] {이름} - {연락처}\"\n\n[필수 수집 정보 (Slot)]\n1. 예약 날짜 및 시간\n2. 예약자 이름\n3. 연락처 (전화번호 또는 이메일)\n\n[작업 규칙 및 순차 질의(Slot Filling) 프로세스]\n대화 내역을 분석하여 누락된 정보를 파악하고, 아래 순서에 따라 **반드시 한 번에 한 가지 항목만** 질문하라. 두 가지 이상을 동시에 묻지 마라.\n\n1. 날짜 및 시간 수집:\n- 사용자가 특정 날짜나 시간 지정 없이 예약을 요청할 경우, \"언제가 좋으신가요?\"라고 먼저 되묻는 것을 절대 금지한다.\n- 질문하기 전에 가장 먼저 \u0027구글 캘린더 조회(List/FreeBusy) 툴\u0027을 반드시 호출하라.\n- 오늘을 기준으로 향후 30일 이내의 일정을 파악하여, 기존 일정과 겹치지 않는 빈 시간대(1시간 단위) 2~3가지를 추출하라.\n- 추출한 시간대를 사용자에게 제안하며 희망 시간을 질문하라.\n- **중복 검증 및 환각 방지 (절대 규칙):** 사용자가 제안된 시간이 아닌 다른 날짜/시간을 요청할 경우, 캘린더 조회 툴로 해당 시간의 일정을 반드시 조회하라. \n  * 만약 조회 결과가 \u0027비어있음(Empty)\u0027이거나 아무 일정도 반환되지 않는다면, 이는 **예약이 가능한 상태**다. 즉시 해당 시간으로 예약을 진행하고 절대 예약이 차 있다고 거짓말하지 마라.\n  * 명확하게 해당 시간에 기존 일정이 존재하는 데이터가 반환되었을 때만 \"해당 시간은 이미 예약이 차 있습니다. 다른 시간을 선택해 주세요.\"라고 안내하라.\n- (출력 예시: \"가장 빠른 예약 가능 시간은 O일 O시, X일 X시입니다. 편하신 시간을 선택하시거나 원하시는 날짜를 말씀해 주세요.\")\n\n2. 이름 수집:\n- 날짜와 시간이 확정되었으나 이름이 파악되지 않았다면 이름을 질문하라.\n- (출력 예시: \"예약자분의 성함을 알려주세요.\")\n\n3. 연락처 수집:\n- 날짜/시간, 이름이 모두 확인되었으나 연락처가 없다면 질문하라.\n- **알림 고지:** 예약 확정 알림(문자 또는 이메일) 발송을 위해 연락처가 필요함을 반드시 명시하라.\n- (출력 예시: \"예약 확정 알림을 보내드리기 위해 연락 가능한 전화번호나 이메일을 남겨주세요.\")\n\n[도구(Tool) 사용 엄격 통제 규칙]\n- **절대 금지:** 위 3가지 필수 정보 중 하나라도 누락되거나 불명확한 상태에서는 **절대로 캘린더 생성(Create Event) 툴을 호출하지 마라.**\n- 툴 오남용 방지: 필수 정보가 부족할 경우 툴을 억지로 실행하려 시도하지 말고, 사용자에게 부족한 정보를 묻는 텍스트만 출력하라.\n\n[예약 확정 및 대화 종료]\n- 3가지 정보가 모두 수집된 것이 확인된 즉시, 지체 없이 캘린더 생성 툴을 호출하여 일정을 등록하라.\n- 툴 실행이 성공적으로 완료되면 다음과 같은 양식으로 최종 안내를 수행하라.\n- **취소 정책 고지:** 최종 메시지에는 반드시 취소 시 관리자 이메일 문의 안내를 포함하라.\n- (최종 출력 예시: \"O년 O월 O일 O시에 OOO님의 예약이 접수되었습니다. 예약 취소를 원하실 경우 관리자 이메일로 문의해 주시기 바랍니다.\")\n- 캘린더 일정을 등록한 직후(성공적인 등록후에만) 예약에 관련해서 수집한 고객 연락처에 맞는 알림 전송 툴(Twilio 전송 또는 Email 전송)을 반드시 실행하라. Email 이 없으면 전화번호 로 문자 메시지만 발송하고, 전화 번호가 없으면 Email 로 이메일만 발송하라. 둘 중의 하나만 발송하면 된다."
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       112,
+                                       -640
+                                   ],
+                      "id":  "e04cc0b2-97b8-42b5-92d9-c82c30e44f1a",
+                      "name":  "AI Agent1"
+                  },
+                  {
+                      "parameters":  {
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "jinibyunsungmin@gmail.com",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "jinibyunsungmin@gmail.com"
+                                                      },
+                                         "start":  "={{ $fromAI(\u0027start_time\u0027) }}",
+                                         "end":  "={{ $fromAI(\u0027end_time\u0027) }}",
+                                         "additionalFields":  {
+                                                                  "summary":  "={{ $fromAI(\u0027summary\u0027) }}"
+                                                              }
+                                     },
+                      "type":  "n8n-nodes-base.googleCalendarTool",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       544,
+                                       -352
+                                   ],
+                      "id":  "487db412-f005-4425-baed-9d2080201792",
+                      "name":  "Create an event in Google Calendar",
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "ySr3Lm54uXCOeBf9",
+                                                                          "name":  "Google Calendar account"
+                                                                      }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       112,
+                                       -448
+                                   ],
+                      "id":  "7aa2ceef-ac2f-4825-9bac-3178a5b715b4",
+                      "name":  "OpenAI Chat Model1",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       240,
+                                       -416
+                                   ],
+                      "id":  "804efa7b-febc-4601-8339-cf1cc655356a",
+                      "name":  "Simple Memory1"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "0: Info\n1: Booking",
+                                         "height":  192,
+                                         "width":  272,
+                                         "color":  3
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -688,
+                                       -352
+                                   ],
+                      "id":  "8b320c97-061a-4039-9028-b7e6b522d55e",
+                      "name":  "Sticky Note3"
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "/chat-api-mybusiness",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -1280,
+                                       -64
+                                   ],
+                      "id":  "7ee08212-e305-4e72-903f-56d34c0884ac",
+                      "name":  "Webhook",
+                      "webhookId":  "faf8e30c-f73b-46ba-b68e-360d5e7b1d16"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**실제 웹 폼에서 POST**",
+                                         "height":  224,
+                                         "width":  192
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1328,
+                                       -96
+                                   ],
+                      "id":  "9930de8f-f0cb-4119-beab-049b68f71f61",
+                      "name":  "Sticky Note6"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "getAll",
+                                         "calendar":  {
+                                                          "__rl":  true,
+                                                          "value":  "jinibyunsungmin@gmail.com",
+                                                          "mode":  "list",
+                                                          "cachedResultName":  "jinibyunsungmin@gmail.com"
+                                                      },
+                                         "limit":  100,
+                                         "timeMax":  "={{ $now.plus({ month: 1 }) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.googleCalendarTool",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       368,
+                                       -336
+                                   ],
+                      "id":  "a7540ab6-c51e-4c15-b798-6030d7cbebac",
+                      "name":  "Get many events in Google Calendar",
+                      "credentials":  {
+                                          "googleCalendarOAuth2Api":  {
+                                                                          "id":  "ySr3Lm54uXCOeBf9",
+                                                                          "name":  "Google Calendar account"
+                                                                      }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "=너는 사용자의 의도를 분석하는 라우팅 AI(Intent Classifier)다.\n반드시 아래 JSON 형식으로만 응답하라. 다른 텍스트는 절대 덧붙이지 마라.\n{\"intent\": \"분류결과\"}\n\n[분류 기준]\n- BOOKING: 예약, 상담 예약, 미팅, 상담 신청, 일정 추가/변경/취소 요청\n- INFO: 비즈니스 설명, 일반 문의, 요약, 교육, 단순 인사\n\n[문맥 파악 규칙 - 매우 중요]\n1. \u0027상담\u0027이라는 단어가 포함되더라도, 일정을 잡기 위한 목적(상담 예약, 상담 신청 등)이라면 반드시 \"BOOKING\"으로 분류하라.\n2. 이전 대화 내역(Memory)을 확인하여, 현재 대화가 \u0027예약\u0027을 진행 중인 문맥(예: 직전 챗봇의 질문이 이름, 시간, 연락처 등을 묻는 과정)이라면, 사용자가 \"네\", \"오후 3시요\", \"김철수입니다\"처럼 단답형으로 대답하더라도 반드시 \"BOOKING\"으로 분류하라.\n\n[예시]\nUser: 상담 예약하고 싶어 -\u003e {\"intent\": \"BOOKING\"}\nUser: 내일 3시에 예약해줘 -\u003e {\"intent\": \"BOOKING\"}\nUser: 교육에 대해 알려줘 -\u003e {\"intent\": \"INFO\"}\nUser: (예약 진행 중) 김철수, 010-1234-5678 -\u003e {\"intent\": \"BOOKING\"}"
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       -1056,
+                                       -304
+                                   ],
+                      "id":  "96770597-f3cb-4690-81e4-9489362040a5",
+                      "name":  "AI Agent2"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+                                                         "textFormat":  {
+                                                                            "textOptions":  {
+                                                                                                "type":  "json_object"
+                                                                                            }
+                                                                        }
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -1056,
+                                       -96
+                                   ],
+                      "id":  "dd0dc444-a816-42cb-ab53-2e0597ad469f",
+                      "name":  "OpenAI Chat Model2",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "from":  "18455766455",
+                                         "to":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027To\u0027, ``, \u0027string\u0027) }}",
+                                         "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Message\u0027, ``, \u0027string\u0027) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.twilioTool",
+                      "typeVersion":  1,
+                      "position":  [
+                                       800,
+                                       -448
+                                   ],
+                      "id":  "d73808c9-3a87-45c3-9ef6-8b140ef1bec1",
+                      "name":  "Send an SMS/MMS/WhatsApp message in Twilio",
+                      "credentials":  {
+                                          "twilioApi":  {
+                                                            "id":  "0YbWryDBNQl9bJeo",
+                                                            "name":  "Twilio account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "sendTo":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027To\u0027, ``, \u0027string\u0027) }}",
+                                         "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Subject\u0027, ``, \u0027string\u0027) }}",
+                                         "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Message\u0027, ``, \u0027string\u0027) }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.gmailTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       960,
+                                       -464
+                                   ],
+                      "id":  "0c90fd74-7809-46e1-85c8-0d5cd6fa5dd1",
+                      "name":  "Send a message in Gmail",
+                      "webhookId":  "2d3a7a8f-3a72-4fa2-800a-7e6d221d2e08",
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"ai_reply\": $json.output } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       -48,
+                                       -272
+                                   ],
+                      "id":  "31028127-9b08-4cb7-91b8-bac85eb77f1e",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { \"ai_reply\": $json.output } }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       464,
+                                       -640
+                                   ],
+                      "id":  "2a9e2dbc-2cb8-431e-a9bf-517ca3b56d38",
+                      "name":  "Respond to Webhook1"
+                  },
+                  {
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                         "contextWindowLength":  10
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       -864,
+                                       -96
+                                   ],
+                      "id":  "79b5a28a-af23-4819-9419-613c048de134",
+                      "name":  "Simple Memory2"
+                  }
+              ],
+    "connections":  {
+                        "When chat message received":  {
+                                                           "main":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "AI Agent2",
+                                                                                "type":  "main",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                       },
+                        "OpenAI Chat Model":  {
+                                                  "ai_languageModel":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "AI Agent",
+                                                                                   "type":  "ai_languageModel",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                              },
+                        "Simple Memory":  {
+                                              "ai_memory":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "AI Agent",
+                                                                        "type":  "ai_memory",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                          },
+                        "search_business_data":  {
+                                                     "ai_tool":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "AI Agent",
+                                                                             "type":  "ai_tool",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                 },
+                        "Embeddings OpenAI1":  {
+                                                   "ai_embedding":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "search_business_data",
+                                                                                "type":  "ai_embedding",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                               },
+                        "AI Agent":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "Respond to Webhook",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "Switch":  {
+                                       "main":  [
+                                                    [
+                                                        {
+                                                            "node":  "AI Agent",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                                    ],
+                                                    [
+                                                        {
+                                                            "node":  "AI Agent1",
+                                                            "type":  "main",
+                                                            "index":  0
+                                                        }
+                                                    ]
+                                                ]
+                                   },
+                        "Create an event in Google Calendar":  {
+                                                                   "ai_tool":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "AI Agent1",
+                                                                                           "type":  "ai_tool",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                               },
+                        "OpenAI Chat Model1":  {
+                                                   "ai_languageModel":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "AI Agent1",
+                                                                                    "type":  "ai_languageModel",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                               },
+                        "Simple Memory1":  {
+                                               "ai_memory":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "AI Agent1",
+                                                                         "type":  "ai_memory",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                           },
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "AI Agent2",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "Get many events in Google Calendar":  {
+                                                                   "ai_tool":  [
+                                                                                   [
+                                                                                       {
+                                                                                           "node":  "AI Agent1",
+                                                                                           "type":  "ai_tool",
+                                                                                           "index":  0
+                                                                                       }
+                                                                                   ]
+                                                                               ]
+                                                               },
+                        "OpenAI Chat Model2":  {
+                                                   "ai_languageModel":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "AI Agent2",
+                                                                                    "type":  "ai_languageModel",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                               },
+                        "AI Agent2":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Switch",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Send an SMS/MMS/WhatsApp message in Twilio":  {
+                                                                           "ai_tool":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "AI Agent1",
+                                                                                                   "type":  "ai_tool",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                       },
+                        "Send a message in Gmail":  {
+                                                        "ai_tool":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "AI Agent1",
+                                                                                "type":  "ai_tool",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                    },
+                        "AI Agent1":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Respond to Webhook1",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "Simple Memory2":  {
+                                               "ai_memory":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "AI Agent2",
+                                                                         "type":  "ai_memory",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                           }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "ca4a66fa-0a30-4608-b58e-df0b4aa5990b",
+    "activeVersionId":  "ca4a66fa-0a30-4608-b58e-df0b4aa5990b",
+    "versionCounter":  248,
+    "triggerCount":  2,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-27T19:43:28.617Z",
+                       "createdAt":  "2026-07-27T19:43:28.617Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "yZ5C3pXUdAXzjNw2",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-08-01T15:11:11.521Z",
+                          "createdAt":  "2026-08-01T15:02:50.678Z",
+                          "versionId":  "ca4a66fa-0a30-4608-b58e-df0b4aa5990b",
+                          "workflowId":  "yZ5C3pXUdAXzjNw2",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "public":  true,
+                                                               "mode":  "webhook",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.chatTrigger",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             -1312,
+                                                             -304
+                                                         ],
+                                            "id":  "56055c1a-cc2e-4ff3-abd2-70da67d2d3e0",
+                                            "name":  "When chat message received",
+                                            "webhookId":  "d07fcf4b-1789-401e-8979-7c0c44d12026"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "=너는 kBusiness AI의 전문 교육 상담 및 비즈니스 자동화 에이전트다.\n사용자의 질문에 대해 검색된 문서(Context)의 내용을 절대 임의로 축약하거나 요약하지 말고, 가장 구체적이고 상세하게 풀어서 설명하라.\n\n[절대 금지 규칙]\n1. \"웹사이트를 확인하세요\", \"/education 링크를 참고하세요\" 등 사용자에게 정보 탐색을 떠넘기거나 회피하지 마라. 네가 직접 설명하라.\n2. 문서의 \u0027목차\u0027나 \u0027구조(이 섹션에는 ~가 있습니다)\u0027를 설명하지 마라.\n3. 검색된 데이터에 있는 실제 핵심 정보(예: 8주 완성 커리큘럼, 플랜별 가격, 기술 스택 등)를 빠짐없이 직접 나열하라.\n4. 검색된 문서에 없는 내용은 절대 지어내지 말고 \"해당 정보가 없습니다\"라고 답변하라."
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             -336,
+                                                             -272
+                                                         ],
+                                            "id":  "955d4ab4-9285-443a-8e07-1a35d8ff9c37",
+                                            "name":  "AI Agent"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "value":  "gpt-4o-mini",
+                                                                             "mode":  "list",
+                                                                             "cachedResultName":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             -496,
+                                                             -112
+                                                         ],
+                                            "id":  "e50cc2c3-df65-40ed-aaea-3ccd5dba9532",
+                                            "name":  "OpenAI Chat Model",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sessionIdType":  "customKey",
+                                                               "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                                               "contextWindowLength":  10
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             -368,
+                                                             -64
+                                                         ],
+                                            "id":  "3bff37cf-bc96-4dbf-90a3-8fe16ffc3732",
+                                            "name":  "Simple Memory"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "mode":  "retrieve-as-tool",
+                                                               "toolDescription":  "너는 kBusiness AI의 전문 고객 상담 AI 에이전트다.\n반드시 제공된 컨텍스트(Context) 데이터를 기반으로 가장 구체적이고 상세하게 답변해라.\n\n[절대 금지 규칙]\n- \"이 섹션에는 ~가 적혀 있습니다\", \"~가 포함되어 있습니다\" 같은 문서 구조를 설명하는 메타 발언을 절대 하지 마라.\n- 검색된 내용에 있는 실제 서비스 이름, 가격, 프로세스 등의 알맹이 정보를 직접 나열해라.\n- 컨텍스트에 없는 내용을 지어내지 마라.",
+                                                               "qdrantCollection":  {
+                                                                                        "__rl":  true,
+                                                                                        "value":  "my_business",
+                                                                                        "mode":  "list",
+                                                                                        "cachedResultName":  "my_business"
+                                                                                    },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             -224,
+                                                             -48
+                                                         ],
+                                            "id":  "9db9ae17-0f11-4372-aab3-0c95a5383177",
+                                            "name":  "search_business_data",
+                                            "credentials":  {
+                                                                "qdrantApi":  {
+                                                                                  "id":  "38FZYAovbavrkGDf",
+                                                                                  "name":  "Qdrant account - cloud"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             -112,
+                                                             80
+                                                         ],
+                                            "id":  "54bf34dd-e144-411b-a129-ce81dd8183ce",
+                                            "name":  "Embeddings OpenAI1",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**Chat Test**\n앞의 Insert 과정이 진행됐으면, 여기서는 Chat 을 통해 확인한다.",
+                                                               "height":  560,
+                                                               "width":  1440,
+                                                               "color":  4
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -1424,
+                                                             -48
+                                                         ],
+                                            "id":  "a36e3689-4e08-4359-b0da-20abb17ff83b",
+                                            "name":  "Sticky Note2"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**AI 로 하여금** 조회 뿐만 아니라 **실제** 일을 시키는 과정중 하나이다",
+                                                               "height":  528,
+                                                               "width":  1056
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             96,
+                                                             -704
+                                                         ],
+                                            "id":  "12c8657e-571c-40c7-bcdc-fe3f5bc97c68",
+                                            "name":  "Sticky Note"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "rules":  {
+                                                                             "values":  [
+                                                                                            {
+                                                                                                "conditions":  {
+                                                                                                                   "options":  {
+                                                                                                                                   "caseSensitive":  true,
+                                                                                                                                   "leftValue":  "",
+                                                                                                                                   "typeValidation":  "strict",
+                                                                                                                                   "version":  3
+                                                                                                                               },
+                                                                                                                   "conditions":  [
+                                                                                                                                      {
+                                                                                                                                          "id":  "d8a7a810-7b81-4390-b7f2-9ea8c4880926",
+                                                                                                                                          "leftValue":  "={{ JSON.parse($(\u0027AI Agent2\u0027).item.json.output).intent }}",
+                                                                                                                                          "rightValue":  "INFO",
+                                                                                                                                          "operator":  {
+                                                                                                                                                           "type":  "string",
+                                                                                                                                                           "operation":  "equals",
+                                                                                                                                                           "name":  "filter.operator.equals"
+                                                                                                                                                       }
+                                                                                                                                      }
+                                                                                                                                  ],
+                                                                                                                   "combinator":  "and"
+                                                                                                               }
+                                                                                            },
+                                                                                            {
+                                                                                                "conditions":  {
+                                                                                                                   "options":  {
+                                                                                                                                   "caseSensitive":  true,
+                                                                                                                                   "leftValue":  "",
+                                                                                                                                   "typeValidation":  "strict",
+                                                                                                                                   "version":  3
+                                                                                                                               },
+                                                                                                                   "conditions":  [
+                                                                                                                                      {
+                                                                                                                                          "id":  "0910b3b8-e976-4425-9cc8-fd86668a97f1",
+                                                                                                                                          "leftValue":  "={{ JSON.parse($(\u0027AI Agent2\u0027).item.json.output).intent }}",
+                                                                                                                                          "rightValue":  "BOOKING",
+                                                                                                                                          "operator":  {
+                                                                                                                                                           "type":  "string",
+                                                                                                                                                           "operation":  "equals",
+                                                                                                                                                           "name":  "filter.operator.equals"
+                                                                                                                                                       }
+                                                                                                                                      }
+                                                                                                                                  ],
+                                                                                                                   "combinator":  "and"
+                                                                                                               }
+                                                                                            }
+                                                                                        ]
+                                                                         },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.switch",
+                                            "typeVersion":  3.4,
+                                            "position":  [
+                                                             -608,
+                                                             -304
+                                                         ],
+                                            "id":  "e8d543cc-e8b5-4121-a88f-1f71fed47063",
+                                            "name":  "Switch"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "=너는 상담 예약을 전담하는 AI 어시스턴트다. \n대화 맥락을 기억하며, 한 번에 하나씩 질문하여 예약 정보를 수집한다.\n\n[시스템 환경 및 변수]\n- 현재 시간: {{ $now }} (기준 타임존: America/Toronto)\n- start_time: 시작 시간 (ISO 8601 형식)\n- end_time: 종료 시간 (ISO 8601 형식, 미지정 시 시작 시간으로부터 1시간 뒤)\n- summary: \"[상담 예약] {이름} - {연락처}\"\n\n[필수 수집 정보 (Slot)]\n1. 예약 날짜 및 시간\n2. 예약자 이름\n3. 연락처 (전화번호 또는 이메일)\n\n[작업 규칙 및 순차 질의(Slot Filling) 프로세스]\n대화 내역을 분석하여 누락된 정보를 파악하고, 아래 순서에 따라 **반드시 한 번에 한 가지 항목만** 질문하라. 두 가지 이상을 동시에 묻지 마라.\n\n1. 날짜 및 시간 수집:\n- 사용자가 특정 날짜나 시간 지정 없이 예약을 요청할 경우, \"언제가 좋으신가요?\"라고 먼저 되묻는 것을 절대 금지한다.\n- 질문하기 전에 가장 먼저 \u0027구글 캘린더 조회(List/FreeBusy) 툴\u0027을 반드시 호출하라.\n- 오늘을 기준으로 향후 30일 이내의 일정을 파악하여, 기존 일정과 겹치지 않는 빈 시간대(1시간 단위) 2~3가지를 추출하라.\n- 추출한 시간대를 사용자에게 제안하며 희망 시간을 질문하라.\n- **중복 검증 및 환각 방지 (절대 규칙):** 사용자가 제안된 시간이 아닌 다른 날짜/시간을 요청할 경우, 캘린더 조회 툴로 해당 시간의 일정을 반드시 조회하라. \n  * 만약 조회 결과가 \u0027비어있음(Empty)\u0027이거나 아무 일정도 반환되지 않는다면, 이는 **예약이 가능한 상태**다. 즉시 해당 시간으로 예약을 진행하고 절대 예약이 차 있다고 거짓말하지 마라.\n  * 명확하게 해당 시간에 기존 일정이 존재하는 데이터가 반환되었을 때만 \"해당 시간은 이미 예약이 차 있습니다. 다른 시간을 선택해 주세요.\"라고 안내하라.\n- (출력 예시: \"가장 빠른 예약 가능 시간은 O일 O시, X일 X시입니다. 편하신 시간을 선택하시거나 원하시는 날짜를 말씀해 주세요.\")\n\n2. 이름 수집:\n- 날짜와 시간이 확정되었으나 이름이 파악되지 않았다면 이름을 질문하라.\n- (출력 예시: \"예약자분의 성함을 알려주세요.\")\n\n3. 연락처 수집:\n- 날짜/시간, 이름이 모두 확인되었으나 연락처가 없다면 질문하라.\n- **알림 고지:** 예약 확정 알림(문자 또는 이메일) 발송을 위해 연락처가 필요함을 반드시 명시하라.\n- (출력 예시: \"예약 확정 알림을 보내드리기 위해 연락 가능한 전화번호나 이메일을 남겨주세요.\")\n\n[도구(Tool) 사용 엄격 통제 규칙]\n- **절대 금지:** 위 3가지 필수 정보 중 하나라도 누락되거나 불명확한 상태에서는 **절대로 캘린더 생성(Create Event) 툴을 호출하지 마라.**\n- 툴 오남용 방지: 필수 정보가 부족할 경우 툴을 억지로 실행하려 시도하지 말고, 사용자에게 부족한 정보를 묻는 텍스트만 출력하라.\n\n[예약 확정 및 대화 종료]\n- 3가지 정보가 모두 수집된 것이 확인된 즉시, 지체 없이 캘린더 생성 툴을 호출하여 일정을 등록하라.\n- 툴 실행이 성공적으로 완료되면 다음과 같은 양식으로 최종 안내를 수행하라.\n- **취소 정책 고지:** 최종 메시지에는 반드시 취소 시 관리자 이메일 문의 안내를 포함하라.\n- (최종 출력 예시: \"O년 O월 O일 O시에 OOO님의 예약이 접수되었습니다. 예약 취소를 원하실 경우 관리자 이메일로 문의해 주시기 바랍니다.\")\n- 캘린더 일정을 등록한 직후(성공적인 등록후에만) 예약에 관련해서 수집한 고객 연락처에 맞는 알림 전송 툴(Twilio 전송 또는 Email 전송)을 반드시 실행하라. Email 이 없으면 전화번호 로 문자 메시지만 발송하고, 전화 번호가 없으면 Email 로 이메일만 발송하라. 둘 중의 하나만 발송하면 된다."
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             112,
+                                                             -640
+                                                         ],
+                                            "id":  "e04cc0b2-97b8-42b5-92d9-c82c30e44f1a",
+                                            "name":  "AI Agent1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "calendar":  {
+                                                                                "__rl":  true,
+                                                                                "value":  "jinibyunsungmin@gmail.com",
+                                                                                "mode":  "list",
+                                                                                "cachedResultName":  "jinibyunsungmin@gmail.com"
+                                                                            },
+                                                               "start":  "={{ $fromAI(\u0027start_time\u0027) }}",
+                                                               "end":  "={{ $fromAI(\u0027end_time\u0027) }}",
+                                                               "additionalFields":  {
+                                                                                        "summary":  "={{ $fromAI(\u0027summary\u0027) }}"
+                                                                                    }
+                                                           },
+                                            "type":  "n8n-nodes-base.googleCalendarTool",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             544,
+                                                             -352
+                                                         ],
+                                            "id":  "487db412-f005-4425-baed-9d2080201792",
+                                            "name":  "Create an event in Google Calendar",
+                                            "credentials":  {
+                                                                "googleCalendarOAuth2Api":  {
+                                                                                                "id":  "ySr3Lm54uXCOeBf9",
+                                                                                                "name":  "Google Calendar account"
+                                                                                            }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "value":  "gpt-4o-mini",
+                                                                             "mode":  "list",
+                                                                             "cachedResultName":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             112,
+                                                             -448
+                                                         ],
+                                            "id":  "7aa2ceef-ac2f-4825-9bac-3178a5b715b4",
+                                            "name":  "OpenAI Chat Model1",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sessionIdType":  "customKey",
+                                                               "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                                               "contextWindowLength":  10
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             240,
+                                                             -416
+                                                         ],
+                                            "id":  "804efa7b-febc-4601-8339-cf1cc655356a",
+                                            "name":  "Simple Memory1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "0: Info\n1: Booking",
+                                                               "height":  192,
+                                                               "width":  272,
+                                                               "color":  3
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -688,
+                                                             -352
+                                                         ],
+                                            "id":  "8b320c97-061a-4039-9028-b7e6b522d55e",
+                                            "name":  "Sticky Note3"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "httpMethod":  "POST",
+                                                               "path":  "/chat-api-mybusiness",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             -1280,
+                                                             -64
+                                                         ],
+                                            "id":  "7ee08212-e305-4e72-903f-56d34c0884ac",
+                                            "name":  "Webhook",
+                                            "webhookId":  "faf8e30c-f73b-46ba-b68e-360d5e7b1d16"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**실제 웹 폼에서 POST**",
+                                                               "height":  224,
+                                                               "width":  192
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -1328,
+                                                             -96
+                                                         ],
+                                            "id":  "9930de8f-f0cb-4119-beab-049b68f71f61",
+                                            "name":  "Sticky Note6"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "getAll",
+                                                               "calendar":  {
+                                                                                "__rl":  true,
+                                                                                "value":  "jinibyunsungmin@gmail.com",
+                                                                                "mode":  "list",
+                                                                                "cachedResultName":  "jinibyunsungmin@gmail.com"
+                                                                            },
+                                                               "limit":  100,
+                                                               "timeMax":  "={{ $now.plus({ month: 1 }) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.googleCalendarTool",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             368,
+                                                             -336
+                                                         ],
+                                            "id":  "a7540ab6-c51e-4c15-b798-6030d7cbebac",
+                                            "name":  "Get many events in Google Calendar",
+                                            "credentials":  {
+                                                                "googleCalendarOAuth2Api":  {
+                                                                                                "id":  "ySr3Lm54uXCOeBf9",
+                                                                                                "name":  "Google Calendar account"
+                                                                                            }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.chatInput : $(\u0027When chat message received\u0027).first().json.chatInput }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "=너는 사용자의 의도를 분석하는 라우팅 AI(Intent Classifier)다.\n반드시 아래 JSON 형식으로만 응답하라. 다른 텍스트는 절대 덧붙이지 마라.\n{\"intent\": \"분류결과\"}\n\n[분류 기준]\n- BOOKING: 예약, 상담 예약, 미팅, 상담 신청, 일정 추가/변경/취소 요청\n- INFO: 비즈니스 설명, 일반 문의, 요약, 교육, 단순 인사\n\n[문맥 파악 규칙 - 매우 중요]\n1. \u0027상담\u0027이라는 단어가 포함되더라도, 일정을 잡기 위한 목적(상담 예약, 상담 신청 등)이라면 반드시 \"BOOKING\"으로 분류하라.\n2. 이전 대화 내역(Memory)을 확인하여, 현재 대화가 \u0027예약\u0027을 진행 중인 문맥(예: 직전 챗봇의 질문이 이름, 시간, 연락처 등을 묻는 과정)이라면, 사용자가 \"네\", \"오후 3시요\", \"김철수입니다\"처럼 단답형으로 대답하더라도 반드시 \"BOOKING\"으로 분류하라.\n\n[예시]\nUser: 상담 예약하고 싶어 -\u003e {\"intent\": \"BOOKING\"}\nUser: 내일 3시에 예약해줘 -\u003e {\"intent\": \"BOOKING\"}\nUser: 교육에 대해 알려줘 -\u003e {\"intent\": \"INFO\"}\nUser: (예약 진행 중) 김철수, 010-1234-5678 -\u003e {\"intent\": \"BOOKING\"}"
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             -1056,
+                                                             -304
+                                                         ],
+                                            "id":  "96770597-f3cb-4690-81e4-9489362040a5",
+                                            "name":  "AI Agent2"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "value":  "gpt-4o-mini",
+                                                                             "mode":  "list",
+                                                                             "cachedResultName":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+                                                                               "textFormat":  {
+                                                                                                  "textOptions":  {
+                                                                                                                      "type":  "json_object"
+                                                                                                                  }
+                                                                                              }
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             -1056,
+                                                             -96
+                                                         ],
+                                            "id":  "dd0dc444-a816-42cb-ab53-2e0597ad469f",
+                                            "name":  "OpenAI Chat Model2",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "from":  "18455766455",
+                                                               "to":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027To\u0027, ``, \u0027string\u0027) }}",
+                                                               "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Message\u0027, ``, \u0027string\u0027) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.twilioTool",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             800,
+                                                             -448
+                                                         ],
+                                            "id":  "d73808c9-3a87-45c3-9ef6-8b140ef1bec1",
+                                            "name":  "Send an SMS/MMS/WhatsApp message in Twilio",
+                                            "credentials":  {
+                                                                "twilioApi":  {
+                                                                                  "id":  "0YbWryDBNQl9bJeo",
+                                                                                  "name":  "Twilio account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sendTo":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027To\u0027, ``, \u0027string\u0027) }}",
+                                                               "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Subject\u0027, ``, \u0027string\u0027) }}",
+                                                               "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027Message\u0027, ``, \u0027string\u0027) }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.gmailTool",
+                                            "typeVersion":  2.2,
+                                            "position":  [
+                                                             960,
+                                                             -464
+                                                         ],
+                                            "id":  "0c90fd74-7809-46e1-85c8-0d5cd6fa5dd1",
+                                            "name":  "Send a message in Gmail",
+                                            "webhookId":  "2d3a7a8f-3a72-4fa2-800a-7e6d221d2e08",
+                                            "credentials":  {
+                                                                "gmailOAuth2":  {
+                                                                                    "id":  "BREMduOcSoKZsyd3",
+                                                                                    "name":  "Gmail account"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "={{ { \"ai_reply\": $json.output } }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             -48,
+                                                             -272
+                                                         ],
+                                            "id":  "31028127-9b08-4cb7-91b8-bac85eb77f1e",
+                                            "name":  "Respond to Webhook"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "={{ { \"ai_reply\": $json.output } }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             464,
+                                                             -640
+                                                         ],
+                                            "id":  "2a9e2dbc-2cb8-431e-a9bf-517ca3b56d38",
+                                            "name":  "Respond to Webhook1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "sessionIdType":  "customKey",
+                                                               "sessionKey":  "={{ $(\u0027Webhook\u0027).isExecuted ? $(\u0027Webhook\u0027).first().json.body.sender.id : $(\u0027When chat message received\u0027).first().json.sessionId }}",
+                                                               "contextWindowLength":  10
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                                            "typeVersion":  1.4,
+                                            "position":  [
+                                                             -864,
+                                                             -96
+                                                         ],
+                                            "id":  "79b5a28a-af23-4819-9419-613c048de134",
+                                            "name":  "Simple Memory2"
+                                        }
+                                    ],
+                          "connections":  {
+                                              "When chat message received":  {
+                                                                                 "main":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "AI Agent2",
+                                                                                                      "type":  "main",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                             },
+                                              "OpenAI Chat Model":  {
+                                                                        "ai_languageModel":  [
+                                                                                                 [
+                                                                                                     {
+                                                                                                         "node":  "AI Agent",
+                                                                                                         "type":  "ai_languageModel",
+                                                                                                         "index":  0
+                                                                                                     }
+                                                                                                 ]
+                                                                                             ]
+                                                                    },
+                                              "Simple Memory":  {
+                                                                    "ai_memory":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "AI Agent",
+                                                                                              "type":  "ai_memory",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                },
+                                              "search_business_data":  {
+                                                                           "ai_tool":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "AI Agent",
+                                                                                                   "type":  "ai_tool",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                                       },
+                                              "Embeddings OpenAI1":  {
+                                                                         "ai_embedding":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "search_business_data",
+                                                                                                      "type":  "ai_embedding",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                     },
+                                              "AI Agent":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Respond to Webhook",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                                              "Switch":  {
+                                                             "main":  [
+                                                                          [
+                                                                              {
+                                                                                  "node":  "AI Agent",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ],
+                                                                          [
+                                                                              {
+                                                                                  "node":  "AI Agent1",
+                                                                                  "type":  "main",
+                                                                                  "index":  0
+                                                                              }
+                                                                          ]
+                                                                      ]
+                                                         },
+                                              "Create an event in Google Calendar":  {
+                                                                                         "ai_tool":  [
+                                                                                                         [
+                                                                                                             {
+                                                                                                                 "node":  "AI Agent1",
+                                                                                                                 "type":  "ai_tool",
+                                                                                                                 "index":  0
+                                                                                                             }
+                                                                                                         ]
+                                                                                                     ]
+                                                                                     },
+                                              "OpenAI Chat Model1":  {
+                                                                         "ai_languageModel":  [
+                                                                                                  [
+                                                                                                      {
+                                                                                                          "node":  "AI Agent1",
+                                                                                                          "type":  "ai_languageModel",
+                                                                                                          "index":  0
+                                                                                                      }
+                                                                                                  ]
+                                                                                              ]
+                                                                     },
+                                              "Simple Memory1":  {
+                                                                     "ai_memory":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "AI Agent1",
+                                                                                               "type":  "ai_memory",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                 },
+                                              "Webhook":  {
+                                                              "main":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "AI Agent2",
+                                                                                   "type":  "main",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                                          },
+                                              "Get many events in Google Calendar":  {
+                                                                                         "ai_tool":  [
+                                                                                                         [
+                                                                                                             {
+                                                                                                                 "node":  "AI Agent1",
+                                                                                                                 "type":  "ai_tool",
+                                                                                                                 "index":  0
+                                                                                                             }
+                                                                                                         ]
+                                                                                                     ]
+                                                                                     },
+                                              "OpenAI Chat Model2":  {
+                                                                         "ai_languageModel":  [
+                                                                                                  [
+                                                                                                      {
+                                                                                                          "node":  "AI Agent2",
+                                                                                                          "type":  "ai_languageModel",
+                                                                                                          "index":  0
+                                                                                                      }
+                                                                                                  ]
+                                                                                              ]
+                                                                     },
+                                              "AI Agent2":  {
+                                                                "main":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "Switch",
+                                                                                     "type":  "main",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                            },
+                                              "Send an SMS/MMS/WhatsApp message in Twilio":  {
+                                                                                                 "ai_tool":  [
+                                                                                                                 [
+                                                                                                                     {
+                                                                                                                         "node":  "AI Agent1",
+                                                                                                                         "type":  "ai_tool",
+                                                                                                                         "index":  0
+                                                                                                                     }
+                                                                                                                 ]
+                                                                                                             ]
+                                                                                             },
+                                              "Send a message in Gmail":  {
+                                                                              "ai_tool":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "AI Agent1",
+                                                                                                      "type":  "ai_tool",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                          },
+                                              "AI Agent1":  {
+                                                                "main":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "Respond to Webhook1",
+                                                                                     "type":  "main",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                            },
+                                              "Simple Memory2":  {
+                                                                     "ai_memory":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "AI Agent2",
+                                                                                               "type":  "ai_memory",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                 }
+                                          },
+                          "nodeGroups":  [
+
+                                         ],
+                          "authors":  "Jini Byun",
+                          "name":  "Version ca4a66fa",
+                          "description":  "",
+                          "autosaved":  true,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-08-01T15:11:11.511Z",
+                                                             "id":  84,
+                                                             "workflowId":  "yZ5C3pXUdAXzjNw2",
+                                                             "versionId":  "ca4a66fa-0a30-4608-b58e-df0b4aa5990b",
+                                                             "event":  "activated",
+                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                                         }
+                                                     ]
+                      }
+}

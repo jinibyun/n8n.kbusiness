@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-07-14T21:43:47.697Z",
+    "updatedAt":  "2026-07-21T00:03:40.211Z",
     "createdAt":  "2026-07-12T22:42:51.243Z",
     "id":  "sD1AomYmaicqx63V",
     "name":  "Weekly-Sales-CSV",
@@ -7,26 +7,6 @@
     "active":  false,
     "isArchived":  false,
     "nodes":  [
-                  {
-                      "parameters":  {
-                                         "rule":  {
-                                                      "interval":  [
-                                                                       {
-                                                                           "field":  "cronExpression",
-                                                                           "expression":  "0 14 * * *"
-                                                                       }
-                                                                   ]
-                                                  }
-                                     },
-                      "id":  "2a34b21a-f3c6-4a8f-80fa-5b3100d213ee",
-                      "name":  "매일 오후 11시 실행",
-                      "type":  "n8n-nodes-base.scheduleTrigger",
-                      "typeVersion":  1.3,
-                      "position":  [
-                                       -448,
-                                       -320
-                                   ]
-                  },
                   {
                       "parameters":  {
                                          "operation":  "download",
@@ -727,20 +707,29 @@
                                                            "name":  "Postgres account"
                                                        }
                                       }
+                  },
+                  {
+                      "parameters":  {
+                                         "rule":  {
+                                                      "interval":  [
+                                                                       {
+                                                                           "field":  "cronExpression",
+                                                                           "expression":  "0 14 * * *"
+                                                                       }
+                                                                   ]
+                                                  }
+                                     },
+                      "id":  "2a34b21a-f3c6-4a8f-80fa-5b3100d213ee",
+                      "name":  "매일 오후 11시 실행",
+                      "type":  "n8n-nodes-base.scheduleTrigger",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -448,
+                                       -320
+                                   ]
                   }
               ],
     "connections":  {
-                        "매일 오후 11시 실행":  {
-                                             "main":  [
-                                                          [
-                                                              {
-                                                                  "node":  "Search files and folders1",
-                                                                  "type":  "main",
-                                                                  "index":  0
-                                                              }
-                                                          ]
-                                                      ]
-                                         },
                         "Weekly Sales xlsx 다운로드":  {
                                                        "main":  [
                                                                     [
@@ -886,7 +875,18 @@
                                                                                   }
                                                                               ]
                                                                           ]
-                                                             }
+                                                             },
+                        "매일 오후 11시 실행":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Search files and folders1",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         }
                     },
     "settings":  {
                      "executionOrder":  "v1",
@@ -911,9 +911,9 @@
     "pinData":  {
 
                 },
-    "versionId":  "b84995f4-5e4c-4f83-ab81-8e2fac739fdc",
+    "versionId":  "d2a3d4ef-e8c7-4e6a-a9a4-59f48194e933",
     "activeVersionId":  null,
-    "versionCounter":  172,
+    "versionCounter":  185,
     "triggerCount":  1,
     "sourceWorkflowId":  null,
     "shared":  [

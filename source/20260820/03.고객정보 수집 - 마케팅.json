@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-07-11T03:14:43.842Z",
+    "updatedAt":  "2026-07-22T01:41:41.393Z",
     "createdAt":  "2026-06-13T14:58:41.290Z",
     "id":  "Je091VzW5uYX4xqD",
     "name":  "03.고객정보 수집 - 마케팅",
@@ -40,8 +40,8 @@
                       "type":  "n8n-nodes-base.googleSheetsTrigger",
                       "typeVersion":  1,
                       "position":  [
-                                       0,
-                                       0
+                                       -176,
+                                       -48
                                    ],
                       "credentials":  {
                                           "googleSheetsTriggerOAuth2Api":  {
@@ -61,7 +61,7 @@
                                                                              "content":  "={{ $json[\u0027System Prompt\u0027] }}"
                                                                          },
                                                                          {
-                                                                             "content":  "=새로운 고객 문의가 접수되었습니다. 시스템 프롬프트의 지침에 따라 아래 고객 정보를 바탕으로 맞춤형 답변 초안을 작성하세요.\n\n[고객 정보]\n- 고객 이름: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027고객이름\u0027] }}\n- 고객 연락처: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027전화번호\u0027] }}\n- 고객이 선택한 카테고리: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027카테고리\u0027] }}\n- 실제 문의 내용: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027문의내용\u0027] }}\n\n\n[작업 지시 사항]\n위 정보를 분석하여 문의 성격에 맞는 최종 카테고리(예약/가격/위치/시설/기타 중 택 1)를 첫 줄에 괄호로 명시하고, 줄바꿈 후 즉시 고객에게 발송할 완성된 답변 텍스트만 작성하세요."
+                                                                             "content":  "=새로운 고객 문의가 접수되었습니다. 시스템 프롬프트의 지침에 따라 아래 고객 정보를 바탕으로 맞춤형 답변 초안을 작성하세요.\n\n[고객 정보]\n- 고객 이름: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027고객이름2026-7-18\u0027] }}\n- 고객 연락처: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u00274165558888\u0027] }}\n- 고객이 선택한 카테고리: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027카테고리\u0027] }}\n- 실제 문의 내용: {{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027회사에 대해 문의\u0027]}}\n\n\n[작업 지시 사항]\n위 정보를 분석하여 문의 성격에 맞는 최종 카테고리(예약/가격/위치/시설/기타 중 택 1)를 첫 줄에 괄호로 명시하고, 줄바꿈 후 즉시 고객에게 발송할 완성된 답변 텍스트만 작성하세요."
                                                                          }
                                                                      ]
                                                     },
@@ -77,8 +77,8 @@
                       "type":  "n8n-nodes-base.openAi",
                       "typeVersion":  1.1,
                       "position":  [
-                                       528,
-                                       0
+                                       384,
+                                       64
                                    ],
                       "credentials":  {
                                           "openAiApi":  {
@@ -126,8 +126,8 @@
                                                                             "removed":  false
                                                                         },
                                                                         {
-                                                                            "id":  "고객이름",
-                                                                            "displayName":  "고객이름",
+                                                                            "id":  "고객이름2026-7-18",
+                                                                            "displayName":  "고객이름2026-7-18",
                                                                             "required":  false,
                                                                             "defaultMatch":  false,
                                                                             "display":  true,
@@ -136,8 +136,8 @@
                                                                             "removed":  true
                                                                         },
                                                                         {
-                                                                            "id":  "전화번호",
-                                                                            "displayName":  "전화번호",
+                                                                            "id":  "4165558888",
+                                                                            "displayName":  "4165558888",
                                                                             "required":  false,
                                                                             "defaultMatch":  false,
                                                                             "display":  true,
@@ -146,8 +146,8 @@
                                                                             "removed":  true
                                                                         },
                                                                         {
-                                                                            "id":  "이메일",
-                                                                            "displayName":  "이메일",
+                                                                            "id":  "jijinisbyun@gmail.com",
+                                                                            "displayName":  "jijinisbyun@gmail.com",
                                                                             "required":  false,
                                                                             "defaultMatch":  false,
                                                                             "display":  true,
@@ -156,8 +156,8 @@
                                                                             "removed":  true
                                                                         },
                                                                         {
-                                                                            "id":  "문의내용",
-                                                                            "displayName":  "문의내용",
+                                                                            "id":  "회사에 대해 문의",
+                                                                            "displayName":  "회사에 대해 문의",
                                                                             "required":  false,
                                                                             "defaultMatch":  false,
                                                                             "display":  true,
@@ -236,8 +236,8 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       208,
-                                       -32
+                                       32,
+                                       -80
                                    ],
                       "id":  "eb88da9d-92a8-43c5-870d-f91b0c843b0e",
                       "name":  "Sticky Note"
@@ -265,8 +265,8 @@
                       "type":  "n8n-nodes-base.googleSheets",
                       "typeVersion":  4.7,
                       "position":  [
-                                       272,
-                                       0
+                                       96,
+                                       -48
                                    ],
                       "id":  "7c43a6b5-e8ab-4f31-8803-8c53c926c678",
                       "name":  "Get row(s) in sheet",
@@ -287,15 +287,15 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -96,
-                                       -32
+                                       -272,
+                                       -80
                                    ],
                       "id":  "8988c985-86ae-4ebd-8eb2-4827bc48ef29",
                       "name":  "Sticky Note1"
                   },
                   {
                       "parameters":  {
-                                         "sendTo":  "={{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027이메일\u0027] }}",
+                                         "sendTo":  "={{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027이메일\u0027]}}",
                                          "subject":  "=[안내] 문의하신 내용에 대한 답변입니다. ({{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027고객이름\u0027] }} 고객님)",
                                          "message":  "={{ $(\u0027AI 분석 및 답변 생성\u0027).item.json.message.content }}\n\n\n\u003cdiv style=\"font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; color: #333;\"\u003e\n  \u003cp\u003e안녕하세요, \u003cstrong\u003e{{ $(\u0027Google Sheets Trigger\u0027).item.json[\u0027고객이름\u0027] }}\u003c/strong\u003e 고객님.\u003c/p\u003e\n  \u003cp\u003e접수하신 문의 사항에 대한 답변을 안내해 드립니다.\u003c/p\u003e\n  \n  \u003cdiv style=\"background-color: #f5f7fa; padding: 20px; border-left: 4px solid #2b6cb0; margin: 20px 0; border-radius: 4px; white-space: pre-wrap;\"\u003e\n    {{ $(\u0027AI 분석 및 답변 생성\u0027).item.json.message.content }}\n  \u003c/div\u003e\n\n\u003c/div\u003e",
                                          "options":  {
@@ -377,7 +377,13 @@
                      "availableInMCP":  true,
                      "binaryMode":  "separate"
                  },
-    "staticData":  null,
+    "staticData":  {
+                       "node:Google Sheets Trigger":  {
+                                                          "documentId":  "10BujGYdV6anFAvAGLlvzapWMYW88mayqW4JtWiOpdvE",
+                                                          "sheetId":  183227187,
+                                                          "lastIndexChecked":  7
+                                                      }
+                   },
     "meta":  {
                  "aiBuilderAssisted":  true,
                  "builderVariant":  "mcp",
@@ -389,10 +395,10 @@
     "pinData":  {
 
                 },
-    "versionId":  "c79e37cd-d086-4bb0-b3e0-c8289d59adf0",
+    "versionId":  "ef3a7b4b-4417-46a4-8c8f-a26590f3e90b",
     "activeVersionId":  null,
-    "versionCounter":  102,
-    "triggerCount":  0,
+    "versionCounter":  161,
+    "triggerCount":  1,
     "sourceWorkflowId":  null,
     "shared":  [
                    {

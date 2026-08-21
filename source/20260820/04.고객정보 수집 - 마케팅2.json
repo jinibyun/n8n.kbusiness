@@ -1,5 +1,5 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:35:20.757Z",
+    "updatedAt":  "2026-07-18T03:53:59.091Z",
     "createdAt":  "2026-06-14T00:31:51.409Z",
     "id":  "vG3R0ceTlJC25VQy",
     "name":  "04.고객정보 수집 - 마케팅2",
@@ -792,13 +792,13 @@
                   },
                   {
                       "parameters":  {
-                                         "content":  "**Fake** 로 Webhook 트리거를 위해서 다음의 Tool 을 이용해 송신 할 수 있다. \n\nhttps://hoppscotch.io/",
-                                         "width":  256
+                                         "content":  "**Fake** 로 Webhook 트리거를 위해서 다음의 Tool 을 이용해 송신 할 수 있다. \n\nhttps://hoppscotch.io/\n\n혹은 테스트 폼을 가지고 테스트할 수 있다: \nhttps://v0-k-medispa.vercel.app/instagram-dm",
+                                         "width":  640
                                      },
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -96,
+                                       -288,
                                        704
                                    ],
                       "id":  "e4688f28-0cfc-4a6e-bd9c-5a27f079fa10",
@@ -1305,9 +1305,9 @@
                                     }
                                 ]
                 },
-    "versionId":  "3d4b274a-a430-4f3e-b374-29623fad735b",
+    "versionId":  "ecdeff87-8bb6-4923-bb2c-dcee2d0afa34",
     "activeVersionId":  null,
-    "versionCounter":  220,
+    "versionCounter":  228,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [

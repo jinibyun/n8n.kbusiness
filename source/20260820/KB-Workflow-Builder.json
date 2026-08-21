@@ -1,0 +1,435 @@
+﻿{
+    "updatedAt":  "2026-07-17T21:21:30.863Z",
+    "createdAt":  "2026-07-17T21:07:49.229Z",
+    "id":  "MmrmbVCe17SfJZGv",
+    "name":  "KB-Workflow-Builder",
+    "description":  "kBusiness.ca 로그인 사용자가 채팅으로 자동화 요구사항을 제출하면 AI가 8개 항목을 수집 후 n8n 시나리오 md를 생성하고 Google Drive 저장 + 이메일 발송하는 서비스",
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "id":  "7c8e20f0-bdc0-44f6-a43c-8368b067d45f",
+                      "name":  "Webhook",
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       0,
+                                       144
+                                   ],
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "workflow-builder-api",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "webhookId":  "ce67d2fd-3ee6-4cd8-9682-6bdf60d52e9c"
+                  },
+                  {
+                      "id":  "a24e4496-2ff2-46f8-924b-cd46a0ad3b16",
+                      "name":  "Neon DB 사용횟수 조회",
+                      "type":  "n8n-nodes-base.postgres",
+                      "typeVersion":  2.6,
+                      "position":  [
+                                       224,
+                                       144
+                                   ],
+                      "parameters":  {
+                                         "operation":  "executeQuery",
+                                         "query":  "SELECT COALESCE((SELECT usage_count FROM workflow_builder_usage WHERE user_id = $1), 0) AS usage_count",
+                                         "options":  {
+                                                         "queryReplacement":  "={{ $json.body.sessionId }}"
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "postgres":  {
+                                                           "id":  "whuctzn3nFikHQu0",
+                                                           "name":  "Postgres account"
+                                                       }
+                                      }
+                  },
+                  {
+                      "id":  "180ef9e0-b90e-44fb-b04d-bc11bea98c16",
+                      "name":  "사용횟수 체크 (3회 초과?)",
+                      "type":  "n8n-nodes-base.if",
+                      "typeVersion":  2.3,
+                      "position":  [
+                                       448,
+                                       144
+                                   ],
+                      "parameters":  {
+                                         "conditions":  {
+                                                            "options":  {
+                                                                            "caseSensitive":  true,
+                                                                            "leftValue":  "",
+                                                                            "typeValidation":  "strict"
+                                                                        },
+                                                            "conditions":  [
+                                                                               {
+                                                                                   "leftValue":  "={{ $json.usage_count }}",
+                                                                                   "rightValue":  3,
+                                                                                   "operator":  {
+                                                                                                    "type":  "number",
+                                                                                                    "operation":  "gte"
+                                                                                                }
+                                                                               }
+                                                                           ],
+                                                            "combinator":  "and"
+                                                        }
+                                     }
+                  },
+                  {
+                      "id":  "9a404fec-d0bb-4aef-bdc7-ef2654619cf7",
+                      "name":  "차단 응답 (한도 초과)",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       992,
+                                       0
+                                   ],
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  {
+                                                              "answer":  "죄송합니다. 무료 사용 한도(3회)를 모두 사용하셨습니다. kBusiness.ca에서 업그레이드해 주세요."
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "66340679-1398-45cd-b578-b3d687460a52",
+                      "name":  "KB-WFB Agent",
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       928,
+                                       304
+                                   ],
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "={{ $(\u0027Webhook\u0027).first().json.body.chatInput }}",
+                                         "options":  {
+                                                         "systemMessage":  "역할: 너는 n8n 워크플로우 요구사항 수집 전문가다. kBusiness.ca 사용자의 비즈니스 프로세스 자동화 요구사항을 채팅으로 수집하고 정제하는 것이 목표다.\n\n[세션 정보]\nsessionId: {{ $(\u0027Webhook\u0027).first().json.body.sessionId }}\nuserEmail: {{ $(\u0027Webhook\u0027).first().json.body.userEmail }}\n\n[대화 첫 시작 시 인사]\n안녕하세요! 저는 kBusiness 워크플로우 빌더입니다. 자동화하려는 프로세스에 대한 문서나 샘플 데이터가 있으면 첨부하거나 붙여넣기 해주세요. 없으시면 \u0027없음\u0027이라고 해주세요.\n\n[수집 항목 - 하나씩 순서대로 질문]\n1. 프로세스 이름/목적: \"어떤 업무를 자동화하고 싶으신가요?\"\n2. 트리거: \"언제 실행되어야 하나요? (정해진 시간 / 이벤트 / 폼 제출)\"\n3. 입력 데이터: \"데이터는 어디서 오나요? (Excel, Sheets, 이메일, API 등)\"\n4. 핵심 처리: \"중간에 어떤 작업이 필요한가요? (변환, 분류, 계산, AI 등)\"\n5. 출력/저장: \"최종 결과는 어디로? (Drive, DB, 이메일, Slack 등)\"\n6. 외부 연동: \"현재 사용 중인 툴/서비스가 있나요?\"\n7. AI 필요 여부: \"AI 기능(분류/판단/생성)이 필요한가요?\"\n8. 에러/예외 처리: \"실패하면 어떻게 해야 하나요? (알림, 재시도, 무시)\"\n\n[질문 원칙]\n- 한 번에 하나의 항목만 질문\n- 모호한 답변은 예시를 들어 추가 질문\n- 기술 용어는 쉬운 말로\n- 파일/텍스트 첨부 시 분석 후 이미 답변된 항목은 생략\n- 8개 항목 완료 후 Draft 요약 출력\n\n[Draft 요약 형식]\n📋 수집된 요구사항 요약입니다. 확인해 주세요.\n■ 프로세스: [내용]\n■ 트리거: [내용]\n■ 입력: [내용]\n■ 처리: [내용]\n■ 출력: [내용]\n■ 연동 툴: [내용]\n■ AI 필요: [Yes/No + 용도]\n■ 에러 처리: [내용]\n수정할 항목이 있으면 말씀해 주세요. 모두 맞으면 \"확정\"이라고 입력해 주세요.\n\n[확정 처리 순서 - \"확정\" 입력 시]\n1. generate_scenario_md 호출 (8개 항목 + sessionId + userEmail)\n2. save_to_google_drive 호출 (content, filename)\n3. send_final_email 호출 (userEmail, subject, body)\n4. increment_usage 호출 (sessionId)\n5. 완료 메시지: ✅ 시나리오 생성 완료! 📁 Drive 저장 완료 📧 이메일 발송: {userEmail}\n\n[금지]\n- 8개 항목 수집 전 산출물 생성 금지\n- \"확정\" 전 이메일 발송 금지\n- credential 실제 값 요청 금지\n- 한 번에 여러 항목 동시 질문 금지"
+                                                     }
+                                     }
+                  },
+                  {
+                      "id":  "99781c61-4ed4-4e2f-b5ca-ae68de9f2db6",
+                      "name":  "OpenAI gpt-4o-mini",
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       672,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "id":  "3853fc52-9a80-48e5-b514-b94fd26a2f96",
+                      "name":  "Memory Buffer",
+                      "type":  "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+                      "typeVersion":  1.4,
+                      "position":  [
+                                       800,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "sessionIdType":  "customKey",
+                                         "sessionKey":  "={{ $(\u0027Webhook\u0027).first().json.body.sessionId }}",
+                                         "contextWindowLength":  20
+                                     }
+                  },
+                  {
+                      "id":  "c73910a6-ed4a-477a-9a65-2ef3ecc45be0",
+                      "name":  "generate_scenario_md",
+                      "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       928,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "description":  "수집된 8개 항목(process_name, trigger, input_data, processing, output, tools, ai_needed, error_handling, sessionId, userEmail)을 받아 n8n 워크플로우 시나리오 md를 생성한다. 사용자가 \"확정\" 입력 후에만 호출.",
+                                         "language":  "javaScript",
+                                         "specifyInputSchema":  true,
+                                         "schemaType":  "fromJson",
+                                         "jsonSchemaExample":  "{\"process_name\":\"주문 처리 자동화\",\"trigger\":\"Webhook\",\"input_data\":\"Google Sheets\",\"processing\":\"분류 및 변환\",\"output\":\"Slack 알림\",\"tools\":\"Google Sheets, Slack\",\"ai_needed\":\"Yes - 분류\",\"error_handling\":\"Slack 알림\",\"sessionId\":\"user123\",\"userEmail\":\"user@example.com\"}",
+                                         "jsCode":  "const args = JSON.parse(query || \u0027{}\u0027);\nconst { process_name=\u0027미정\u0027, trigger=\u0027\u0027, input_data=\u0027\u0027, processing=\u0027\u0027, output=\u0027\u0027, tools=\u0027\u0027, ai_needed=\u0027\u0027, error_handling=\u0027\u0027, sessionId=\u0027\u0027, userEmail=\u0027\u0027 } = args;\nconst today = new Date().toISOString().split(\u0027T\u0027)[0];\nconst safe = process_name.replace(/[\\s/\\\\:*?\"\u003c\u003e|]/g, \u0027_\u0027);\nconst filename = today + \u0027_\u0027 + safe + \u0027.md\u0027;\nconst lines = [\n  \u0027# 시나리오: \u0027 + process_name, \u0027\u0027,\n  \u0027## Context\u0027, \u0027\u0027,\n  process_name + \u0027 비즈니스 프로세스 자동화 워크플로우. kBusiness Workflow Builder 생성.\u0027, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 트리거\u0027, \u0027\u0027, trigger, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 입력 데이터\u0027, \u0027\u0027, input_data, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 핵심 처리\u0027, \u0027\u0027, processing, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 출력/저장\u0027, \u0027\u0027, output, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 외부 연동\u0027, \u0027\u0027, tools, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## AI 사용 여부\u0027, \u0027\u0027, ai_needed, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 에러/예외 처리\u0027, \u0027\u0027, error_handling, \u0027\u0027,\n  \u0027---\u0027, \u0027\u0027, \u0027## 생성 정보\u0027, \u0027\u0027,\n  \u0027- 생성일: \u0027 + today,\n  \u0027- 요청자: \u0027 + (userEmail || sessionId),\n  \u0027- 생성 도구: KB Workflow Builder (kBusiness.ca)\u0027\n];\nreturn JSON.stringify({ content: lines.join(\u0027\\n\u0027), filename, processName: process_name });"
+                                     }
+                  },
+                  {
+                      "id":  "f9dbc06f-c989-4bc7-ab85-c65b1592cbf6",
+                      "name":  "save_to_google_drive",
+                      "type":  "n8n-nodes-base.googleDriveTool",
+                      "typeVersion":  3,
+                      "position":  [
+                                       1056,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "resource":  "file",
+                                         "operation":  "createFromText",
+                                         "content":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027content\u0027, \u0027저장할 마크다운 텍스트 내용\u0027) }}",
+                                         "name":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027filename\u0027, \u0027저장할 파일명 (예: 2026-01-01_프로세스명.md)\u0027) }}",
+                                         "folderId":  {
+                                                          "__rl":  true,
+                                                          "value":  "PLACEHOLDER_GDRIVE_ROOT_FOLDER_ID",
+                                                          "mode":  "id"
+                                                      },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "googleDriveOAuth2Api":  {
+                                                                       "id":  "VCZPApvimllYwsQ9",
+                                                                       "name":  "Google Drive account"
+                                                                   }
+                                      }
+                  },
+                  {
+                      "id":  "3fbcfc8b-7bee-4672-b0c6-dd8c69a28f1e",
+                      "name":  "send_final_email",
+                      "type":  "n8n-nodes-base.gmailTool",
+                      "typeVersion":  2.2,
+                      "position":  [
+                                       1184,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "resource":  "message",
+                                         "operation":  "send",
+                                         "sendTo":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027userEmail\u0027, \u0027수신자 이메일 주소\u0027) }}",
+                                         "subject":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027subject\u0027, \u0027이메일 제목\u0027) }}",
+                                         "emailType":  "html",
+                                         "message":  "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI(\u0027body\u0027, \u0027이메일 본문 HTML\u0027) }}",
+                                         "options":  {
+                                                         "appendAttribution":  false
+                                                     }
+                                     },
+                      "credentials":  {
+                                          "gmailOAuth2":  {
+                                                              "id":  "BREMduOcSoKZsyd3",
+                                                              "name":  "Gmail account"
+                                                          }
+                                      },
+                      "webhookId":  "b7f7ef7e-1a9b-402d-bc26-89e3573a802a"
+                  },
+                  {
+                      "id":  "5dc52883-6a88-455d-a2e6-bf8225d2fe20",
+                      "name":  "increment_usage",
+                      "type":  "@n8n/n8n-nodes-langchain.toolCode",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       1312,
+                                       528
+                                   ],
+                      "parameters":  {
+                                         "description":  "workflow_builder_usage 테이블의 usage_count를 1 증가시킨다. 이메일 발송 완료 후 마지막으로 호출. 입력: sessionId",
+                                         "language":  "javaScript",
+                                         "specifyInputSchema":  true,
+                                         "schemaType":  "fromJson",
+                                         "jsonSchemaExample":  "{\"sessionId\":\"user123\"}",
+                                         "jsCode":  "const args = JSON.parse(query || \u0027{}\u0027);\nconst { sessionId = \u0027\u0027 } = args;\nif (!sessionId) return \u0027sessionId 누락\u0027;\nconst resp = await fetch(\u0027PLACEHOLDER_NEON_HTTP_URL/sql\u0027, {\n  method: \u0027POST\u0027,\n  headers: { \u0027Authorization\u0027: \u0027Bearer PLACEHOLDER_NEON_API_KEY\u0027, \u0027Content-Type\u0027: \u0027application/json\u0027 },\n  body: JSON.stringify({\n    query: \u0027INSERT INTO workflow_builder_usage (user_id, usage_count, last_used_at) VALUES ($1, 1, NOW()) ON CONFLICT (user_id) DO UPDATE SET usage_count = workflow_builder_usage.usage_count + 1, last_used_at = NOW() RETURNING usage_count\u0027,\n    params: [sessionId]\n  })\n});\nconst data = await resp.json();\nconst newCount = data.rows?.[0]?.usage_count ?? 1;\nreturn JSON.stringify({ success: true, newCount, remaining: Math.max(0, 3 - newCount) });"
+                                     }
+                  },
+                  {
+                      "id":  "555de7c4-f273-40c2-94eb-9cedc1d45607",
+                      "name":  "Respond to Webhook",
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1520,
+                                       304
+                                   ],
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "={{ { answer: $json.output } }}",
+                                         "options":  {
+
+                                                     }
+                                     }
+                  }
+              ],
+    "connections":  {
+                        "Webhook":  {
+                                        "main":  [
+                                                     [
+                                                         {
+                                                             "node":  "Neon DB 사용횟수 조회",
+                                                             "type":  "main",
+                                                             "index":  0
+                                                         }
+                                                     ]
+                                                 ]
+                                    },
+                        "Neon DB 사용횟수 조회":  {
+                                                "main":  [
+                                                             [
+                                                                 {
+                                                                     "node":  "사용횟수 체크 (3회 초과?)",
+                                                                     "type":  "main",
+                                                                     "index":  0
+                                                                 }
+                                                             ]
+                                                         ]
+                                            },
+                        "사용횟수 체크 (3회 초과?)":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "차단 응답 (한도 초과)",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ],
+                                                              [
+                                                                  {
+                                                                      "node":  "KB-WFB Agent",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "KB-WFB Agent":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Respond to Webhook",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "OpenAI gpt-4o-mini":  {
+                                                   "ai_languageModel":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "KB-WFB Agent",
+                                                                                    "type":  "ai_languageModel",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                               },
+                        "Memory Buffer":  {
+                                              "ai_memory":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "KB-WFB Agent",
+                                                                        "type":  "ai_memory",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                          },
+                        "generate_scenario_md":  {
+                                                     "ai_tool":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "KB-WFB Agent",
+                                                                             "type":  "ai_tool",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                 },
+                        "save_to_google_drive":  {
+                                                     "ai_tool":  [
+                                                                     [
+                                                                         {
+                                                                             "node":  "KB-WFB Agent",
+                                                                             "type":  "ai_tool",
+                                                                             "index":  0
+                                                                         }
+                                                                     ]
+                                                                 ]
+                                                 },
+                        "send_final_email":  {
+                                                 "ai_tool":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "KB-WFB Agent",
+                                                                         "type":  "ai_tool",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                             },
+                        "increment_usage":  {
+                                                "ai_tool":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "KB-WFB Agent",
+                                                                        "type":  "ai_tool",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                            }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "availableInMCP":  true
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "aiBuilderAssisted":  true,
+                 "builderVariant":  "mcp"
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  null,
+    "versionId":  "2ccd23cb-5c5f-47fd-a030-66a8e8b4f4ff",
+    "activeVersionId":  null,
+    "versionCounter":  1,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-17T21:21:30.841Z",
+                       "createdAt":  "2026-07-17T21:21:30.841Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "MmrmbVCe17SfJZGv",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

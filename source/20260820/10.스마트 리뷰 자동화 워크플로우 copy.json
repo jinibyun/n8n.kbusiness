@@ -1,11 +1,11 @@
 ﻿{
-    "updatedAt":  "2026-06-20T23:38:19.403Z",
-    "createdAt":  "2026-06-20T02:16:55.972Z",
-    "id":  "SOMBX0WJssfqU0j1",
-    "name":  "10.스마트 리뷰 자동화 워크플로우",
+    "updatedAt":  "2026-07-27T19:40:34.887Z",
+    "createdAt":  "2026-07-25T01:31:42.391Z",
+    "id":  "OnWZSIjQ1Jr2fXHP",
+    "name":  "10.스마트 리뷰 자동화 워크플로우 copy",
     "description":  "Detects new Google reviews, routes by 5-star/1-star, posts responses, sends coupon or urgent alerts.",
     "active":  false,
-    "isArchived":  false,
+    "isArchived":  true,
     "nodes":  [
                   {
                       "parameters":  {
@@ -62,13 +62,13 @@
                                                          "fallbackOutput":  "extra"
                                                      }
                                      },
-                      "id":  "0ad0da58-c4a2-43f9-b5fb-d5e6805489f9",
+                      "id":  "c8b74241-def5-42ba-b2de-059c3a964df6",
                       "name":  "Switch Rating Route",
                       "type":  "n8n-nodes-base.switch",
                       "typeVersion":  3.2,
                       "position":  [
-                                       208,
-                                       400
+                                       80,
+                                       240
                                    ]
                   },
                   {
@@ -96,13 +96,13 @@
 
                                                      }
                                      },
-                      "id":  "40d490f2-608c-41cd-9e48-a8d7800270e1",
+                      "id":  "c9127500-fd25-4553-acb7-2b94b712e2ae",
                       "name":  "IF Email Exists",
                       "type":  "n8n-nodes-base.if",
                       "typeVersion":  2.2,
                       "position":  [
-                                       1168,
-                                       384
+                                       1040,
+                                       224
                                    ]
                   },
                   {
@@ -127,13 +127,13 @@
 
                                                      }
                                      },
-                      "id":  "345fb30d-3817-4f07-afeb-6bc3f615ee41",
+                      "id":  "76297d33-c1b7-41a5-b19b-fa75b4cf1fd5",
                       "name":  "Build 1Star Alert",
                       "type":  "n8n-nodes-base.set",
                       "typeVersion":  3.4,
                       "position":  [
-                                       480,
-                                       640
+                                       352,
+                                       480
                                    ]
                   },
                   {
@@ -165,10 +165,10 @@
                       "type":  "@n8n/n8n-nodes-langchain.openAi",
                       "typeVersion":  2.3,
                       "position":  [
-                                       480,
-                                       384
+                                       352,
+                                       224
                                    ],
-                      "id":  "ed472e67-3cea-44d5-b1f1-76242e557f4e",
+                      "id":  "38279f22-2db3-4226-bea9-5464ea831b5b",
                       "name":  "Message a model",
                       "credentials":  {
                                           "openAiApi":  {
@@ -180,7 +180,7 @@
                   {
                       "parameters":  {
                                          "httpMethod":  "POST",
-                                         "path":  "review-receive",
+                                         "path":  "e92ed2e5-9808-40a8-805c-1fafb26f92c9",
                                          "responseMode":  "responseNode",
                                          "options":  {
                                                          "allowedOrigins":  "*"
@@ -189,12 +189,12 @@
                       "type":  "n8n-nodes-base.webhook",
                       "typeVersion":  2.1,
                       "position":  [
-                                       -80,
-                                       400
+                                       -224,
+                                       240
                                    ],
-                      "id":  "51c4f74a-240d-4bc1-bd9b-0454dab0dc80",
+                      "id":  "67777914-0cce-4b3b-a337-1f5fc017dd8b",
                       "name":  "Webhook",
-                      "webhookId":  "bf4c3e3e-ece7-4e48-9f23-d6441650848c"
+                      "webhookId":  "e92ed2e5-9808-40a8-805c-1fafb26f92c9"
                   },
                   {
                       "parameters":  {
@@ -205,10 +205,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       -176,
-                                       304
+                                       -336,
+                                       176
                                    ],
-                      "id":  "6cad148c-2e69-4bec-a770-bde3e2e934c6",
+                      "id":  "d0693ae3-5af5-42c8-abdf-17241aa9050a",
                       "name":  "Sticky Note2"
                   },
                   {
@@ -222,10 +222,10 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       1456,
-                                       368
+                                       1328,
+                                       208
                                    ],
-                      "id":  "ccb517e0-8b0c-4df1-8e46-6663861fa557",
+                      "id":  "ff6b0305-62c8-4ebe-ab98-2b2d51efb3f2",
                       "name":  "Respond to Webhook"
                   },
                   {
@@ -239,10 +239,10 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       720,
-                                       640
+                                       592,
+                                       480
                                    ],
-                      "id":  "ab3e3065-dd90-4f3f-8c84-7bc419f61d3f",
+                      "id":  "9156ab2c-1305-416b-b1de-ad33c452b861",
                       "name":  "Respond to Webhook1"
                   },
                   {
@@ -276,10 +276,10 @@
                       "type":  "n8n-nodes-base.googleSheets",
                       "typeVersion":  4.7,
                       "position":  [
-                                       896,
-                                       384
+                                       768,
+                                       224
                                    ],
-                      "id":  "0b927a4d-9bf5-4f13-aa9f-039707d77773",
+                      "id":  "97ebaf11-bc7f-43b6-9000-0a891f5f022b",
                       "name":  "Get row(s) in sheet1",
                       "alwaysOutputData":  true,
                       "credentials":  {
@@ -297,10 +297,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       832,
-                                       320
+                                       704,
+                                       160
                                    ],
-                      "id":  "0b00d108-8105-4b35-af46-18190fdb9f75",
+                      "id":  "fb4397f0-b962-48e2-8f82-83dee96d7095",
                       "name":  "Sticky Note3"
                   },
                   {
@@ -315,12 +315,12 @@
                       "type":  "n8n-nodes-base.gmail",
                       "typeVersion":  2.2,
                       "position":  [
-                                       1952,
-                                       272
+                                       1824,
+                                       112
                                    ],
-                      "id":  "fa1702df-1f60-4e9a-939e-8529abf1c2ed",
+                      "id":  "9c41bc4d-23f2-4c8b-9756-6fe4a5b43136",
                       "name":  "Send a message1",
-                      "webhookId":  "1991b4a8-21c9-463d-b6ee-ad17ba0378e6",
+                      "webhookId":  "73ff39cb-35b8-49ba-be0b-44def9328f3f",
                       "credentials":  {
                                           "gmailOAuth2":  {
                                                               "id":  "BREMduOcSoKZsyd3",
@@ -337,10 +337,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       1888,
-                                       224
+                                       1760,
+                                       64
                                    ],
-                      "id":  "e519e405-f72b-47fc-9690-96fc88e72d7c",
+                      "id":  "9536842e-f739-4c79-abaa-e2ce5393c6b7",
                       "name":  "Sticky Note"
                   },
                   {
@@ -362,10 +362,10 @@
                       "type":  "n8n-nodes-base.set",
                       "typeVersion":  3.4,
                       "position":  [
-                                       1712,
-                                       288
+                                       1600,
+                                       144
                                    ],
-                      "id":  "6a1748ea-c337-41bc-b4ae-a94b6e758b1b",
+                      "id":  "bd99de77-8a29-47d7-a9fb-e2cf23849d17",
                       "name":  "Edit Fields"
                   },
                   {
@@ -377,10 +377,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       1680,
-                                       224
+                                       1552,
+                                       64
                                    ],
-                      "id":  "7852781f-6c67-45db-ac9f-d20211515edb",
+                      "id":  "829c2c36-8c9b-4532-9c02-269adfe804ec",
                       "name":  "Sticky Note1"
                   },
                   {
@@ -451,10 +451,10 @@
                       "type":  "n8n-nodes-base.googleSheets",
                       "typeVersion":  4.7,
                       "position":  [
-                                       2080,
-                                       624
+                                       1952,
+                                       464
                                    ],
-                      "id":  "6f32771a-1cc6-4c24-b241-aca623ae5458",
+                      "id":  "e4e4313b-a2cb-4b7d-a4b3-e37d1fc2b564",
                       "name":  "Append row in sheet",
                       "credentials":  {
                                           "googleSheetsOAuth2Api":  {
@@ -471,10 +471,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       2032,
-                                       592
+                                       1904,
+                                       432
                                    ],
-                      "id":  "bcd666e3-1cb3-4afc-bed9-e7385cba9336",
+                      "id":  "4043bf3b-5cc1-47cc-9fed-849db61a3e7d",
                       "name":  "Sticky Note4"
                   },
                   {
@@ -486,10 +486,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       1104,
-                                       320
+                                       976,
+                                       160
                                    ],
-                      "id":  "81636589-5d81-471a-b9f4-320aa812dce4",
+                      "id":  "56b3651a-d404-40a0-9b45-fd0d134abc7b",
                       "name":  "Sticky Note5"
                   },
                   {
@@ -500,10 +500,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       160,
-                                       304
+                                       32,
+                                       144
                                    ],
-                      "id":  "e0f0f0cd-4a91-4aac-ba18-09f0d833480e",
+                      "id":  "5b38d146-9b58-45eb-9c32-c798b468d444",
                       "name":  "Sticky Note6"
                   },
                   {
@@ -522,12 +522,12 @@
                       "type":  "n8n-nodes-base.slack",
                       "typeVersion":  2.5,
                       "position":  [
-                                       1072,
-                                       640
+                                       944,
+                                       480
                                    ],
-                      "id":  "bc87e3c7-16e7-4d60-a83e-30738e8ce425",
+                      "id":  "ccc75a77-2d9d-491a-90ed-1a4033b52e16",
                       "name":  "Send a message",
-                      "webhookId":  "261d39fb-e43a-479e-80ac-f58e9aafc199",
+                      "webhookId":  "596e333d-20fa-479b-aab1-f72a48cdb686",
                       "credentials":  {
                                           "slackApi":  {
                                                            "id":  "n0q1pi3bapaa4Lkf",
@@ -544,10 +544,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       976,
-                                       576
+                                       848,
+                                       416
                                    ],
-                      "id":  "1f78915f-5af1-41d7-9b19-afeb2c96531d",
+                      "id":  "c686d667-34eb-47b3-b9f5-270cbbc1696b",
                       "name":  "Sticky Note7"
                   },
                   {
@@ -561,10 +561,10 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       1456,
-                                       624
+                                       1328,
+                                       464
                                    ],
-                      "id":  "60b38e6d-e4a0-44ba-8f0f-2bcd905f377e",
+                      "id":  "b4155e2a-ac0b-4257-bd7a-c22de50f3788",
                       "name":  "Respond to Webhook2"
                   },
                   {
@@ -576,10 +576,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       1392,
-                                       576
+                                       1264,
+                                       416
                                    ],
-                      "id":  "53bfdd2d-f3c9-4174-b1a9-c3bc483db285",
+                      "id":  "9a0cffa3-af46-4952-8ec9-f66130bfcce9",
                       "name":  "Sticky Note8"
                   },
                   {
@@ -590,10 +590,10 @@
                       "type":  "n8n-nodes-base.stickyNote",
                       "typeVersion":  1,
                       "position":  [
-                                       1392,
-                                       320
+                                       1264,
+                                       160
                                    ],
-                      "id":  "1fbb60ba-b177-4f6b-9643-9ab083bfa8c3",
+                      "id":  "62d29d6e-6f90-42fd-b2f1-bccf2229cb78",
                       "name":  "Sticky Note9"
                   },
                   {
@@ -625,10 +625,10 @@
                       "type":  "@n8n/n8n-nodes-langchain.openAi",
                       "typeVersion":  2.3,
                       "position":  [
-                                       464,
-                                       864
+                                       336,
+                                       704
                                    ],
-                      "id":  "a6342387-f05a-4937-8c6b-6b3563a378ce",
+                      "id":  "14a8854d-041e-4b80-aff0-ca651cb430f0",
                       "name":  "Message a model2",
                       "credentials":  {
                                           "openAiApi":  {
@@ -648,10 +648,10 @@
                       "type":  "n8n-nodes-base.respondToWebhook",
                       "typeVersion":  1.5,
                       "position":  [
-                                       784,
-                                       864
+                                       656,
+                                       704
                                    ],
-                      "id":  "dc4d935f-98cf-42bb-80ee-1c8dac327172",
+                      "id":  "f234a022-de9b-4fc2-b96c-2e15edfab02d",
                       "name":  "Respond to Webhook3"
                   }
               ],
@@ -801,7 +801,7 @@
                     },
     "settings":  {
                      "executionOrder":  "v1",
-                     "availableInMCP":  true,
+                     "availableInMCP":  false,
                      "binaryMode":  "separate"
                  },
     "staticData":  null,
@@ -816,17 +816,17 @@
     "pinData":  {
 
                 },
-    "versionId":  "7452944f-4a54-4eea-b007-8633ff1ee259",
+    "versionId":  "90ba4856-3e3f-4b15-8bd7-731e11d8c4a9",
     "activeVersionId":  null,
-    "versionCounter":  359,
-    "triggerCount":  0,
+    "versionCounter":  20,
+    "triggerCount":  1,
     "sourceWorkflowId":  null,
     "shared":  [
                    {
-                       "updatedAt":  "2026-06-20T02:16:55.972Z",
-                       "createdAt":  "2026-06-20T02:16:55.972Z",
+                       "updatedAt":  "2026-07-25T01:31:42.391Z",
+                       "createdAt":  "2026-07-25T01:31:42.391Z",
                        "role":  "workflow:owner",
-                       "workflowId":  "SOMBX0WJssfqU0j1",
+                       "workflowId":  "OnWZSIjQ1Jr2fXHP",
                        "projectId":  "2uSiLPUGyNB6hQ5F",
                        "project":  {
                                        "updatedAt":  "2026-06-08T01:33:56.100Z",

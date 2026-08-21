@@ -1,0 +1,2023 @@
+﻿{
+    "updatedAt":  "2026-08-07T02:23:00.167Z",
+    "createdAt":  "2026-08-05T03:33:06.213Z",
+    "id":  "wuHtOkbwYHS8dpB2",
+    "name":  "kakao channel",
+    "description":  null,
+    "active":  true,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       -480,
+                                       -320
+                                   ],
+                      "id":  "58608412-11f4-4232-bf9a-663a6910c0fb",
+                      "name":  "Webhook-kakao channel",
+                      "webhookId":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**kakao channel 이름**\n토론토 AI업소록",
+                                         "height":  224,
+                                         "width":  368
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -624,
+                                       -384
+                                   ],
+                      "id":  "cc9bd54a-0872-4e24-8000-08ad62059110",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "465aabc5-be06-476f-8c58-aa047ea474d8",
+                                                                                     "name":  "request",
+                                                                                     "value":  "={{ $json.body.userRequest.utterance }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       96,
+                                       -320
+                                   ],
+                      "id":  "6c5eda69-a7e9-4361-8740-3bbfd794a055",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+                                                         "includeInputFields":  false,
+                                                         "timezone":  "America/Toronto"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.dateTime",
+                      "typeVersion":  2,
+                      "position":  [
+                                       288,
+                                       -320
+                                   ],
+                      "id":  "78708bda-d139-4b78-9e30-ccafde147220",
+                      "name":  "Date \u0026 Time"
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// 1. AI 응답 및 사용자 원문 수신\nconst rawText = $input.first().json.output || \"검색된 결과가 없습니다.\";\nlet userQuery = \"\";\n\ntry {\n  userQuery = $(\u0027Webhook-kakao channel\u0027).first().json.body.userRequest.utterance || \"\";\n} catch(e) {\n  userQuery = \"\";\n}\n\n// 2. 마크다운 및 특수문자 정제\nconst cleanText = rawText\n  .replace(/\\*\\*(.*?)\\*\\*/g, \u0027$1\u0027)\n  .replace(/\\*(.*?)\\*/g, \u0027$1\u0027)\n  .replace(/#+\\s?/g, \u0027\u0027)\n  .replace(/`/g, \u0027\u0027)\n  .trim();\n\n// 3. 업소 정보 정밀 파싱\nconst items = [];\nconst blocks = cleanText.split(/(?=\\n?\\d+\\.\\s*)/).filter(b =\u003e b.trim().length \u003e 0);\n\nblocks.forEach(block =\u003e {\n  const trimmedBlock = block.trim();\n  if (!/^\\d+\\.\\s*/.test(trimmedBlock)) return;\n\n  const lines = trimmedBlock.split(\u0027\\n\u0027).map(l =\u003e l.trim()).filter(l =\u003e l.length \u003e 0);\n  if (lines.length === 0) return;\n\n  let title = lines[0].replace(/^\\d+\\.\\s*/, \u0027\u0027).replace(/[\\*\\_]/g, \u0027\u0027).trim();\n  title = title.split(/\\s*-\\s*(주소|전화|웹|TEL|Web):/i)[0].trim();\n\n  let address = \"\";\n  let phone = \"\";\n  let web = \"\";\n\n  const addrMatch = trimmedBlock.match(/(?:주소|Address):\\s*([^\\n\\-]+)/i);\n  if (addrMatch) address = addrMatch[1].trim();\n\n  const phoneMatch = trimmedBlock.match(/(?:전화|TEL|Phone):\\s*([^\\n\\-]+)/i);\n  if (phoneMatch) {\n    const rawPhone = phoneMatch[1].trim();\n    if (!rawPhone.includes(\"없음\") \u0026\u0026 !rawPhone.includes(\"N/A\")) {\n      phone = rawPhone;\n    }\n  }\n\n  const webMatch = trimmedBlock.match(/(?:웹|Web|URL|사이트):\\s*(https?:\\/\\/[^\\s\\n\\-]+)/i) || trimmedBlock.match(/(https?:\\/\\/[^\\s\\n\\-]+)/i);\n  if (webMatch) web = webMatch[1].trim();\n\n  if (title) {\n    items.push({\n      title: title,\n      description: address || \"토론토\",\n      phone: phone,\n      web: web\n    });\n  }\n});\n\n// 4. Carousel (textCard) 구성\nlet templateOutputs = [];\n\nif (items.length \u003e 0) {\n  const cards = items.slice(0, 5).map(item =\u003e {\n    const mapUrl = `https://www.google.com/maps/search/?api=1\u0026query=${encodeURIComponent(item.description)}`;\n    \n    const buttons = [\n      {\n        action: \"webLink\",\n        label: \"📍 지도\",\n        webLinkUrl: mapUrl\n      }\n    ];\n\n    if (item.phone) {\n      buttons.push({\n        action: \"phone\",\n        label: \"📞 전화\",\n        phoneNumber: item.phone.replace(/[^0-9]/g, \u0027\u0027)\n      });\n    }\n\n    if (item.web) {\n      buttons.push({\n        action: \"webLink\",\n        label: \"🌐 Web\",\n        webLinkUrl: item.web\n      });\n    }\n\n    let cardDesc = `📍 주소: ${item.description}`;\n    if (item.phone) cardDesc += `\\n📞 전화: ${item.phone}`;\n\n    return {\n      title: item.title,\n      description: cardDesc,\n      buttons: buttons\n    };\n  });\n\n  templateOutputs.push({\n    carousel: {\n      type: \"textCard\",\n      items: cards\n    }\n  });\n\n  if (cards.length \u003e 1) {\n    templateOutputs.push({\n      simpleText: {\n        text: \"💡 카드를 옆으로 넘기시면 더 많은 검색 결과를 보실 수 있습니다.\"\n      }\n    });\n  }\n\n} else {\n  templateOutputs.push({\n    simpleText: {\n      text: cleanText\n    }\n  });\n}\n\n// 5. 지역 미입력(\"유학원\" 등) 시 감지 및 동적 연관 질문(Quick Replies) 제어\n\n// 5-1. 지역 키워드 존재 여부 체크\nlet detectedLoc = \"\";\nif (userQuery.includes(\"핀치\")) detectedLoc = \"핀치역\";\nelse if (userQuery.includes(\"노스욕\")) detectedLoc = \"노스욕\";\nelse if (userQuery.includes(\"다운타운\")) detectedLoc = \"다운타운\";\nelse if (userQuery.includes(\"영앤블루어\")) detectedLoc = \"영앤블루어\";\n\n// 검색어에서 순수 업종/키워드 추출 (예: \"유학원\")\nconst cleanKeyword = userQuery.replace(/(토론토|핀치|노스욕|다운타운|근처|추천|지역)/g, \u0027\u0027).trim() || \"업소\";\n\nlet dynamicQuickReplies = [];\n\nif (!detectedLoc) {\n  // [지역명이 입력되지 않은 경우] -\u003e 주요 지역별 재검색 버튼 분기 제공\n  dynamicQuickReplies = [\n    { label: `📍 핀치근처 ${cleanKeyword}`, action: \"message\", messageText: `핀치역 근처 ${cleanKeyword}` },\n    { label: `📍 노스욕 ${cleanKeyword}`, action: \"message\", messageText: `노스욕 ${cleanKeyword}` },\n    { label: `📍 다운타운 ${cleanKeyword}`, action: \"message\", messageText: `다운타운 ${cleanKeyword}` },\n    { label: `⭐ 후기 좋은 ${cleanKeyword}`, action: \"message\", messageText: `토론토 가장 후기 좋은 ${cleanKeyword}` }\n  ];\n} else {\n  // [지역명이 명시된 경우] -\u003e 업종 맞춤 2차 연관 질문 제공\n  const loc = detectedLoc;\n  if (/(유학원|유학|비자|유학원추천)/.test(userQuery)) {\n    dynamicQuickReplies = [\n      { label: `📄 ${loc} 학생비자/컬리지 상담`, action: \"message\", messageText: `${loc} 학생비자 컬리지 유학원` },\n      { label: `💼 ${loc} 조기유학 전문`, action: \"message\", messageText: `${loc} 조기유학 전문 유학원` },\n      { label: `⭐ ${loc} 가장 후기 좋은 유학원`, action: \"message\", messageText: `${loc} 후기 좋은 유학원` }\n    ];\n  } else if (/(부동산|콘도|렌트|매매)/.test(userQuery)) {\n    dynamicQuickReplies = [\n      { label: `🏠 ${loc} 콘도 렌트 시세`, action: \"message\", messageText: `${loc} 콘도 렌트 시세` },\n      { label: `⚖️ ${loc} 한인 부동산 변호사`, action: \"message\", messageText: `${loc} 근처 한인 부동산 변호사` },\n      { label: `🛠️ ${loc} 홈 인스펙션`, action: \"message\", messageText: `${loc} 근처 홈 인스펙션` }\n    ];\n  } else {\n    dynamicQuickReplies = [\n      { label: `⭐ ${loc} 추천 ${cleanKeyword}`, action: \"message\", messageText: `${loc} 추천 ${cleanKeyword}` },\n      { label: `🅿️ ${loc} 주차 가능`, action: \"message\", messageText: `${loc} 주차 가능한 ${cleanKeyword}` },\n      { label: `🕒 ${loc} 영업중인 곳`, action: \"message\", messageText: `${loc} 영업중인 ${cleanKeyword}` }\n    ];\n  }\n}\n\n// 6. 카카오 규격 반환\nreturn {\n  json: {\n    version: \"2.0\",\n    template: {\n      outputs: templateOutputs,\n      quickReplies: dynamicQuickReplies\n    }\n  }\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       800,
+                                       -320
+                                   ],
+                      "id":  "4ccf8bef-7807-4f5c-8546-eaddf2f2d176",
+                      "name":  "Code in JavaScript"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "getAll",
+                                         "projectId":  "business-directory-app-83456",
+                                         "collection":  "BusinessList",
+                                         "returnAll":  true
+                                     },
+                      "type":  "n8n-nodes-base.googleFirebaseCloudFirestore",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -528,
+                                       784
+                                   ],
+                      "id":  "8a76df20-bd57-4d53-bfca-3ad4d6b3d126",
+                      "name":  "Get many documents",
+                      "credentials":  {
+                                          "googleFirebaseCloudFirestoreOAuth2Api":  {
+                                                                                        "id":  "dReZMSbutTnRNs9C",
+                                                                                        "name":  "Google Firebase Cloud Firestore account"
+                                                                                    }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "tableId":  "businesses",
+                                         "dataToSend":  "autoMapInputData"
+                                     },
+                      "type":  "n8n-nodes-base.supabase",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -80,
+                                       784
+                                   ],
+                      "id":  "6694f726-b0e9-4592-9f42-c92e82080e68",
+                      "name":  "Create a row",
+                      "credentials":  {
+                                          "supabaseApi":  {
+                                                              "id":  "LDxFD9W6GptVhQ5a",
+                                                              "name":  "Supabase account"
+                                                          }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "return $input.all().map(item =\u003e {\n  return {\n    json: {\n      id: item.json._id,\n      name: item.json.name || null,\n      category: item.json.category || null,\n      address: item.json.address || null,\n      contact: item.json.contact || null,\n      about: item.json.about || null,\n      website: item.json.website || null,\n      imageurl: item.json.imageUrl || null,\n      isactive: item.json.isActive ?? false,\n      ispopular: item.json.isPopular ?? false,\n      kakaoaccount: item.json.kakaoAccount || null,\n      useremail: item.json.userEmail || null,\n      createddate: item.json.createdDate || null,\n      updatedate: item.json.updateDate || null\n    }\n  };\n});"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       -320,
+                                       784
+                                   ],
+                      "id":  "2adc3e07-277b-4e85-9015-6432e99b01b4",
+                      "name":  "Code in JavaScript1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**정상적으로 실행됐음. 그 후 비활성화**\nfirebase to supabase",
+                                         "height":  288,
+                                         "width":  816,
+                                         "color":  3
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -640,
+                                       704
+                                   ],
+                      "id":  "b20572e4-7ce6-412e-9c33-a6714461581c",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "getAll",
+                                         "tableId":  "businesses",
+                                         "returnAll":  true,
+                                         "filters":  {
+                                                         "conditions":  [
+                                                                            {
+                                                                                "keyName":  "embedding",
+                                                                                "condition":  "is",
+                                                                                "keyValue":  "null"
+                                                                            }
+                                                                        ]
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.supabase",
+                      "typeVersion":  1,
+                      "position":  [
+                                       656,
+                                       784
+                                   ],
+                      "id":  "029c3de7-086f-407b-97d0-303faff0e541",
+                      "name":  "Get many rows",
+                      "credentials":  {
+                                          "supabaseApi":  {
+                                                              "id":  "LDxFD9W6GptVhQ5a",
+                                                              "name":  "Supabase account"
+                                                          }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "let results = [];\nfor (let item of $input.all()) {\n  let text = `${item.json.name || \u0027\u0027} ${item.json.category || \u0027\u0027} ${item.json.address || \u0027\u0027} ${item.json.about || \u0027\u0027}`.trim();\n  results.push({\n    json: {\n      id: item.json.id,\n      combined_text: text,\n      body: {\n        input: text,\n        model: \"text-embedding-3-small\"\n      }\n    }\n  });\n}\nreturn results;"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       864,
+                                       784
+                                   ],
+                      "id":  "2c65c126-6c24-4567-8d40-bf08b1eb8cd3",
+                      "name":  "Code in JavaScript2",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "https://api.openai.com/v1/embeddings",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "openAiApi",
+                                         "sendBody":  true,
+                                         "bodyParameters":  {
+                                                                "parameters":  [
+                                                                                   {
+                                                                                       "name":  "input",
+                                                                                       "value":  "=={{ $json.combined_text }}"
+                                                                                   },
+                                                                                   {
+                                                                                       "name":  "model",
+                                                                                       "value":  "text-embedding-3-small"
+                                                                                   }
+                                                                               ]
+                                                            },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1056,
+                                       784
+                                   ],
+                      "id":  "5b42f96c-3c47-4bfd-b36a-cf108fd067af",
+                      "name":  "HTTP Request",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "update",
+                                         "tableId":  "businesses",
+                                         "filters":  {
+                                                         "conditions":  [
+                                                                            {
+                                                                                "keyName":  "id",
+                                                                                "condition":  "eq",
+                                                                                "keyValue":  "={{ $(\u0027Code in JavaScript2\u0027).item.json.id }}"
+                                                                            }
+                                                                        ]
+                                                     },
+                                         "fieldsUi":  {
+                                                          "fieldValues":  [
+                                                                              {
+                                                                                  "fieldId":  "embedding",
+                                                                                  "fieldValue":  "={{ $json.data[0].embedding }}"
+                                                                              },
+                                                                              {
+                                                                                  "fieldId":  "content",
+                                                                                  "fieldValue":  "={{ $(\u0027Code in JavaScript2\u0027).item.json.combined_text }}"
+                                                                              }
+                                                                          ]
+                                                      }
+                                     },
+                      "type":  "n8n-nodes-base.supabase",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1264,
+                                       784
+                                   ],
+                      "id":  "56b78df8-2685-45c0-aff9-901b7cb451cf",
+                      "name":  "Update a row",
+                      "credentials":  {
+                                          "supabaseApi":  {
+                                                              "id":  "LDxFD9W6GptVhQ5a",
+                                                              "name":  "Supabase account"
+                                                          }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**기존의 table 에 두 개의 vector 칼럼 추가 후 embedding 데이타 update**",
+                                         "height":  288,
+                                         "width":  1152,
+                                         "color":  2
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       368,
+                                       704
+                                   ],
+                      "id":  "b7bcdffa-3426-4fc3-b548-90586db6a70a",
+                      "name":  "Sticky Note2",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+
+                                     },
+                      "type":  "n8n-nodes-base.manualTrigger",
+                      "typeVersion":  1,
+                      "position":  [
+                                       448,
+                                       784
+                                   ],
+                      "id":  "1c447413-b6da-48dc-897e-774f67354ca0",
+                      "name":  "When clicking ‘Execute workflow’",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       576,
+                                       -32
+                                   ],
+                      "id":  "ff06d24f-9a67-4eb4-8c66-1fe2f7ab6d6d",
+                      "name":  "Embeddings OpenAI",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "retrieve-as-tool",
+                                         "toolDescription":  "토론토 한인 소상공인, 비즈니스, 변호사 등의 업체 정보를 검색할 때 사용. (Input must be a valid JSON object containing a \u0027query\u0027 key with the search string.)",
+                                         "tableName":  {
+                                                           "__rl":  true,
+                                                           "value":  "businesses",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "businesses"
+                                                       },
+                                         "options":  {
+                                                         "queryName":  "match_businesses"
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       704,
+                                       -144
+                                   ],
+                      "id":  "94be65a6-08ea-4d89-83ca-a6bcf308f885",
+                      "name":  "Supabase Vector Store",
+                      "credentials":  {
+                                          "supabaseApi":  {
+                                                              "id":  "LDxFD9W6GptVhQ5a",
+                                                              "name":  "Supabase account"
+                                                          }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=사용자 검색어: {{ $(\u0027Edit Fields\u0027).item.json.request }}\n현재 토론토 시간: {{ $(\u0027Date \u0026 Time\u0027).item.json.currentDate }}",
+                                         "options":  {
+                                                         "systemMessage":  "너는 토론토 한인 상권 업소록 검색을 돕는 카카오톡 AI 챗봇이다.\n사용자의 질문을 분석하여, 연결된 검색 도구(Tool)를 사용해 데이터베이스에서 업소 정보를 조회하고 답변하라.\n\n[데이터베이스(DB) 환경]\n- 상호명(Name) 및 설명(About): 한글/영문 혼용\n- 카테고리(Category): 주로 한글\n- 주소(Address): 영문\n\n[검색 도구(Tool) 호출 규칙]\n- 단어 축약 금지: 단일 명사로 자르지 말고, 지역명, 업종, 특징이 모두 포함된 자연스러운 한국어 구문이나 문장 형태를 그대로 파라미터로 전달한다.\n- 지역명 영문 병기 (핵심): 주소가 영문으로 되어 있으므로, 질문에 토론토 주요 지명이나 도로명(예: 핀치, 영, 노스욕, 스틸스)이 포함된 경우 한국어 문맥 뒤에 해당 지명의 영문명(Finch, Yonge, North York, Steeles)을 반드시 추가하여 전달한다.\n  * 예시: \"핀치역 근처 치킨집\" -\u003e \"핀치역 근처 치킨집 Finch\"\n  * 예시: \"노스욕 영스트릿 고깃집\" -\u003e \"노스욕 영스트릿 고깃집 North York Yonge\"\n- 오타 자체 교정: 사용자 입력에 오타나 잘못된 발음(예: \u0027휜치\u0027)이 포함된 경우, 정확한 표준어(예: \u0027핀치\u0027)로 문맥을 교정한 후 도구에 전달한다.\n- 툴 호출 포맷 준수: 내부적으로 검색 도구를 호출할 때는 반드시 툴이 요구하는 JSON Object 형식(예: {\"query\": \"검색어\"})을 사용해야 한다.\n\n[응답 출력 규칙]\n- 검색 성공: 반환된 결과의 상호명, 주소, 연락처, 카테고리를 읽기 쉽게 요약하여 자연스러운 한국어로 안내한다.\n- 검색 실패: 벡터 검색 결과가 없으면 \"요청하신 조건에 맞는 업소를 찾지 못했습니다.\"라고만 안내한다.\n- 최종 출력 포맷: 사용자에게 최종 답변을 제공할 때는 카카오톡에서 읽기 편한 일반 텍스트(자연어) 형태로만 응답한다. 최종 응답은 반드시 카카오톡에서 읽기 편한 자연스러운 한국어 평문으로만 작성하라\n\n[제한 사항] 검색 도구(Tool)는 반드시 단 한 번만 호출하라. 도구에서 결과가 반환되면 추가 검색을 시도하지 말고, 그 즉시 요약하여 최종 답변을 생성하라.\n\n[출력형식] 카카오톡 출력용이므로 마크다운 기호(, #,** 등)를 절대 사용하지 말고 플레인 텍스트나 JSON 형식으로만 출력하라\n\n[업소 출력 필수 포맷]\n1. 업소명\n- 주소: [정확한 도로명 주소]\n- 전화: [전화번호]\n- 웹: [웹사이트 URL]",
+                                                         "maxIterations":  2
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       448,
+                                       -320
+                                   ],
+                      "id":  "23624b7f-43eb-4875-bfaa-158d8320bcc5",
+                      "name":  "AI Agent"
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       384,
+                                       -160
+                                   ],
+                      "id":  "0a8a1de3-0fdf-4268-9a87-6b31fdec18d8",
+                      "name":  "OpenAI Chat Model",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{ $(\u0027Webhook-kakao channel\u0027).item.json.body.userRequest.callbackUrl }}",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ $json }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       1008,
+                                       -320
+                                   ],
+                      "id":  "d299a24b-bae4-4f7b-a2d5-9d261c850875",
+                      "name":  "HTTP Request1"
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\n  \"useCallback\": true\n}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       -176,
+                                       -320
+                                   ],
+                      "id":  "80c7b470-364d-4fab-ba81-d4cba5fc7153",
+                      "name":  "Respond to Webhook"
+                  },
+                  {
+                      "parameters":  {
+                                         "httpMethod":  "POST",
+                                         "path":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                                         "responseMode":  "responseNode",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.webhook",
+                      "typeVersion":  2.1,
+                      "position":  [
+                                       1328,
+                                       176
+                                   ],
+                      "id":  "c21d6ce2-1a02-4afc-bf51-5829a2edf4f0",
+                      "name":  "Webhook-kakao channel1",
+                      "webhookId":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**kakao channel 이름**\n토론토 AI업소록",
+                                         "height":  224,
+                                         "width":  368
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1184,
+                                       112
+                                   ],
+                      "id":  "9b712257-c5b2-428b-859a-6c833137de16",
+                      "name":  "Sticky Note3",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "465aabc5-be06-476f-8c58-aa047ea474d8",
+                                                                                     "name":  "request",
+                                                                                     "value":  "={{ $json.body.userRequest.utterance }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       1904,
+                                       176
+                                   ],
+                      "id":  "3047411a-f56b-4f61-9a79-1ee2c8c310cc",
+                      "name":  "Edit Fields1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+                                                         "includeInputFields":  false,
+                                                         "timezone":  "America/Toronto"
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.dateTime",
+                      "typeVersion":  2,
+                      "position":  [
+                                       2096,
+                                       176
+                                   ],
+                      "id":  "8d5237c3-1994-4a67-b697-9d981b4944b1",
+                      "name":  "Date \u0026 Time1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "jsCode":  "// AI 응답 텍스트의 정확한 JSON 경로로 수정 (복잡한 배열 인덱스 제거)\nlet aiResponse = $input.first().json.output || \"검색된 결과가 없습니다.\";\n\n// 카카오 규격에 맞춘 JSON 구조 반환\nreturn {\n  json: {\n    \"version\": \"2.0\",\n    \"template\": {\n      \"outputs\": [\n        {\n          \"simpleText\": {\n            \"text\": aiResponse\n          }\n        }\n      ]\n    }\n  }\n};"
+                                     },
+                      "type":  "n8n-nodes-base.code",
+                      "typeVersion":  2,
+                      "position":  [
+                                       2608,
+                                       176
+                                   ],
+                      "id":  "beca90c9-8fa7-461e-906b-842da85aa463",
+                      "name":  "Code in JavaScript3",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       2384,
+                                       464
+                                   ],
+                      "id":  "e5bdda6e-3063-4eca-84bc-43dbfd3309d3",
+                      "name":  "Embeddings OpenAI1",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "retrieve-as-tool",
+                                         "toolDescription":  "토론토 한인 소상공인, 비즈니스, 변호사 등의 업체 정보를 검색할 때 사용. (Input must be a valid JSON object containing a \u0027query\u0027 key with the search string.)",
+                                         "tableName":  {
+                                                           "__rl":  true,
+                                                           "value":  "businesses",
+                                                           "mode":  "list",
+                                                           "cachedResultName":  "businesses"
+                                                       },
+                                         "options":  {
+                                                         "queryName":  "match_businesses"
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       2512,
+                                       352
+                                   ],
+                      "id":  "e5ea7ab0-cfdd-4918-b5fd-85861de071a4",
+                      "name":  "Supabase Vector Store1",
+                      "credentials":  {
+                                          "supabaseApi":  {
+                                                              "id":  "LDxFD9W6GptVhQ5a",
+                                                              "name":  "Supabase account"
+                                                          }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "promptType":  "define",
+                                         "text":  "=사용자 검색어: {{ $(\u0027Edit Fields1\u0027).item.json.request }}\n현재 토론토 시간: {{ $(\u0027Date \u0026 Time1\u0027).item.json.currentDate }}",
+                                         "options":  {
+                                                         "systemMessage":  "너는 토론토 한인 상권 업소록 검색을 돕는 카카오톡 AI 챗봇이다.\n사용자의 질문을 분석하여, 연결된 검색 도구(Tool)를 사용해 데이터베이스에서 업소 정보를 조회하고 답변하라.\n\n[데이터베이스(DB) 환경]\n- 상호명(Name) 및 설명(About): 한글/영문 혼용\n- 카테고리(Category): 주로 한글\n- 주소(Address): 영문\n\n[검색 도구(Tool) 호출 규칙]\n- 단어 축약 금지: 단일 명사로 자르지 말고, 지역명, 업종, 특징이 모두 포함된 자연스러운 한국어 구문이나 문장 형태를 그대로 파라미터로 전달한다.\n- 지역명 영문 병기 (핵심): 주소가 영문으로 되어 있으므로, 질문에 토론토 주요 지명이나 도로명(예: 핀치, 영, 노스욕, 스틸스)이 포함된 경우 한국어 문맥 뒤에 해당 지명의 영문명(Finch, Yonge, North York, Steeles)을 반드시 추가하여 전달한다.\n  * 예시: \"핀치역 근처 치킨집\" -\u003e \"핀치역 근처 치킨집 Finch\"\n  * 예시: \"노스욕 영스트릿 고깃집\" -\u003e \"노스욕 영스트릿 고깃집 North York Yonge\"\n- 오타 자체 교정: 사용자 입력에 오타나 잘못된 발음(예: \u0027휜치\u0027)이 포함된 경우, 정확한 표준어(예: \u0027핀치\u0027)로 문맥을 교정한 후 도구에 전달한다.\n- 툴 호출 포맷 준수: 내부적으로 검색 도구를 호출할 때는 반드시 툴이 요구하는 JSON Object 형식(예: {\"query\": \"검색어\"})을 사용해야 한다.\n\n[응답 출력 규칙]\n- 검색 성공: 반환된 결과의 상호명, 주소, 연락처, 카테고리를 읽기 쉽게 요약하여 자연스러운 한국어로 안내한다.\n- 검색 실패: 벡터 검색 결과가 없으면 \"요청하신 조건에 맞는 업소를 찾지 못했습니다.\"라고만 안내한다.\n- 최종 출력 포맷: 사용자에게 최종 답변을 제공할 때는 카카오톡에서 읽기 편한 일반 텍스트(자연어) 형태로만 응답한다. 최종 응답은 반드시 카카오톡에서 읽기 편한 자연스러운 한국어 평문으로만 작성하라\n\n[제한 사항] 검색 도구(Tool)는 반드시 단 한 번만 호출하라. 도구에서 결과가 반환되면 추가 검색을 시도하지 말고, 그 즉시 요약하여 최종 답변을 생성하라.",
+                                                         "maxIterations":  2
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.agent",
+                      "typeVersion":  3.1,
+                      "position":  [
+                                       2256,
+                                       176
+                                   ],
+                      "id":  "4fb7aeb8-282c-4678-8ec4-baa507664801",
+                      "name":  "AI Agent1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "model":  {
+                                                       "__rl":  true,
+                                                       "value":  "gpt-4o-mini",
+                                                       "mode":  "list",
+                                                       "cachedResultName":  "gpt-4o-mini"
+                                                   },
+                                         "builtInTools":  {
+
+                                                          },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       2192,
+                                       336
+                                   ],
+                      "id":  "2fb68f15-2b63-4fb9-bf5c-bea65d6c6c6e",
+                      "name":  "OpenAI Chat Model1",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      },
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "POST",
+                                         "url":  "={{ $(\u0027Webhook-kakao channel1\u0027).item.json.body.userRequest.callbackUrl }}",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "={{ $json }}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       2816,
+                                       176
+                                   ],
+                      "id":  "c8d2b126-0d59-48cc-81d0-0943c3912ab4",
+                      "name":  "HTTP Request2",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "respondWith":  "json",
+                                         "responseBody":  "{\n  \"useCallback\": true\n}",
+                                         "options":  {
+                                                         "responseCode":  200
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.respondToWebhook",
+                      "typeVersion":  1.5,
+                      "position":  [
+                                       1632,
+                                       176
+                                   ],
+                      "id":  "839fe740-2d80-4ee3-a568-b55d1ed7a396",
+                      "name":  "Respond to Webhook1",
+                      "disabled":  true
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**BACKUP**",
+                                         "height":  640,
+                                         "width":  2000,
+                                         "color":  4
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       1104,
+                                       -16
+                                   ],
+                      "id":  "cb862415-6cb0-4123-82b2-a753e71f9713",
+                      "name":  "Sticky Note4",
+                      "disabled":  true
+                  }
+              ],
+    "connections":  {
+                        "Webhook-kakao channel":  {
+                                                      "main":  [
+                                                                   [
+                                                                       {
+                                                                           "node":  "Respond to Webhook",
+                                                                           "type":  "main",
+                                                                           "index":  0
+                                                                       }
+                                                                   ]
+                                                               ]
+                                                  },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Date \u0026 Time",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "Date \u0026 Time":  {
+                                                 "main":  [
+                                                              [
+                                                                  {
+                                                                      "node":  "AI Agent",
+                                                                      "type":  "main",
+                                                                      "index":  0
+                                                                  }
+                                                              ]
+                                                          ]
+                                             },
+                        "Get many documents":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Code in JavaScript1",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Code in JavaScript1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Create a row",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Get many rows":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Code in JavaScript2",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Code in JavaScript2":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "HTTP Request",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "HTTP Request":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Update a row",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "When clicking ‘Execute workflow’":  {
+                                                                 "main":  [
+                                                                              [
+                                                                                  {
+                                                                                      "node":  "Get many rows",
+                                                                                      "type":  "main",
+                                                                                      "index":  0
+                                                                                  }
+                                                                              ]
+                                                                          ]
+                                                             },
+                        "Embeddings OpenAI":  {
+                                                  "ai_embedding":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Supabase Vector Store",
+                                                                               "type":  "ai_embedding",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                              },
+                        "Supabase Vector Store":  {
+                                                      "ai_tool":  [
+                                                                      [
+                                                                          {
+                                                                              "node":  "AI Agent",
+                                                                              "type":  "ai_tool",
+                                                                              "index":  0
+                                                                          }
+                                                                      ]
+                                                                  ]
+                                                  },
+                        "OpenAI Chat Model":  {
+                                                  "ai_languageModel":  [
+                                                                           [
+                                                                               {
+                                                                                   "node":  "AI Agent",
+                                                                                   "type":  "ai_languageModel",
+                                                                                   "index":  0
+                                                                               }
+                                                                           ]
+                                                                       ]
+                                              },
+                        "AI Agent":  {
+                                         "main":  [
+                                                      [
+                                                          {
+                                                              "node":  "Code in JavaScript",
+                                                              "type":  "main",
+                                                              "index":  0
+                                                          }
+                                                      ]
+                                                  ]
+                                     },
+                        "Code in JavaScript":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "HTTP Request1",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Respond to Webhook":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Edit Fields",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Webhook-kakao channel1":  {
+                                                       "main":  [
+                                                                    [
+                                                                        {
+                                                                            "node":  "Respond to Webhook1",
+                                                                            "type":  "main",
+                                                                            "index":  0
+                                                                        }
+                                                                    ]
+                                                                ]
+                                                   },
+                        "Edit Fields1":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Date \u0026 Time1",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Date \u0026 Time1":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "AI Agent1",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Code in JavaScript3":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "HTTP Request2",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Embeddings OpenAI1":  {
+                                                   "ai_embedding":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Supabase Vector Store1",
+                                                                                "type":  "ai_embedding",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                               },
+                        "Supabase Vector Store1":  {
+                                                       "ai_tool":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "AI Agent1",
+                                                                               "type":  "ai_tool",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                                   },
+                        "AI Agent1":  {
+                                          "main":  [
+                                                       [
+                                                           {
+                                                               "node":  "Code in JavaScript3",
+                                                               "type":  "main",
+                                                               "index":  0
+                                                           }
+                                                       ]
+                                                   ]
+                                      },
+                        "OpenAI Chat Model1":  {
+                                                   "ai_languageModel":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "AI Agent1",
+                                                                                    "type":  "ai_languageModel",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                               },
+                        "Respond to Webhook1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Edit Fields1",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "53c6b512-5adf-4009-b0a3-f490b6f2c63e",
+    "activeVersionId":  "53c6b512-5adf-4009-b0a3-f490b6f2c63e",
+    "versionCounter":  396,
+    "triggerCount":  1,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-08-05T03:33:06.213Z",
+                       "createdAt":  "2026-08-05T03:33:06.213Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "wuHtOkbwYHS8dpB2",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  {
+                          "updatedAt":  "2026-08-07T02:27:26.354Z",
+                          "createdAt":  "2026-08-07T02:23:00.171Z",
+                          "versionId":  "53c6b512-5adf-4009-b0a3-f490b6f2c63e",
+                          "workflowId":  "wuHtOkbwYHS8dpB2",
+                          "nodes":  [
+                                        {
+                                            "parameters":  {
+                                                               "httpMethod":  "POST",
+                                                               "path":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             -480,
+                                                             -320
+                                                         ],
+                                            "id":  "58608412-11f4-4232-bf9a-663a6910c0fb",
+                                            "name":  "Webhook-kakao channel",
+                                            "webhookId":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**kakao channel 이름**\n토론토 AI업소록",
+                                                               "height":  224,
+                                                               "width":  368
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -624,
+                                                             -384
+                                                         ],
+                                            "id":  "cc9bd54a-0872-4e24-8000-08ad62059110",
+                                            "name":  "Sticky Note"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "assignments":  {
+                                                                                   "assignments":  [
+                                                                                                       {
+                                                                                                           "id":  "465aabc5-be06-476f-8c58-aa047ea474d8",
+                                                                                                           "name":  "request",
+                                                                                                           "value":  "={{ $json.body.userRequest.utterance }}",
+                                                                                                           "type":  "string"
+                                                                                                       }
+                                                                                                   ]
+                                                                               },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.set",
+                                            "typeVersion":  3.4,
+                                            "position":  [
+                                                             96,
+                                                             -320
+                                                         ],
+                                            "id":  "6c5eda69-a7e9-4361-8740-3bbfd794a055",
+                                            "name":  "Edit Fields"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+                                                                               "includeInputFields":  false,
+                                                                               "timezone":  "America/Toronto"
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.dateTime",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             288,
+                                                             -320
+                                                         ],
+                                            "id":  "78708bda-d139-4b78-9e30-ccafde147220",
+                                            "name":  "Date \u0026 Time"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// 1. AI 응답 및 사용자 원문 수신\nconst rawText = $input.first().json.output || \"검색된 결과가 없습니다.\";\nlet userQuery = \"\";\n\ntry {\n  userQuery = $(\u0027Webhook-kakao channel\u0027).first().json.body.userRequest.utterance || \"\";\n} catch(e) {\n  userQuery = \"\";\n}\n\n// 2. 마크다운 및 특수문자 정제\nconst cleanText = rawText\n  .replace(/\\*\\*(.*?)\\*\\*/g, \u0027$1\u0027)\n  .replace(/\\*(.*?)\\*/g, \u0027$1\u0027)\n  .replace(/#+\\s?/g, \u0027\u0027)\n  .replace(/`/g, \u0027\u0027)\n  .trim();\n\n// 3. 업소 정보 정밀 파싱\nconst items = [];\nconst blocks = cleanText.split(/(?=\\n?\\d+\\.\\s*)/).filter(b =\u003e b.trim().length \u003e 0);\n\nblocks.forEach(block =\u003e {\n  const trimmedBlock = block.trim();\n  if (!/^\\d+\\.\\s*/.test(trimmedBlock)) return;\n\n  const lines = trimmedBlock.split(\u0027\\n\u0027).map(l =\u003e l.trim()).filter(l =\u003e l.length \u003e 0);\n  if (lines.length === 0) return;\n\n  let title = lines[0].replace(/^\\d+\\.\\s*/, \u0027\u0027).replace(/[\\*\\_]/g, \u0027\u0027).trim();\n  title = title.split(/\\s*-\\s*(주소|전화|웹|TEL|Web):/i)[0].trim();\n\n  let address = \"\";\n  let phone = \"\";\n  let web = \"\";\n\n  const addrMatch = trimmedBlock.match(/(?:주소|Address):\\s*([^\\n\\-]+)/i);\n  if (addrMatch) address = addrMatch[1].trim();\n\n  const phoneMatch = trimmedBlock.match(/(?:전화|TEL|Phone):\\s*([^\\n\\-]+)/i);\n  if (phoneMatch) {\n    const rawPhone = phoneMatch[1].trim();\n    if (!rawPhone.includes(\"없음\") \u0026\u0026 !rawPhone.includes(\"N/A\")) {\n      phone = rawPhone;\n    }\n  }\n\n  const webMatch = trimmedBlock.match(/(?:웹|Web|URL|사이트):\\s*(https?:\\/\\/[^\\s\\n\\-]+)/i) || trimmedBlock.match(/(https?:\\/\\/[^\\s\\n\\-]+)/i);\n  if (webMatch) web = webMatch[1].trim();\n\n  if (title) {\n    items.push({\n      title: title,\n      description: address || \"토론토\",\n      phone: phone,\n      web: web\n    });\n  }\n});\n\n// 4. Carousel (textCard) 구성\nlet templateOutputs = [];\n\nif (items.length \u003e 0) {\n  const cards = items.slice(0, 5).map(item =\u003e {\n    const mapUrl = `https://www.google.com/maps/search/?api=1\u0026query=${encodeURIComponent(item.description)}`;\n    \n    const buttons = [\n      {\n        action: \"webLink\",\n        label: \"📍 지도\",\n        webLinkUrl: mapUrl\n      }\n    ];\n\n    if (item.phone) {\n      buttons.push({\n        action: \"phone\",\n        label: \"📞 전화\",\n        phoneNumber: item.phone.replace(/[^0-9]/g, \u0027\u0027)\n      });\n    }\n\n    if (item.web) {\n      buttons.push({\n        action: \"webLink\",\n        label: \"🌐 Web\",\n        webLinkUrl: item.web\n      });\n    }\n\n    let cardDesc = `📍 주소: ${item.description}`;\n    if (item.phone) cardDesc += `\\n📞 전화: ${item.phone}`;\n\n    return {\n      title: item.title,\n      description: cardDesc,\n      buttons: buttons\n    };\n  });\n\n  templateOutputs.push({\n    carousel: {\n      type: \"textCard\",\n      items: cards\n    }\n  });\n\n  if (cards.length \u003e 1) {\n    templateOutputs.push({\n      simpleText: {\n        text: \"💡 카드를 옆으로 넘기시면 더 많은 검색 결과를 보실 수 있습니다.\"\n      }\n    });\n  }\n\n} else {\n  templateOutputs.push({\n    simpleText: {\n      text: cleanText\n    }\n  });\n}\n\n// 5. 지역 미입력(\"유학원\" 등) 시 감지 및 동적 연관 질문(Quick Replies) 제어\n\n// 5-1. 지역 키워드 존재 여부 체크\nlet detectedLoc = \"\";\nif (userQuery.includes(\"핀치\")) detectedLoc = \"핀치역\";\nelse if (userQuery.includes(\"노스욕\")) detectedLoc = \"노스욕\";\nelse if (userQuery.includes(\"다운타운\")) detectedLoc = \"다운타운\";\nelse if (userQuery.includes(\"영앤블루어\")) detectedLoc = \"영앤블루어\";\n\n// 검색어에서 순수 업종/키워드 추출 (예: \"유학원\")\nconst cleanKeyword = userQuery.replace(/(토론토|핀치|노스욕|다운타운|근처|추천|지역)/g, \u0027\u0027).trim() || \"업소\";\n\nlet dynamicQuickReplies = [];\n\nif (!detectedLoc) {\n  // [지역명이 입력되지 않은 경우] -\u003e 주요 지역별 재검색 버튼 분기 제공\n  dynamicQuickReplies = [\n    { label: `📍 핀치근처 ${cleanKeyword}`, action: \"message\", messageText: `핀치역 근처 ${cleanKeyword}` },\n    { label: `📍 노스욕 ${cleanKeyword}`, action: \"message\", messageText: `노스욕 ${cleanKeyword}` },\n    { label: `📍 다운타운 ${cleanKeyword}`, action: \"message\", messageText: `다운타운 ${cleanKeyword}` },\n    { label: `⭐ 후기 좋은 ${cleanKeyword}`, action: \"message\", messageText: `토론토 가장 후기 좋은 ${cleanKeyword}` }\n  ];\n} else {\n  // [지역명이 명시된 경우] -\u003e 업종 맞춤 2차 연관 질문 제공\n  const loc = detectedLoc;\n  if (/(유학원|유학|비자|유학원추천)/.test(userQuery)) {\n    dynamicQuickReplies = [\n      { label: `📄 ${loc} 학생비자/컬리지 상담`, action: \"message\", messageText: `${loc} 학생비자 컬리지 유학원` },\n      { label: `💼 ${loc} 조기유학 전문`, action: \"message\", messageText: `${loc} 조기유학 전문 유학원` },\n      { label: `⭐ ${loc} 가장 후기 좋은 유학원`, action: \"message\", messageText: `${loc} 후기 좋은 유학원` }\n    ];\n  } else if (/(부동산|콘도|렌트|매매)/.test(userQuery)) {\n    dynamicQuickReplies = [\n      { label: `🏠 ${loc} 콘도 렌트 시세`, action: \"message\", messageText: `${loc} 콘도 렌트 시세` },\n      { label: `⚖️ ${loc} 한인 부동산 변호사`, action: \"message\", messageText: `${loc} 근처 한인 부동산 변호사` },\n      { label: `🛠️ ${loc} 홈 인스펙션`, action: \"message\", messageText: `${loc} 근처 홈 인스펙션` }\n    ];\n  } else {\n    dynamicQuickReplies = [\n      { label: `⭐ ${loc} 추천 ${cleanKeyword}`, action: \"message\", messageText: `${loc} 추천 ${cleanKeyword}` },\n      { label: `🅿️ ${loc} 주차 가능`, action: \"message\", messageText: `${loc} 주차 가능한 ${cleanKeyword}` },\n      { label: `🕒 ${loc} 영업중인 곳`, action: \"message\", messageText: `${loc} 영업중인 ${cleanKeyword}` }\n    ];\n  }\n}\n\n// 6. 카카오 규격 반환\nreturn {\n  json: {\n    version: \"2.0\",\n    template: {\n      outputs: templateOutputs,\n      quickReplies: dynamicQuickReplies\n    }\n  }\n};"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             800,
+                                                             -320
+                                                         ],
+                                            "id":  "4ccf8bef-7807-4f5c-8546-eaddf2f2d176",
+                                            "name":  "Code in JavaScript"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "getAll",
+                                                               "projectId":  "business-directory-app-83456",
+                                                               "collection":  "BusinessList",
+                                                               "returnAll":  true
+                                                           },
+                                            "type":  "n8n-nodes-base.googleFirebaseCloudFirestore",
+                                            "typeVersion":  1.1,
+                                            "position":  [
+                                                             -528,
+                                                             784
+                                                         ],
+                                            "id":  "8a76df20-bd57-4d53-bfca-3ad4d6b3d126",
+                                            "name":  "Get many documents",
+                                            "credentials":  {
+                                                                "googleFirebaseCloudFirestoreOAuth2Api":  {
+                                                                                                              "id":  "dReZMSbutTnRNs9C",
+                                                                                                              "name":  "Google Firebase Cloud Firestore account"
+                                                                                                          }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "tableId":  "businesses",
+                                                               "dataToSend":  "autoMapInputData"
+                                                           },
+                                            "type":  "n8n-nodes-base.supabase",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -80,
+                                                             784
+                                                         ],
+                                            "id":  "6694f726-b0e9-4592-9f42-c92e82080e68",
+                                            "name":  "Create a row",
+                                            "credentials":  {
+                                                                "supabaseApi":  {
+                                                                                    "id":  "LDxFD9W6GptVhQ5a",
+                                                                                    "name":  "Supabase account"
+                                                                                }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "return $input.all().map(item =\u003e {\n  return {\n    json: {\n      id: item.json._id,\n      name: item.json.name || null,\n      category: item.json.category || null,\n      address: item.json.address || null,\n      contact: item.json.contact || null,\n      about: item.json.about || null,\n      website: item.json.website || null,\n      imageurl: item.json.imageUrl || null,\n      isactive: item.json.isActive ?? false,\n      ispopular: item.json.isPopular ?? false,\n      kakaoaccount: item.json.kakaoAccount || null,\n      useremail: item.json.userEmail || null,\n      createddate: item.json.createdDate || null,\n      updatedate: item.json.updateDate || null\n    }\n  };\n});"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             -320,
+                                                             784
+                                                         ],
+                                            "id":  "2adc3e07-277b-4e85-9015-6432e99b01b4",
+                                            "name":  "Code in JavaScript1",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**정상적으로 실행됐음. 그 후 비활성화**\nfirebase to supabase",
+                                                               "height":  288,
+                                                               "width":  816,
+                                                               "color":  3
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             -640,
+                                                             704
+                                                         ],
+                                            "id":  "b20572e4-7ce6-412e-9c33-a6714461581c",
+                                            "name":  "Sticky Note1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "getAll",
+                                                               "tableId":  "businesses",
+                                                               "returnAll":  true,
+                                                               "filters":  {
+                                                                               "conditions":  [
+                                                                                                  {
+                                                                                                      "keyName":  "embedding",
+                                                                                                      "condition":  "is",
+                                                                                                      "keyValue":  "null"
+                                                                                                  }
+                                                                                              ]
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.supabase",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             656,
+                                                             784
+                                                         ],
+                                            "id":  "029c3de7-086f-407b-97d0-303faff0e541",
+                                            "name":  "Get many rows",
+                                            "credentials":  {
+                                                                "supabaseApi":  {
+                                                                                    "id":  "LDxFD9W6GptVhQ5a",
+                                                                                    "name":  "Supabase account"
+                                                                                }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "let results = [];\nfor (let item of $input.all()) {\n  let text = `${item.json.name || \u0027\u0027} ${item.json.category || \u0027\u0027} ${item.json.address || \u0027\u0027} ${item.json.about || \u0027\u0027}`.trim();\n  results.push({\n    json: {\n      id: item.json.id,\n      combined_text: text,\n      body: {\n        input: text,\n        model: \"text-embedding-3-small\"\n      }\n    }\n  });\n}\nreturn results;"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             864,
+                                                             784
+                                                         ],
+                                            "id":  "2c65c126-6c24-4567-8d40-bf08b1eb8cd3",
+                                            "name":  "Code in JavaScript2",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "https://api.openai.com/v1/embeddings",
+                                                               "authentication":  "predefinedCredentialType",
+                                                               "nodeCredentialType":  "openAiApi",
+                                                               "sendBody":  true,
+                                                               "bodyParameters":  {
+                                                                                      "parameters":  [
+                                                                                                         {
+                                                                                                             "name":  "input",
+                                                                                                             "value":  "=={{ $json.combined_text }}"
+                                                                                                         },
+                                                                                                         {
+                                                                                                             "name":  "model",
+                                                                                                             "value":  "text-embedding-3-small"
+                                                                                                         }
+                                                                                                     ]
+                                                                                  },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             1056,
+                                                             784
+                                                         ],
+                                            "id":  "5b42f96c-3c47-4bfd-b36a-cf108fd067af",
+                                            "name":  "HTTP Request",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "operation":  "update",
+                                                               "tableId":  "businesses",
+                                                               "filters":  {
+                                                                               "conditions":  [
+                                                                                                  {
+                                                                                                      "keyName":  "id",
+                                                                                                      "condition":  "eq",
+                                                                                                      "keyValue":  "={{ $(\u0027Code in JavaScript2\u0027).item.json.id }}"
+                                                                                                  }
+                                                                                              ]
+                                                                           },
+                                                               "fieldsUi":  {
+                                                                                "fieldValues":  [
+                                                                                                    {
+                                                                                                        "fieldId":  "embedding",
+                                                                                                        "fieldValue":  "={{ $json.data[0].embedding }}"
+                                                                                                    },
+                                                                                                    {
+                                                                                                        "fieldId":  "content",
+                                                                                                        "fieldValue":  "={{ $(\u0027Code in JavaScript2\u0027).item.json.combined_text }}"
+                                                                                                    }
+                                                                                                ]
+                                                                            }
+                                                           },
+                                            "type":  "n8n-nodes-base.supabase",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             1264,
+                                                             784
+                                                         ],
+                                            "id":  "56b78df8-2685-45c0-aff9-901b7cb451cf",
+                                            "name":  "Update a row",
+                                            "credentials":  {
+                                                                "supabaseApi":  {
+                                                                                    "id":  "LDxFD9W6GptVhQ5a",
+                                                                                    "name":  "Supabase account"
+                                                                                }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**기존의 table 에 두 개의 vector 칼럼 추가 후 embedding 데이타 update**",
+                                                               "height":  288,
+                                                               "width":  1152,
+                                                               "color":  2
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             368,
+                                                             704
+                                                         ],
+                                            "id":  "b7bcdffa-3426-4fc3-b548-90586db6a70a",
+                                            "name":  "Sticky Note2",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+
+                                                           },
+                                            "type":  "n8n-nodes-base.manualTrigger",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             448,
+                                                             784
+                                                         ],
+                                            "id":  "1c447413-b6da-48dc-897e-774f67354ca0",
+                                            "name":  "When clicking ‘Execute workflow’",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             576,
+                                                             -32
+                                                         ],
+                                            "id":  "ff06d24f-9a67-4eb4-8c66-1fe2f7ab6d6d",
+                                            "name":  "Embeddings OpenAI",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "mode":  "retrieve-as-tool",
+                                                               "toolDescription":  "토론토 한인 소상공인, 비즈니스, 변호사 등의 업체 정보를 검색할 때 사용. (Input must be a valid JSON object containing a \u0027query\u0027 key with the search string.)",
+                                                               "tableName":  {
+                                                                                 "__rl":  true,
+                                                                                 "value":  "businesses",
+                                                                                 "mode":  "list",
+                                                                                 "cachedResultName":  "businesses"
+                                                                             },
+                                                               "options":  {
+                                                                               "queryName":  "match_businesses"
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             704,
+                                                             -144
+                                                         ],
+                                            "id":  "94be65a6-08ea-4d89-83ca-a6bcf308f885",
+                                            "name":  "Supabase Vector Store",
+                                            "credentials":  {
+                                                                "supabaseApi":  {
+                                                                                    "id":  "LDxFD9W6GptVhQ5a",
+                                                                                    "name":  "Supabase account"
+                                                                                }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "=사용자 검색어: {{ $(\u0027Edit Fields\u0027).item.json.request }}\n현재 토론토 시간: {{ $(\u0027Date \u0026 Time\u0027).item.json.currentDate }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "너는 토론토 한인 상권 업소록 검색을 돕는 카카오톡 AI 챗봇이다.\n사용자의 질문을 분석하여, 연결된 검색 도구(Tool)를 사용해 데이터베이스에서 업소 정보를 조회하고 답변하라.\n\n[데이터베이스(DB) 환경]\n- 상호명(Name) 및 설명(About): 한글/영문 혼용\n- 카테고리(Category): 주로 한글\n- 주소(Address): 영문\n\n[검색 도구(Tool) 호출 규칙]\n- 단어 축약 금지: 단일 명사로 자르지 말고, 지역명, 업종, 특징이 모두 포함된 자연스러운 한국어 구문이나 문장 형태를 그대로 파라미터로 전달한다.\n- 지역명 영문 병기 (핵심): 주소가 영문으로 되어 있으므로, 질문에 토론토 주요 지명이나 도로명(예: 핀치, 영, 노스욕, 스틸스)이 포함된 경우 한국어 문맥 뒤에 해당 지명의 영문명(Finch, Yonge, North York, Steeles)을 반드시 추가하여 전달한다.\n  * 예시: \"핀치역 근처 치킨집\" -\u003e \"핀치역 근처 치킨집 Finch\"\n  * 예시: \"노스욕 영스트릿 고깃집\" -\u003e \"노스욕 영스트릿 고깃집 North York Yonge\"\n- 오타 자체 교정: 사용자 입력에 오타나 잘못된 발음(예: \u0027휜치\u0027)이 포함된 경우, 정확한 표준어(예: \u0027핀치\u0027)로 문맥을 교정한 후 도구에 전달한다.\n- 툴 호출 포맷 준수: 내부적으로 검색 도구를 호출할 때는 반드시 툴이 요구하는 JSON Object 형식(예: {\"query\": \"검색어\"})을 사용해야 한다.\n\n[응답 출력 규칙]\n- 검색 성공: 반환된 결과의 상호명, 주소, 연락처, 카테고리를 읽기 쉽게 요약하여 자연스러운 한국어로 안내한다.\n- 검색 실패: 벡터 검색 결과가 없으면 \"요청하신 조건에 맞는 업소를 찾지 못했습니다.\"라고만 안내한다.\n- 최종 출력 포맷: 사용자에게 최종 답변을 제공할 때는 카카오톡에서 읽기 편한 일반 텍스트(자연어) 형태로만 응답한다. 최종 응답은 반드시 카카오톡에서 읽기 편한 자연스러운 한국어 평문으로만 작성하라\n\n[제한 사항] 검색 도구(Tool)는 반드시 단 한 번만 호출하라. 도구에서 결과가 반환되면 추가 검색을 시도하지 말고, 그 즉시 요약하여 최종 답변을 생성하라.\n\n[출력형식] 카카오톡 출력용이므로 마크다운 기호(, #,** 등)를 절대 사용하지 말고 플레인 텍스트나 JSON 형식으로만 출력하라\n\n[업소 출력 필수 포맷]\n1. 업소명\n- 주소: [정확한 도로명 주소]\n- 전화: [전화번호]\n- 웹: [웹사이트 URL]",
+                                                                               "maxIterations":  2
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             448,
+                                                             -320
+                                                         ],
+                                            "id":  "23624b7f-43eb-4875-bfaa-158d8320bcc5",
+                                            "name":  "AI Agent"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "value":  "gpt-4o-mini",
+                                                                             "mode":  "list",
+                                                                             "cachedResultName":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             384,
+                                                             -160
+                                                         ],
+                                            "id":  "0a8a1de3-0fdf-4268-9a87-6b31fdec18d8",
+                                            "name":  "OpenAI Chat Model",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            }
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "={{ $(\u0027Webhook-kakao channel\u0027).item.json.body.userRequest.callbackUrl }}",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ $json }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             1008,
+                                                             -320
+                                                         ],
+                                            "id":  "d299a24b-bae4-4f7b-a2d5-9d261c850875",
+                                            "name":  "HTTP Request1"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "{\n  \"useCallback\": true\n}",
+                                                               "options":  {
+                                                                               "responseCode":  200
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             -176,
+                                                             -320
+                                                         ],
+                                            "id":  "80c7b470-364d-4fab-ba81-d4cba5fc7153",
+                                            "name":  "Respond to Webhook"
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "httpMethod":  "POST",
+                                                               "path":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                                                               "responseMode":  "responseNode",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.webhook",
+                                            "typeVersion":  2.1,
+                                            "position":  [
+                                                             1328,
+                                                             176
+                                                         ],
+                                            "id":  "c21d6ce2-1a02-4afc-bf51-5829a2edf4f0",
+                                            "name":  "Webhook-kakao channel1",
+                                            "webhookId":  "0dc8f4a4-f8f6-4b0d-aeb5-48cfd9301f11",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**kakao channel 이름**\n토론토 AI업소록",
+                                                               "height":  224,
+                                                               "width":  368
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             1184,
+                                                             112
+                                                         ],
+                                            "id":  "9b712257-c5b2-428b-859a-6c833137de16",
+                                            "name":  "Sticky Note3",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "assignments":  {
+                                                                                   "assignments":  [
+                                                                                                       {
+                                                                                                           "id":  "465aabc5-be06-476f-8c58-aa047ea474d8",
+                                                                                                           "name":  "request",
+                                                                                                           "value":  "={{ $json.body.userRequest.utterance }}",
+                                                                                                           "type":  "string"
+                                                                                                       }
+                                                                                                   ]
+                                                                               },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.set",
+                                            "typeVersion":  3.4,
+                                            "position":  [
+                                                             1904,
+                                                             176
+                                                         ],
+                                            "id":  "3047411a-f56b-4f61-9a79-1ee2c8c310cc",
+                                            "name":  "Edit Fields1",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+                                                                               "includeInputFields":  false,
+                                                                               "timezone":  "America/Toronto"
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.dateTime",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             2096,
+                                                             176
+                                                         ],
+                                            "id":  "8d5237c3-1994-4a67-b697-9d981b4944b1",
+                                            "name":  "Date \u0026 Time1",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "jsCode":  "// AI 응답 텍스트의 정확한 JSON 경로로 수정 (복잡한 배열 인덱스 제거)\nlet aiResponse = $input.first().json.output || \"검색된 결과가 없습니다.\";\n\n// 카카오 규격에 맞춘 JSON 구조 반환\nreturn {\n  json: {\n    \"version\": \"2.0\",\n    \"template\": {\n      \"outputs\": [\n        {\n          \"simpleText\": {\n            \"text\": aiResponse\n          }\n        }\n      ]\n    }\n  }\n};"
+                                                           },
+                                            "type":  "n8n-nodes-base.code",
+                                            "typeVersion":  2,
+                                            "position":  [
+                                                             2608,
+                                                             176
+                                                         ],
+                                            "id":  "beca90c9-8fa7-461e-906b-842da85aa463",
+                                            "name":  "Code in JavaScript3",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                                            "typeVersion":  1.2,
+                                            "position":  [
+                                                             2384,
+                                                             464
+                                                         ],
+                                            "id":  "e5bdda6e-3063-4eca-84bc-43dbfd3309d3",
+                                            "name":  "Embeddings OpenAI1",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "mode":  "retrieve-as-tool",
+                                                               "toolDescription":  "토론토 한인 소상공인, 비즈니스, 변호사 등의 업체 정보를 검색할 때 사용. (Input must be a valid JSON object containing a \u0027query\u0027 key with the search string.)",
+                                                               "tableName":  {
+                                                                                 "__rl":  true,
+                                                                                 "value":  "businesses",
+                                                                                 "mode":  "list",
+                                                                                 "cachedResultName":  "businesses"
+                                                                             },
+                                                               "options":  {
+                                                                               "queryName":  "match_businesses"
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             2512,
+                                                             352
+                                                         ],
+                                            "id":  "e5ea7ab0-cfdd-4918-b5fd-85861de071a4",
+                                            "name":  "Supabase Vector Store1",
+                                            "credentials":  {
+                                                                "supabaseApi":  {
+                                                                                    "id":  "LDxFD9W6GptVhQ5a",
+                                                                                    "name":  "Supabase account"
+                                                                                }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "promptType":  "define",
+                                                               "text":  "=사용자 검색어: {{ $(\u0027Edit Fields1\u0027).item.json.request }}\n현재 토론토 시간: {{ $(\u0027Date \u0026 Time1\u0027).item.json.currentDate }}",
+                                                               "options":  {
+                                                                               "systemMessage":  "너는 토론토 한인 상권 업소록 검색을 돕는 카카오톡 AI 챗봇이다.\n사용자의 질문을 분석하여, 연결된 검색 도구(Tool)를 사용해 데이터베이스에서 업소 정보를 조회하고 답변하라.\n\n[데이터베이스(DB) 환경]\n- 상호명(Name) 및 설명(About): 한글/영문 혼용\n- 카테고리(Category): 주로 한글\n- 주소(Address): 영문\n\n[검색 도구(Tool) 호출 규칙]\n- 단어 축약 금지: 단일 명사로 자르지 말고, 지역명, 업종, 특징이 모두 포함된 자연스러운 한국어 구문이나 문장 형태를 그대로 파라미터로 전달한다.\n- 지역명 영문 병기 (핵심): 주소가 영문으로 되어 있으므로, 질문에 토론토 주요 지명이나 도로명(예: 핀치, 영, 노스욕, 스틸스)이 포함된 경우 한국어 문맥 뒤에 해당 지명의 영문명(Finch, Yonge, North York, Steeles)을 반드시 추가하여 전달한다.\n  * 예시: \"핀치역 근처 치킨집\" -\u003e \"핀치역 근처 치킨집 Finch\"\n  * 예시: \"노스욕 영스트릿 고깃집\" -\u003e \"노스욕 영스트릿 고깃집 North York Yonge\"\n- 오타 자체 교정: 사용자 입력에 오타나 잘못된 발음(예: \u0027휜치\u0027)이 포함된 경우, 정확한 표준어(예: \u0027핀치\u0027)로 문맥을 교정한 후 도구에 전달한다.\n- 툴 호출 포맷 준수: 내부적으로 검색 도구를 호출할 때는 반드시 툴이 요구하는 JSON Object 형식(예: {\"query\": \"검색어\"})을 사용해야 한다.\n\n[응답 출력 규칙]\n- 검색 성공: 반환된 결과의 상호명, 주소, 연락처, 카테고리를 읽기 쉽게 요약하여 자연스러운 한국어로 안내한다.\n- 검색 실패: 벡터 검색 결과가 없으면 \"요청하신 조건에 맞는 업소를 찾지 못했습니다.\"라고만 안내한다.\n- 최종 출력 포맷: 사용자에게 최종 답변을 제공할 때는 카카오톡에서 읽기 편한 일반 텍스트(자연어) 형태로만 응답한다. 최종 응답은 반드시 카카오톡에서 읽기 편한 자연스러운 한국어 평문으로만 작성하라\n\n[제한 사항] 검색 도구(Tool)는 반드시 단 한 번만 호출하라. 도구에서 결과가 반환되면 추가 검색을 시도하지 말고, 그 즉시 요약하여 최종 답변을 생성하라.",
+                                                                               "maxIterations":  2
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.agent",
+                                            "typeVersion":  3.1,
+                                            "position":  [
+                                                             2256,
+                                                             176
+                                                         ],
+                                            "id":  "4fb7aeb8-282c-4678-8ec4-baa507664801",
+                                            "name":  "AI Agent1",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "model":  {
+                                                                             "__rl":  true,
+                                                                             "value":  "gpt-4o-mini",
+                                                                             "mode":  "list",
+                                                                             "cachedResultName":  "gpt-4o-mini"
+                                                                         },
+                                                               "builtInTools":  {
+
+                                                                                },
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+                                            "typeVersion":  1.3,
+                                            "position":  [
+                                                             2192,
+                                                             336
+                                                         ],
+                                            "id":  "2fb68f15-2b63-4fb9-bf5c-bea65d6c6c6e",
+                                            "name":  "OpenAI Chat Model1",
+                                            "credentials":  {
+                                                                "openAiApi":  {
+                                                                                  "id":  "LpurHLLxN4l8QZpP",
+                                                                                  "name":  "OpenAI account"
+                                                                              }
+                                                            },
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "method":  "POST",
+                                                               "url":  "={{ $(\u0027Webhook-kakao channel1\u0027).item.json.body.userRequest.callbackUrl }}",
+                                                               "sendBody":  true,
+                                                               "specifyBody":  "json",
+                                                               "jsonBody":  "={{ $json }}",
+                                                               "options":  {
+
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.httpRequest",
+                                            "typeVersion":  4.4,
+                                            "position":  [
+                                                             2816,
+                                                             176
+                                                         ],
+                                            "id":  "c8d2b126-0d59-48cc-81d0-0943c3912ab4",
+                                            "name":  "HTTP Request2",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "respondWith":  "json",
+                                                               "responseBody":  "{\n  \"useCallback\": true\n}",
+                                                               "options":  {
+                                                                               "responseCode":  200
+                                                                           }
+                                                           },
+                                            "type":  "n8n-nodes-base.respondToWebhook",
+                                            "typeVersion":  1.5,
+                                            "position":  [
+                                                             1632,
+                                                             176
+                                                         ],
+                                            "id":  "839fe740-2d80-4ee3-a568-b55d1ed7a396",
+                                            "name":  "Respond to Webhook1",
+                                            "disabled":  true
+                                        },
+                                        {
+                                            "parameters":  {
+                                                               "content":  "**BACKUP**",
+                                                               "height":  640,
+                                                               "width":  2000,
+                                                               "color":  4
+                                                           },
+                                            "type":  "n8n-nodes-base.stickyNote",
+                                            "typeVersion":  1,
+                                            "position":  [
+                                                             1104,
+                                                             -16
+                                                         ],
+                                            "id":  "cb862415-6cb0-4123-82b2-a753e71f9713",
+                                            "name":  "Sticky Note4",
+                                            "disabled":  true
+                                        }
+                                    ],
+                          "connections":  {
+                                              "Webhook-kakao channel":  {
+                                                                            "main":  [
+                                                                                         [
+                                                                                             {
+                                                                                                 "node":  "Respond to Webhook",
+                                                                                                 "type":  "main",
+                                                                                                 "index":  0
+                                                                                             }
+                                                                                         ]
+                                                                                     ]
+                                                                        },
+                                              "Edit Fields":  {
+                                                                  "main":  [
+                                                                               [
+                                                                                   {
+                                                                                       "node":  "Date \u0026 Time",
+                                                                                       "type":  "main",
+                                                                                       "index":  0
+                                                                                   }
+                                                                               ]
+                                                                           ]
+                                                              },
+                                              "Date \u0026 Time":  {
+                                                                       "main":  [
+                                                                                    [
+                                                                                        {
+                                                                                            "node":  "AI Agent",
+                                                                                            "type":  "main",
+                                                                                            "index":  0
+                                                                                        }
+                                                                                    ]
+                                                                                ]
+                                                                   },
+                                              "Get many documents":  {
+                                                                         "main":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "Code in JavaScript1",
+                                                                                              "type":  "main",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                     },
+                                              "Code in JavaScript1":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Create a row",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Get many rows":  {
+                                                                    "main":  [
+                                                                                 [
+                                                                                     {
+                                                                                         "node":  "Code in JavaScript2",
+                                                                                         "type":  "main",
+                                                                                         "index":  0
+                                                                                     }
+                                                                                 ]
+                                                                             ]
+                                                                },
+                                              "Code in JavaScript2":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "HTTP Request",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "HTTP Request":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Update a row",
+                                                                                        "type":  "main",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                                              "When clicking ‘Execute workflow’":  {
+                                                                                       "main":  [
+                                                                                                    [
+                                                                                                        {
+                                                                                                            "node":  "Get many rows",
+                                                                                                            "type":  "main",
+                                                                                                            "index":  0
+                                                                                                        }
+                                                                                                    ]
+                                                                                                ]
+                                                                                   },
+                                              "Embeddings OpenAI":  {
+                                                                        "ai_embedding":  [
+                                                                                             [
+                                                                                                 {
+                                                                                                     "node":  "Supabase Vector Store",
+                                                                                                     "type":  "ai_embedding",
+                                                                                                     "index":  0
+                                                                                                 }
+                                                                                             ]
+                                                                                         ]
+                                                                    },
+                                              "Supabase Vector Store":  {
+                                                                            "ai_tool":  [
+                                                                                            [
+                                                                                                {
+                                                                                                    "node":  "AI Agent",
+                                                                                                    "type":  "ai_tool",
+                                                                                                    "index":  0
+                                                                                                }
+                                                                                            ]
+                                                                                        ]
+                                                                        },
+                                              "OpenAI Chat Model":  {
+                                                                        "ai_languageModel":  [
+                                                                                                 [
+                                                                                                     {
+                                                                                                         "node":  "AI Agent",
+                                                                                                         "type":  "ai_languageModel",
+                                                                                                         "index":  0
+                                                                                                     }
+                                                                                                 ]
+                                                                                             ]
+                                                                    },
+                                              "AI Agent":  {
+                                                               "main":  [
+                                                                            [
+                                                                                {
+                                                                                    "node":  "Code in JavaScript",
+                                                                                    "type":  "main",
+                                                                                    "index":  0
+                                                                                }
+                                                                            ]
+                                                                        ]
+                                                           },
+                                              "Code in JavaScript":  {
+                                                                         "main":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "HTTP Request1",
+                                                                                              "type":  "main",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                     },
+                                              "Respond to Webhook":  {
+                                                                         "main":  [
+                                                                                      [
+                                                                                          {
+                                                                                              "node":  "Edit Fields",
+                                                                                              "type":  "main",
+                                                                                              "index":  0
+                                                                                          }
+                                                                                      ]
+                                                                                  ]
+                                                                     },
+                                              "Webhook-kakao channel1":  {
+                                                                             "main":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "Respond to Webhook1",
+                                                                                                  "type":  "main",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                                         },
+                                              "Edit Fields1":  {
+                                                                   "main":  [
+                                                                                [
+                                                                                    {
+                                                                                        "node":  "Date \u0026 Time1",
+                                                                                        "type":  "main",
+                                                                                        "index":  0
+                                                                                    }
+                                                                                ]
+                                                                            ]
+                                                               },
+                                              "Date \u0026 Time1":  {
+                                                                        "main":  [
+                                                                                     [
+                                                                                         {
+                                                                                             "node":  "AI Agent1",
+                                                                                             "type":  "main",
+                                                                                             "index":  0
+                                                                                         }
+                                                                                     ]
+                                                                                 ]
+                                                                    },
+                                              "Code in JavaScript3":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "HTTP Request2",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      },
+                                              "Embeddings OpenAI1":  {
+                                                                         "ai_embedding":  [
+                                                                                              [
+                                                                                                  {
+                                                                                                      "node":  "Supabase Vector Store1",
+                                                                                                      "type":  "ai_embedding",
+                                                                                                      "index":  0
+                                                                                                  }
+                                                                                              ]
+                                                                                          ]
+                                                                     },
+                                              "Supabase Vector Store1":  {
+                                                                             "ai_tool":  [
+                                                                                             [
+                                                                                                 {
+                                                                                                     "node":  "AI Agent1",
+                                                                                                     "type":  "ai_tool",
+                                                                                                     "index":  0
+                                                                                                 }
+                                                                                             ]
+                                                                                         ]
+                                                                         },
+                                              "AI Agent1":  {
+                                                                "main":  [
+                                                                             [
+                                                                                 {
+                                                                                     "node":  "Code in JavaScript3",
+                                                                                     "type":  "main",
+                                                                                     "index":  0
+                                                                                 }
+                                                                             ]
+                                                                         ]
+                                                            },
+                                              "OpenAI Chat Model1":  {
+                                                                         "ai_languageModel":  [
+                                                                                                  [
+                                                                                                      {
+                                                                                                          "node":  "AI Agent1",
+                                                                                                          "type":  "ai_languageModel",
+                                                                                                          "index":  0
+                                                                                                      }
+                                                                                                  ]
+                                                                                              ]
+                                                                     },
+                                              "Respond to Webhook1":  {
+                                                                          "main":  [
+                                                                                       [
+                                                                                           {
+                                                                                               "node":  "Edit Fields1",
+                                                                                               "type":  "main",
+                                                                                               "index":  0
+                                                                                           }
+                                                                                       ]
+                                                                                   ]
+                                                                      }
+                                          },
+                          "nodeGroups":  [
+
+                                         ],
+                          "authors":  "Jini Byun",
+                          "name":  "Version 53c6b512",
+                          "description":  "",
+                          "autosaved":  false,
+                          "workflowPublishHistory":  [
+                                                         {
+                                                             "createdAt":  "2026-08-07T02:27:26.344Z",
+                                                             "id":  85,
+                                                             "workflowId":  "wuHtOkbwYHS8dpB2",
+                                                             "versionId":  "53c6b512-5adf-4009-b0a3-f490b6f2c63e",
+                                                             "event":  "activated",
+                                                             "userId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                                         }
+                                                     ]
+                      }
+}

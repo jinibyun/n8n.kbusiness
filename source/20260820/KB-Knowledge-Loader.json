@@ -1,0 +1,667 @@
+﻿{
+    "updatedAt":  "2026-07-30T20:07:34.266Z",
+    "createdAt":  "2026-07-30T20:03:38.632Z",
+    "id":  "F0RQZEDMCrjR6rpa",
+    "name":  "KB-Knowledge-Loader",
+    "description":  null,
+    "active":  false,
+    "isArchived":  false,
+    "nodes":  [
+                  {
+                      "parameters":  {
+                                         "content":  "## 최초가 아닌 2 번째 부터\n**원본 데이터** 로드 - **Text File** Upload",
+                                         "height":  272,
+                                         "width":  560
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -3344,
+                                       -752
+                                   ],
+                      "id":  "7ca26c9c-2e05-435e-9b77-82e8c23ddfb0",
+                      "name":  "Sticky Note"
+                  },
+                  {
+                      "parameters":  {
+                                         "chunkSize":  50,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1008,
+                                       -64
+                                   ],
+                      "id":  "d40ca09c-f496-4323-aff5-409dbaff2219",
+                      "name":  "Recursive Character Text Splitter"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       -1216,
+                                       -272
+                                   ],
+                      "id":  "9479ec73-5477-4051-8f4f-07404ab0c727",
+                      "name":  "Embeddings OpenAI",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "insert",
+                                         "qdrantCollection":  {
+                                                                  "__rl":  true,
+                                                                  "value":  "my_business",
+                                                                  "mode":  "id"
+                                                              },
+                                         "embeddingBatchSize":  1000,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -1184,
+                                       -496
+                                   ],
+                      "id":  "a8533a8f-e493-4286-8eca-03d565b0b346",
+                      "name":  "Qdrant Vector Store",
+                      "credentials":  {
+                                          "qdrantApi":  {
+                                                            "id":  "38FZYAovbavrkGDf",
+                                                            "name":  "Qdrant account - cloud"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsonMode":  "expressionData",
+                                         "jsonData":  "={{ $(\u0027Edit Fields\u0027).item.json.text }}",
+                                         "textSplittingMode":  "custom",
+                                         "options":  {
+                                                         "metadata":  {
+                                                                          "metadataValues":  [
+                                                                                                 {
+                                                                                                     "name":  "file_name",
+                                                                                                     "value":  "={{ $(\u0027Edit Fields\u0027).item.json.file_name }}"
+                                                                                                 }
+                                                                                             ]
+                                                                      }
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -1088,
+                                       -272
+                                   ],
+                      "id":  "ee5bdff0-3e8c-423d-9f35-ca7c7c30f5b9",
+                      "name":  "Default Data Loader"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**전처리 파이프라인(도우미)**\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nDefault Data Loader: 일반 텍스트 데이터를 AI/Langchain 생태계의 표준 규격인 \u0027문서(Document)\u0027 형태로 포장한다.\n\nRecursive Character Text Splitter: 긴 텍스트를 검색과 의미 분석에 최적화된 작은 조각(Chunk)으로 잘게 쪼갠다.\n\nEmbeddings OpenAI: 쪼개진 텍스트 조각을 기계가 이해하고 유사도를 계산할 수 있는 \u0027숫자 좌표(벡터)\u0027로 변환한다.",
+                                         "height":  800,
+                                         "width":  832
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -1440,
+                                       -592
+                                   ],
+                      "id":  "631c2b7b-4686-4e3c-a72a-e6b90c0458d4",
+                      "name":  "Sticky Note1"
+                  },
+                  {
+                      "parameters":  {
+                                         "formTitle":  "문서 업로드",
+                                         "formFields":  {
+                                                            "values":  [
+                                                                           {
+                                                                               "fieldLabel":  "data",
+                                                                               "fieldType":  "file"
+                                                                           }
+                                                                       ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.formTrigger",
+                      "typeVersion":  2.6,
+                      "position":  [
+                                       -3184,
+                                       -640
+                                   ],
+                      "id":  "00edf0bb-e151-47b8-9934-9e0a3278cd48",
+                      "name":  "On form submission",
+                      "webhookId":  "3a619ac1-5db6-4b09-be32-71d3c03c6aba"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "text",
+                                         "destinationKey":  "text",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -2960,
+                                       -640
+                                   ],
+                      "id":  "ba92b9c1-2872-447f-9b8b-8ff194ecc91b",
+                      "name":  "Extract from File1"
+                  },
+                  {
+                      "parameters":  {
+                                         "resource":  "point",
+                                         "operation":  "deletePoints",
+                                         "collectionName":  {
+                                                                "__rl":  true,
+                                                                "value":  "my_business",
+                                                                "mode":  "list",
+                                                                "cachedResultName":  "my_business"
+                                                            },
+                                         "points":  "=",
+                                         "filter":  "={\n  \"must\": [\n    {\n      \"key\": \"metadata.file_name\",\n      \"match\": {\n        \"value\": \"{{ $json.file_name }}\"\n      }\n    }\n  ]\n}",
+                                         "shardKey":  "",
+                                         "requestOptions":  {
+
+                                                            }
+                                     },
+                      "type":  "n8n-nodes-qdrant.qdrant",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2064,
+                                       -112
+                                   ],
+                      "id":  "628b8f12-37e5-4511-8da6-82e01f0e9ee8",
+                      "name":  "Delete Points",
+                      "credentials":  {
+                                          "qdrantRestApi":  {
+                                                                "id":  "rcegCv2ctMhR2TIx",
+                                                                "name":  "Qdrant account - cloud"
+                                                            }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "",
+                                         "height":  288,
+                                         "width":  544,
+                                         "color":  4
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2272,
+                                       -192
+                                   ],
+                      "id":  "45fbcf76-f8e7-4f63-be94-76bd60662f12",
+                      "name":  "Sticky Note4"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "**Point 삭제 전에 반드시 한 번 실행해야 할것(Collection 생성 후 딱 한 번만)**  \n\n(오른 쪽의 HttpRequest 를 단독으로 실행을 하던지 혹은)\n\n1. Console 접속: Qdrant Web UI 좌측 메뉴에서 Console을 클릭한다.\n2. \nPUT /collections/my_business/index\n{\n  \"field_name\": \"metadata.file_hash\",\n  \"field_schema\": \"keyword\"\n}\n\n3. 실행\n4. 완료 확인: 우측 응답 창에 \"status\": \"ok\" 메시지가 출력되면 인덱스 생성이 완료",
+                                         "height":  688,
+                                         "width":  672,
+                                         "color":  6
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -2352,
+                                       -544
+                                   ],
+                      "id":  "bffbce28-baa3-46d9-a30b-13b58873af22",
+                      "name":  "Sticky Note7"
+                  },
+                  {
+                      "parameters":  {
+                                         "method":  "PUT",
+                                         "url":  "https://c419d824-7fd1-4953-81be-aab5aa52168b.us-east4-0.gcp.cloud.qdrant.io/collections/my_business/index",
+                                         "authentication":  "predefinedCredentialType",
+                                         "nodeCredentialType":  "qdrantApi",
+                                         "sendBody":  true,
+                                         "specifyBody":  "json",
+                                         "jsonBody":  "{\n  \"field_name\": \"metadata.file_name\",\n  \"field_schema\": \"keyword\"\n}",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.httpRequest",
+                      "typeVersion":  4.4,
+                      "position":  [
+                                       -1808,
+                                       -496
+                                   ],
+                      "id":  "c31e2f57-e1e1-4a87-9b9e-d431ae59494f",
+                      "name":  "HTTP Request",
+                      "credentials":  {
+                                          "qdrantApi":  {
+                                                            "id":  "38FZYAovbavrkGDf",
+                                                            "name":  "Qdrant account - cloud"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "ba5361ca-3f54-4bdf-8cd9-5eff2562643e",
+                                                                                     "name":  "text",
+                                                                                     "value":  "={{ $json.text }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "19a683ce-f987-43f6-9a4a-35baf62d7e57",
+                                                                                     "name":  "file_name",
+                                                                                     "value":  "={{ $(\u0027On form submission\u0027).item.json.data[0].filename }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "includeOtherFields":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       -2624,
+                                       -496
+                                   ],
+                      "id":  "b087914d-8cc7-466b-9efd-bf3104677d5b",
+                      "name":  "Edit Fields"
+                  },
+                  {
+                      "parameters":  {
+                                         "content":  "## 최초 1회만 생성하도록 한다",
+                                         "height":  272,
+                                         "width":  928
+                                     },
+                      "type":  "n8n-nodes-base.stickyNote",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -3360,
+                                       -1296
+                                   ],
+                      "id":  "6edcb2c3-9f99-4f8e-83c8-5ac796fc7918",
+                      "name":  "Sticky Note2"
+                  },
+                  {
+                      "parameters":  {
+                                         "formTitle":  "문서 업로드",
+                                         "formFields":  {
+                                                            "values":  [
+                                                                           {
+                                                                               "fieldLabel":  "data",
+                                                                               "fieldType":  "file"
+                                                                           }
+                                                                       ]
+                                                        },
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.formTrigger",
+                      "typeVersion":  2.6,
+                      "position":  [
+                                       -3216,
+                                       -1216
+                                   ],
+                      "id":  "9b24dd8a-3e01-4c37-8d77-39d9e29da021",
+                      "name":  "On form submission1",
+                      "webhookId":  "a93cf68b-1381-4e65-9c0b-6535e26a16cc"
+                  },
+                  {
+                      "parameters":  {
+                                         "operation":  "text",
+                                         "destinationKey":  "text",
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.extractFromFile",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -2992,
+                                       -1216
+                                   ],
+                      "id":  "e8a129af-4ff6-457c-88ae-0ecadba1265d",
+                      "name":  "Extract from File"
+                  },
+                  {
+                      "parameters":  {
+                                         "assignments":  {
+                                                             "assignments":  [
+                                                                                 {
+                                                                                     "id":  "ba5361ca-3f54-4bdf-8cd9-5eff2562643e",
+                                                                                     "name":  "text",
+                                                                                     "value":  "={{ $json.text }}",
+                                                                                     "type":  "string"
+                                                                                 },
+                                                                                 {
+                                                                                     "id":  "19a683ce-f987-43f6-9a4a-35baf62d7e57",
+                                                                                     "name":  "file_name",
+                                                                                     "value":  "={{ $(\u0027On form submission1\u0027).item.json.data[0].filename }}",
+                                                                                     "type":  "string"
+                                                                                 }
+                                                                             ]
+                                                         },
+                                         "includeOtherFields":  true,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "n8n-nodes-base.set",
+                      "typeVersion":  3.4,
+                      "position":  [
+                                       -2752,
+                                       -1216
+                                   ],
+                      "id":  "699bb1be-f805-4637-aa8b-8fd43c833728",
+                      "name":  "Edit Fields1"
+                  },
+                  {
+                      "parameters":  {
+                                         "chunkSize":  50,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+                      "typeVersion":  1,
+                      "position":  [
+                                       -992,
+                                       -896
+                                   ],
+                      "id":  "b2b2d24a-15e3-4803-98f9-0a26b7505966",
+                      "name":  "Recursive Character Text Splitter1"
+                  },
+                  {
+                      "parameters":  {
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+                      "typeVersion":  1.2,
+                      "position":  [
+                                       -1280,
+                                       -1040
+                                   ],
+                      "id":  "8d4ba8d9-56d0-4d73-88b4-d3539e5a89c8",
+                      "name":  "Embeddings OpenAI1",
+                      "credentials":  {
+                                          "openAiApi":  {
+                                                            "id":  "LpurHLLxN4l8QZpP",
+                                                            "name":  "OpenAI account"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "mode":  "insert",
+                                         "qdrantCollection":  {
+                                                                  "__rl":  true,
+                                                                  "value":  "my_business",
+                                                                  "mode":  "id"
+                                                              },
+                                         "embeddingBatchSize":  1000,
+                                         "options":  {
+
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+                      "typeVersion":  1.3,
+                      "position":  [
+                                       -1248,
+                                       -1216
+                                   ],
+                      "id":  "69a17c89-3807-4217-80f3-815a5fd83c50",
+                      "name":  "Qdrant Vector Store1",
+                      "credentials":  {
+                                          "qdrantApi":  {
+                                                            "id":  "38FZYAovbavrkGDf",
+                                                            "name":  "Qdrant account - cloud"
+                                                        }
+                                      }
+                  },
+                  {
+                      "parameters":  {
+                                         "jsonMode":  "expressionData",
+                                         "jsonData":  "={{ $json.text }}",
+                                         "textSplittingMode":  "custom",
+                                         "options":  {
+                                                         "metadata":  {
+                                                                          "metadataValues":  [
+                                                                                                 {
+                                                                                                     "name":  "file_name",
+                                                                                                     "value":  "={{ $json.file_name }}"
+                                                                                                 }
+                                                                                             ]
+                                                                      }
+                                                     }
+                                     },
+                      "type":  "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+                      "typeVersion":  1.1,
+                      "position":  [
+                                       -1152,
+                                       -1040
+                                   ],
+                      "id":  "694a571f-562c-47db-bfc3-14e5b45eebb5",
+                      "name":  "Default Data Loader1"
+                  }
+              ],
+    "connections":  {
+                        "Embeddings OpenAI":  {
+                                                  "ai_embedding":  [
+                                                                       [
+                                                                           {
+                                                                               "node":  "Qdrant Vector Store",
+                                                                               "type":  "ai_embedding",
+                                                                               "index":  0
+                                                                           }
+                                                                       ]
+                                                                   ]
+                                              },
+                        "Default Data Loader":  {
+                                                    "ai_document":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Qdrant Vector Store",
+                                                                                "type":  "ai_document",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                                },
+                        "Recursive Character Text Splitter":  {
+                                                                  "ai_textSplitter":  [
+                                                                                          [
+                                                                                              {
+                                                                                                  "node":  "Default Data Loader",
+                                                                                                  "type":  "ai_textSplitter",
+                                                                                                  "index":  0
+                                                                                              }
+                                                                                          ]
+                                                                                      ]
+                                                              },
+                        "On form submission":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Extract from File1",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Extract from File1":  {
+                                                   "main":  [
+                                                                [
+                                                                    {
+                                                                        "node":  "Edit Fields",
+                                                                        "type":  "main",
+                                                                        "index":  0
+                                                                    }
+                                                                ]
+                                                            ]
+                                               },
+                        "Delete Points":  {
+                                              "main":  [
+                                                           [
+                                                               {
+                                                                   "node":  "Qdrant Vector Store",
+                                                                   "type":  "main",
+                                                                   "index":  0
+                                                               }
+                                                           ]
+                                                       ]
+                                          },
+                        "Edit Fields":  {
+                                            "main":  [
+                                                         [
+                                                             {
+                                                                 "node":  "Delete Points",
+                                                                 "type":  "main",
+                                                                 "index":  0
+                                                             }
+                                                         ]
+                                                     ]
+                                        },
+                        "On form submission1":  {
+                                                    "main":  [
+                                                                 [
+                                                                     {
+                                                                         "node":  "Extract from File",
+                                                                         "type":  "main",
+                                                                         "index":  0
+                                                                     }
+                                                                 ]
+                                                             ]
+                                                },
+                        "Extract from File":  {
+                                                  "main":  [
+                                                               [
+                                                                   {
+                                                                       "node":  "Edit Fields1",
+                                                                       "type":  "main",
+                                                                       "index":  0
+                                                                   }
+                                                               ]
+                                                           ]
+                                              },
+                        "Edit Fields1":  {
+                                             "main":  [
+                                                          [
+                                                              {
+                                                                  "node":  "Qdrant Vector Store1",
+                                                                  "type":  "main",
+                                                                  "index":  0
+                                                              }
+                                                          ]
+                                                      ]
+                                         },
+                        "Recursive Character Text Splitter1":  {
+                                                                   "ai_textSplitter":  [
+                                                                                           [
+                                                                                               {
+                                                                                                   "node":  "Default Data Loader1",
+                                                                                                   "type":  "ai_textSplitter",
+                                                                                                   "index":  0
+                                                                                               }
+                                                                                           ]
+                                                                                       ]
+                                                               },
+                        "Embeddings OpenAI1":  {
+                                                   "ai_embedding":  [
+                                                                        [
+                                                                            {
+                                                                                "node":  "Qdrant Vector Store1",
+                                                                                "type":  "ai_embedding",
+                                                                                "index":  0
+                                                                            }
+                                                                        ]
+                                                                    ]
+                                               },
+                        "Default Data Loader1":  {
+                                                     "ai_document":  [
+                                                                         [
+                                                                             {
+                                                                                 "node":  "Qdrant Vector Store1",
+                                                                                 "type":  "ai_document",
+                                                                                 "index":  0
+                                                                             }
+                                                                         ]
+                                                                     ]
+                                                 }
+                    },
+    "settings":  {
+                     "executionOrder":  "v1",
+                     "binaryMode":  "separate",
+                     "availableInMCP":  false
+                 },
+    "staticData":  null,
+    "meta":  {
+                 "templateCredsSetupCompleted":  true
+             },
+    "nodeGroups":  [
+
+                   ],
+    "pinData":  {
+
+                },
+    "versionId":  "69b5a69a-8098-4963-a100-7963db7aa217",
+    "activeVersionId":  null,
+    "versionCounter":  2,
+    "triggerCount":  0,
+    "sourceWorkflowId":  null,
+    "shared":  [
+                   {
+                       "updatedAt":  "2026-07-30T20:03:38.632Z",
+                       "createdAt":  "2026-07-30T20:03:38.632Z",
+                       "role":  "workflow:owner",
+                       "workflowId":  "F0RQZEDMCrjR6rpa",
+                       "projectId":  "2uSiLPUGyNB6hQ5F",
+                       "project":  {
+                                       "updatedAt":  "2026-06-08T01:33:56.100Z",
+                                       "createdAt":  "2026-06-04T14:43:46.810Z",
+                                       "id":  "2uSiLPUGyNB6hQ5F",
+                                       "name":  "Jini Byun \u003cjinibyunsungmin@gmail.com\u003e",
+                                       "type":  "personal",
+                                       "icon":  null,
+                                       "description":  null,
+                                       "customTelemetryTags":  [
+
+                                                               ],
+                                       "creatorId":  "6a5833c3-0671-44df-be31-3ecb353685be"
+                                   }
+                   }
+               ],
+    "tags":  [
+
+             ],
+    "activeVersion":  null
+}

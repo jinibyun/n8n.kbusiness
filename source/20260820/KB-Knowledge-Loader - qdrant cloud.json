@@ -1,11 +1,11 @@
 ﻿{
-    "updatedAt":  "2026-06-29T23:53:09.119Z",
-    "createdAt":  "2026-06-29T18:01:26.365Z",
-    "id":  "THgzh1ZN0JbBLkrr",
-    "name":  "KB-Knowledge-Loader",
+    "updatedAt":  "2026-07-30T20:05:36.295Z",
+    "createdAt":  "2026-07-30T16:11:55.973Z",
+    "id":  "UD3VNIb46DQa3b2V",
+    "name":  "KB-Knowledge-Loader - qdrant cloud",
     "description":  "kbusiness_ai Qdrant 컬렉션에 K Business AI 소개 문서를 적재하는 지식베이스 로더",
     "active":  false,
-    "isArchived":  false,
+    "isArchived":  true,
     "nodes":  [
                   {
                       "parameters":  {
@@ -19,7 +19,7 @@
 
                                                      }
                                      },
-                      "id":  "4ab276ef-0b52-4879-b782-fc83b53b8b9b",
+                      "id":  "09990159-1b15-4fde-9186-3271a71fe619",
                       "name":  "Qdrant 적재 (kbusiness_ai)",
                       "type":  "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
                       "typeVersion":  1.3,
@@ -40,7 +40,7 @@
 
                                                      }
                                      },
-                      "id":  "8e56e841-a2aa-4f77-9c6f-88e008e1e82e",
+                      "id":  "e2650cc9-7798-4c19-83b8-756d4806268a",
                       "name":  "OpenAI Embeddings",
                       "type":  "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
                       "typeVersion":  1.2,
@@ -63,7 +63,7 @@
 
                                                      }
                                      },
-                      "id":  "147817f9-5746-4d5c-9f4b-50860bb0bdef",
+                      "id":  "5570cc2e-cd30-4f48-8612-702a91644c79",
                       "name":  "Recursive Text Splitter",
                       "type":  "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
                       "typeVersion":  1,
@@ -84,7 +84,7 @@
                                        688,
                                        128
                                    ],
-                      "id":  "f374f86b-7c75-45af-aa96-35ace42b479a",
+                      "id":  "c83e0f1f-ca92-4983-92c0-e30967b1ef29",
                       "name":  "Sticky Note"
                   },
                   {
@@ -100,7 +100,8 @@
                                                         },
                                          "options":  {
 
-                                                     }
+                                                     },
+                                         "path":  "7b0d41cc-b481-47e0-873e-67e2be070fa6"
                                      },
                       "type":  "n8n-nodes-base.formTrigger",
                       "typeVersion":  2.6,
@@ -108,9 +109,9 @@
                                        -1664,
                                        192
                                    ],
-                      "id":  "b38df6f2-7095-4a09-ab15-097f7e9944b5",
+                      "id":  "1027e814-d766-41a3-8a97-74ceb08d7318",
                       "name":  "On form submission",
-                      "webhookId":  "e46c7e07-4cb5-4b67-892f-e881e5c219ae"
+                      "webhookId":  "7b0d41cc-b481-47e0-873e-67e2be070fa6"
                   },
                   {
                       "parameters":  {
@@ -126,7 +127,7 @@
                                        -880,
                                        176
                                    ],
-                      "id":  "0a41c583-90f8-41b8-98bf-6ae78e829fdc",
+                      "id":  "30565579-540d-4513-a36e-135efaac5ec7",
                       "name":  "Extract from File1"
                   },
                   {
@@ -150,7 +151,7 @@
                                        -96,
                                        352
                                    ],
-                      "id":  "6f0e62b4-7821-4b03-994c-5b37a225eb37",
+                      "id":  "00654427-8c47-4f97-9574-ef5e763674f3",
                       "name":  "Delete Points",
                       "credentials":  {
                                           "qdrantRestApi":  {
@@ -171,7 +172,7 @@
                                        -512,
                                        288
                                    ],
-                      "id":  "b05a2495-abe1-4f44-953d-e731074825ce",
+                      "id":  "6549c45c-d768-4883-ac8c-409455f615b4",
                       "name":  "Sticky Note2"
                   },
                   {
@@ -185,7 +186,7 @@
                                        -400,
                                        352
                                    ],
-                      "id":  "1a153b81-39fa-4488-9af1-c1f6762fb8fb",
+                      "id":  "bea7fedb-4c99-47c0-89fc-6154b38b579a",
                       "name":  "Crypto"
                   },
                   {
@@ -200,7 +201,7 @@
                                        -160,
                                        288
                                    ],
-                      "id":  "f688271a-973e-49b2-a1e5-7ef4be7e11f4",
+                      "id":  "6f45ac10-ec4b-4689-a142-5eb870be0dd2",
                       "name":  "Sticky Note3"
                   },
                   {
@@ -216,7 +217,7 @@
                                        -544,
                                        192
                                    ],
-                      "id":  "88079e90-b26f-44e2-a721-52e4cfe48b5a",
+                      "id":  "65af1254-0ade-4322-82bf-e5de01af58e3",
                       "name":  "Sticky Note4"
                   },
                   {
@@ -231,7 +232,7 @@
                                        -1712,
                                        -16
                                    ],
-                      "id":  "b81259c6-2bc6-4957-af48-0eb399e0beda",
+                      "id":  "ccad0c00-2aa1-4616-a1c9-2451b1649ac0",
                       "name":  "Sticky Note1"
                   },
                   {
@@ -294,7 +295,7 @@
                                        -1360,
                                        192
                                    ],
-                      "id":  "1f961552-908e-4518-849b-b367873ed8db",
+                      "id":  "008d92a2-5510-453a-a05d-92708d1960c0",
                       "name":  "Switch"
                   },
                   {
@@ -308,7 +309,7 @@
                                        -1104,
                                        512
                                    ],
-                      "id":  "dea92b0a-464a-4231-b134-4118e16da049",
+                      "id":  "ddaf596a-3ccf-4838-84e9-8955c699a2cd",
                       "name":  "Convert a file",
                       "credentials":  {
                                           "cloudConvertApi":  {
@@ -329,7 +330,7 @@
                                        -1424,
                                        48
                                    ],
-                      "id":  "2c7fbd5c-b6e0-4274-bf39-f04d7af23bf1",
+                      "id":  "4bb59bbb-2975-4c58-896f-1996762eb215",
                       "name":  "Sticky Note5"
                   },
                   {
@@ -354,7 +355,7 @@
                                        416,
                                        336
                                    ],
-                      "id":  "7025bcfd-591d-4fe6-b23c-d2628d1938a0",
+                      "id":  "a87cf4d6-e7b8-4694-8a46-71a919b8cd95",
                       "name":  "Default Data Loader1"
                   }
               ],
@@ -468,7 +469,7 @@
                     },
     "settings":  {
                      "executionOrder":  "v1",
-                     "availableInMCP":  true,
+                     "availableInMCP":  false,
                      "binaryMode":  "separate"
                  },
     "staticData":  null,
@@ -483,17 +484,17 @@
     "pinData":  {
 
                 },
-    "versionId":  "b4063316-0303-4373-9cb0-b64450625fca",
+    "versionId":  "2afca0c4-bc39-434a-bb44-1bcfacbb88f3",
     "activeVersionId":  null,
-    "versionCounter":  89,
+    "versionCounter":  1,
     "triggerCount":  0,
     "sourceWorkflowId":  null,
     "shared":  [
                    {
-                       "updatedAt":  "2026-06-29T18:01:26.365Z",
-                       "createdAt":  "2026-06-29T18:01:26.365Z",
+                       "updatedAt":  "2026-07-30T16:11:55.973Z",
+                       "createdAt":  "2026-07-30T16:11:55.973Z",
                        "role":  "workflow:owner",
-                       "workflowId":  "THgzh1ZN0JbBLkrr",
+                       "workflowId":  "UD3VNIb46DQa3b2V",
                        "projectId":  "2uSiLPUGyNB6hQ5F",
                        "project":  {
                                        "updatedAt":  "2026-06-08T01:33:56.100Z",
